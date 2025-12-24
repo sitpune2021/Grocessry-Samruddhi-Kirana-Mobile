@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/core/service/app_startup_service.dart';
-
-import 'onboarding_page.dart';
+import 'package:samruddha_kirana/screens/onboarding/onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,33 +15,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
-  final List<OnboardingPage> _pages = const [
-    OnboardingPage(
-      title: 'Fresh Groceries',
-      description: 'Get fresh groceries delivered to your doorstep.',
-      lottie: 'assets/lottie/Grocery Lottie JSON animation.json',
-    ),
-
-    OnboardingPage(
-      title: 'Fast Delivery',
-      description: 'Quick and reliable delivery anytime.',
-      lottie: 'assets/lottie/Grocery shopping bag pickup and delivery.json',
-    ),
-    OnboardingPage(
-      title: 'Secure Payments',
-      description: 'Safe and trusted payment options.',
-      lottie: 'assets/lottie/Grocery Lottie JSON animation.json',
-    ),
-    OnboardingPage(
-      title: 'Quality Products',
-      description: 'Only the best products for your family.',
-      lottie: 'assets/lottie/Grocery shopping bag pickup and delivery.json',
-    ),
+  final List<Map<String, String>> _pageData = const [
+    {
+      'title': 'Fresh Groceries',
+      'description': 'Get fresh groceries delivered to your doorstep.',
+      'lottie': 'assets/lottie/Grocery Lottie JSON animation.json',
+    },
+    {
+      'title': 'Fast Delivery',
+      'description': 'Quick and reliable delivery anytime.',
+      'lottie': 'assets/lottie/Grocery shopping bag pickup and delivery.json',
+    },
+    {
+      'title': 'Secure Payments',
+      'description': 'Safe and trusted payment options.',
+      'lottie': 'assets/lottie/Grocery Lottie JSON animation.json',
+    },
+    {
+      'title': 'Quality Products',
+      'description': 'Only the best products for your family.',
+      'lottie': 'assets/lottie/Grocery shopping bag pickup and delivery.json',
+    },
   ];
 
   Future<void> _onContinue() async {
-    if (_currentIndex == _pages.length - 1) {
-      // Last screen → finish onboarding
+    if (_currentIndex == _pageData.length - 1) {
       await AppStartupService.setOnboardingSeen();
       if (!mounted) return;
       context.go(Routes.login);
@@ -56,13 +53,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLast = _currentIndex == _pages.length - 1;
+    final isLast = _currentIndex == _pageData.length - 1;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            /// TOP RIGHT SKIP
+            /// SKIP BUTTON
             Align(
               alignment: Alignment.topRight,
               child: TextButton(
@@ -77,12 +74,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             /// PAGE VIEW
             Expanded(
-              child: PageView(
+              child: PageView.builder(
                 controller: _pageController,
+                itemCount: _pageData.length,
                 onPageChanged: (index) {
                   setState(() => _currentIndex = index);
                 },
-                children: _pages,
+                itemBuilder: (context, index) {
+                  final data = _pageData[index];
+                  return OnboardingPage(
+                    title: data['title']!,
+                    description: data['description']!,
+                    lottie: data['lottie']!,
+                    isActive: _currentIndex == index,
+                  );
+                },
               ),
             ),
 
@@ -90,7 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                _pages.length,
+                _pageData.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.all(4),
@@ -106,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             const SizedBox(height: 20),
 
-            /// SINGLE BUTTON (CENTER)
+            /// CONTINUE BUTTON
             Padding(
               padding: const EdgeInsets.all(16),
               child: SizedBox(
