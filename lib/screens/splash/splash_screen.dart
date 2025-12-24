@@ -197,13 +197,6 @@ class _SplashScreenState extends State<SplashScreen>
           ),
 
           /// CENTER LOADER (AFTER ALL ANIMATIONS)
-          // if (_showCenterLoader)
-          //   SizedBox(
-          //     child: const CircularProgressIndicator(
-          //       strokeWidth: 4,
-          //       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-          //     ),
-          //   ),
           if (_showCenterLoader)
             const IgnorePointer(
               ignoring: true,
@@ -233,7 +226,7 @@ class _FeatureItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.blue, size: 22),
