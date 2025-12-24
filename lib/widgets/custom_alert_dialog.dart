@@ -72,7 +72,7 @@ class CustomAlertDialog extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onPrimaryTap,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.border,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(

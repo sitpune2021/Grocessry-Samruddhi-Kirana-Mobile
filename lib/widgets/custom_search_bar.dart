@@ -135,7 +135,9 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppSizes.radius),
             border: Border.all(
-              color: _focusNode.hasFocus ? AppColors.primary : AppColors.border,
+              color: _focusNode.hasFocus
+                  ? AppColors.darkGreen
+                  : AppColors.border,
             ),
           ),
           child: Row(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/core/service/app_startup_service.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -200,12 +201,7 @@ class _SplashScreenState extends State<SplashScreen>
           if (_showCenterLoader)
             const IgnorePointer(
               ignoring: true,
-              child: Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                ),
-              ),
+              child: Center(child: Loader(size: 30, strokeWidth: 3)),
             ),
         ],
       ),
