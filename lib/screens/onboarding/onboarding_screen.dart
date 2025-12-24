@@ -67,8 +67,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: () async {
-                  
                   await AppStartupService.setOnboardingSeen();
+                  if (!context.mounted) return;
                   context.go(Routes.login);
                 },
                 child: const Text('SKIP'),
