@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:samruddha_kirana/screens/profile_screen.dart';
+import 'package:samruddha_kirana/screens/profile/profile_screen.dart';
 
 import 'home_screen.dart';
-import 'main_categories_screen.dart';
-import 'order_again_screen.dart';
+import '../category/main_categories_screen.dart';
+import '../order/order_again_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

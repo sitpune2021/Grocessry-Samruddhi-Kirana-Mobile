@@ -1,7 +1,8 @@
 import 'package:go_router/go_router.dart';
-import 'package:samruddha_kirana/screens/dashboard.dart';
-import 'package:samruddha_kirana/screens/login_signup_screen.dart';
-import 'package:samruddha_kirana/screens/splash_screen.dart';
+import 'package:samruddha_kirana/screens/home/dashboard.dart';
+import 'package:samruddha_kirana/screens/auth/login_signup_screen.dart';
+import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
+import 'package:samruddha_kirana/screens/splash/splash_screen.dart';
 
 import 'routes.dart';
 import 'page_transition.dart';
@@ -14,6 +15,13 @@ class AppRouter {
         path: Routes.splash,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const SplashScreen()),
+      ),
+      GoRoute(
+        path: Routes.onboarding,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: Routes.login,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:samruddha_kirana/screens/select_location_screen.dart';
+import 'package:samruddha_kirana/screens/location/select_location_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

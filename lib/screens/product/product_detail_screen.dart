@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'cart_screen.dart';
+import '../cart/cart_screen.dart';
 
 class Product {
   final String id;

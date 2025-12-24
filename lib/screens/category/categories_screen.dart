@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:samruddha_kirana/screens/product_detail_screen.dart';
+import 'package:samruddha_kirana/screens/product/product_detail_screen.dart';
 
 class CategoryProductsScreen extends StatefulWidget {
   const CategoryProductsScreen({super.key});

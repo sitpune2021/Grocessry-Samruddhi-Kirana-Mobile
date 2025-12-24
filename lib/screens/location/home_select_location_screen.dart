@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:samruddha_kirana/screens/select_location_screen.dart';
+import 'package:samruddha_kirana/screens/location/select_location_screen.dart';
 
 class HomeSelectLocationScreen extends StatelessWidget {
   const HomeSelectLocationScreen({super.key});
