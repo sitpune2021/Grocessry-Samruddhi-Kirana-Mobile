@@ -56,5 +56,7 @@ flutter:
     - assets/images/
     - assets/app_icon/
     - assets/lottie/
+    - assets/fack_img/
+    - assets/animations/
     
 
