@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/router.dart';
+import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 
 void main() {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,6 +25,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Samruddha Kirana',
       routerConfig: AppRouter.router,
+
+      // ✅ CORRECT for responsive_framework ^1.5.1
+      builder: (context, child) {
+        return ResponsiveBreakpoints.builder(
+          child: child!,
+          breakpoints: const [
+            Breakpoint(start: 0, end: 599, name: MOBILE),
+            Breakpoint(start: 600, end: 899, name: TABLET),
+            Breakpoint(start: 900, end: double.infinity, name: DESKTOP),
+          ],
+        );
+      },
     );
   }
 }

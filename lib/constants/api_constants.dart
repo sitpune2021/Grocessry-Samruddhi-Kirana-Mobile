@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = ''; //local url
+  static const baseUrl = 'http://192.168.1.14:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -12,6 +12,6 @@ class ApiConstants {
   //----------------------------------------------------------------------------
 
   static const login = '/login';
-  static const signup = '/signup';
+  static const signup = '/register';
   static const dashboard = '/dashboard';
 }
