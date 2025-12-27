@@ -3,6 +3,7 @@ import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/constants/api_constants.dart';
 
 class AuthService {
+  // new user registration
   static Future<ApiResponse> signup({
     required String firstName,
     required String lastName,
@@ -18,6 +19,33 @@ class AuthService {
       "email": email ?? "",
       "password": password,
       "password_confirmation": confirmPassword,
+    });
+  }
+
+  // login with password
+  static Future<ApiResponse> loginWithPassword({
+    required String mobile,
+    required String password,
+  }) async {
+    return await ApiClient.post(ApiConstants.loginWithPassword, {
+      "mobile": mobile,
+      "password": password,
+    });
+  }
+
+  // login with OTP
+  static Future<ApiResponse> loginWithOtp({required String mobile}) async {
+    return await ApiClient.post(ApiConstants.loginWithOtp, {"mobile": mobile});
+  }
+
+  // verify login OTP
+  static Future<ApiResponse> verifyLoginOtp({
+    required String mobile,
+    required String otp,
+  }) async {
+    return await ApiClient.post(ApiConstants.loginVerifyOtp, {
+      "mobile": mobile,
+      "otp": otp,
     });
   }
 }
