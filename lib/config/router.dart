@@ -1,4 +1,6 @@
 import 'package:go_router/go_router.dart';
+import 'package:samruddha_kirana/screens/auth/password_manage/forgot_password.dart';
+import 'package:samruddha_kirana/screens/auth/password_manage/set_password.dart';
 import 'package:samruddha_kirana/screens/auth/sign_up_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
@@ -39,6 +41,20 @@ class AppRouter {
         path: Routes.signup,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const SignUpScreen()),
+      ),
+      GoRoute(
+        path: Routes.forgotPassword,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const ForgotPasswordScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.setPassword,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const SetPasswordScreen(),
+        ),
       ),
       GoRoute(
         path: Routes.dashboard,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/auth/user_model.dart';
@@ -10,12 +12,22 @@ class AuthProvider extends ChangeNotifier {
 
   UserModel? _user;
 
+  int _otpTimer = 0;
+  Timer? _timer;
+
+  String? _forgotPasswordMobile; // ✅ SINGLE SOURCE OF TRUTH
+
   bool get isLoading => _isLoading;
 
   bool get otpSent => _otpSent;
 
   UserModel? get user => _user;
 
+  int get otpTimer => _otpTimer;
+
+  String get forgotPasswordMobile => _forgotPasswordMobile ?? '';
+
+  // ========================= Register METHODS ========================= //
   // new user registration
   Future<ApiResponse> signup({
     required String firstName,
@@ -46,6 +58,7 @@ class AuthProvider extends ChangeNotifier {
     return response;
   }
 
+  // ========================= Login METHODS ========================= //
   // login with password
   Future<ApiResponse> loginWithPassword({
     required String mobile,
@@ -118,5 +131,105 @@ class AuthProvider extends ChangeNotifier {
   void resetOtp() {
     _otpSent = false;
     notifyListeners();
+  }
+
+  // ========================= Forgot PASSWORD METHODS ========================= //
+  // forget password OTP
+  Future<ApiResponse> sendForgotPasswordOtp({required String mobile}) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    final response = await AuthService.sendForgotPasswordOtp(mobile: mobile);
+
+    if (response.success) {
+      _forgotPasswordMobile = mobile; // 🔐 STORE ONCE
+      _otpSent = true; // ✅ KEY LINE (OTP FIELD SHOWS)
+      _startOtpTimer(); // ✅ START TIMER HERE
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return response;
+  }
+
+  // verify forget password OTP
+  Future<ApiResponse> verifyForgotPasswordOtp({
+    // required String mobile,
+    required String otp,
+  }) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    final response = await AuthService.verifyForgotPasswordOtp(
+      mobile: _forgotPasswordMobile!, // ✅ SAME MOBILE
+      otp: otp,
+    );
+
+    _isLoading = false;
+    notifyListeners();
+    return response;
+  }
+
+  // ================= TIMER ================= //
+  void _startOtpTimer() {
+    _otpTimer = 60;
+    _timer?.cancel();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (_otpTimer == 0) {
+        t.cancel();
+      } else {
+        _otpTimer--;
+        notifyListeners();
+      }
+    });
+  }
+
+  // ================= RESET STATE ================= //
+  void resetForgotPasswordState() {
+    _otpSent = false;
+    _otpTimer = 0;
+    _forgotPasswordMobile = null; // 🔐 CLEAR
+    _timer?.cancel();
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  // set new password after forgot password
+  Future<ApiResponse> setNewPassword({
+    // required String mobile,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    final response = await AuthService.setNewPassword(
+      mobile: _forgotPasswordMobile!, // ✅ SAME MOBILE
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    );
+
+    _isLoading = false;
+    notifyListeners();
+    return response;
   }
 }

@@ -182,13 +182,39 @@ class _SignInScreenState extends State<SignInScreen> {
                               const SizedBox(height: 18),
 
                               /// PASSWORD OR OTP FIELD
-                              if (_loginType == LoginType.password)
+                              if (_loginType == LoginType.password) ...[
                                 AppPasswordField(
                                   controller: passwordController,
                                   hintText: "Password",
                                   prefixIcon: const Icon(Icons.lock),
                                   validator: Validators.password,
-                                )
+                                ),
+
+                                const SizedBox(height: 6),
+
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      context.push(Routes.forgotPassword);
+                                    },
+                                    child: Text(
+                                      "Forgot Password?",
+                                      style: GoogleFonts.poppins(
+                                        color: AppColors.darkGreen,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ]
+                              // if (_loginType == LoginType.password)
+                              //   AppPasswordField(
+                              //     controller: passwordController,
+                              //     hintText: "Password",
+                              //     prefixIcon: const Icon(Icons.lock),
+                              //     validator: Validators.password,
+                              //   )
                               else if (auth.otpSent)
                                 AppOtpField(
                                   controller: otpController,

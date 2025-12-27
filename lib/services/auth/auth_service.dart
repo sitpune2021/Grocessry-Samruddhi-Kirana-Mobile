@@ -48,4 +48,37 @@ class AuthService {
       "otp": otp,
     });
   }
+
+  // send forgot password OTP
+  static Future<ApiResponse> sendForgotPasswordOtp({
+    required String mobile,
+  }) async {
+    return await ApiClient.post(ApiConstants.sendForgotPasswordOtp, {
+      "mobile": mobile,
+    });
+  }
+
+  // verify forgot password OTP
+  static Future<ApiResponse> verifyForgotPasswordOtp({
+    required String mobile,
+    required String otp,
+  }) async {
+    return await ApiClient.post(ApiConstants.verifyForgotPasswordOtp, {
+      "mobile": mobile,
+      "otp": otp,
+    });
+  }
+
+  // reset password
+  static Future<ApiResponse> setNewPassword({
+    required String mobile,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    return await ApiClient.post(ApiConstants.resetPassword, {
+      "mobile": mobile,
+      "password": newPassword,
+      "password_confirmation": confirmPassword,
+    });
+  }
 }
