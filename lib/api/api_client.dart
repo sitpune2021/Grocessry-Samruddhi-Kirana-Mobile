@@ -182,6 +182,7 @@ import 'package:samruddha_kirana/api/api_logger.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/api/session/token_storage.dart';
 import 'package:samruddha_kirana/constants/api_constants.dart';
+import 'package:samruddha_kirana/services/internet_service.dart';
 
 class ApiClient {
   static const timeout = Duration(seconds: 30);
@@ -197,11 +198,28 @@ class ApiClient {
     return headers;
   }
 
+  // ================= INTERNET CHECK =================
+  static Future<ApiResponse<dynamic>> _checkInternet() async {
+    if (!InternetService.lastStatus) {
+      return ApiResponse(
+        success: false,
+        message: 'No internet connection',
+        code: 0,
+      );
+    }
+    return ApiResponse(success: true, message: 'Internet available');
+  }
+
   // ---------------- GET Method ----------------
   static Future<ApiResponse<dynamic>> get(
     String endpoint, {
     bool authRequired = false,
   }) async {
+    // ✅ INTERNET CHECK FIRST
+
+    final internetCheck = await _checkInternet();
+    if (!internetCheck.success) return internetCheck;
+
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
@@ -234,6 +252,10 @@ class ApiClient {
     Map<String, dynamic> body, {
     bool authRequired = false,
   }) async {
+    // ✅ INTERNET CHECK FIRST
+    final internetCheck = await _checkInternet();
+    if (!internetCheck.success) return internetCheck;
+
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
@@ -271,6 +293,10 @@ class ApiClient {
     Map<String, dynamic> body, {
     bool authRequired = false,
   }) async {
+    // ✅ INTERNET CHECK FIRST
+    final internetCheck = await _checkInternet();
+    if (!internetCheck.success) return internetCheck;
+
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
@@ -309,6 +335,10 @@ class ApiClient {
     String fieldName, {
     bool authRequired = false,
   }) async {
+    // ✅ INTERNET CHECK FIRST
+    final internetCheck = await _checkInternet();
+    if (!internetCheck.success) return internetCheck;
+
     final url = ApiConstants.baseUrl + endpoint;
 
     try {

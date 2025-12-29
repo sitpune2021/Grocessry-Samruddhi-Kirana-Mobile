@@ -6,6 +6,22 @@ class InternetService {
     checkInterval: const Duration(seconds: 3),
   );
 
+  // // 🔹 Cached internet status
+  // static bool _lastStatus = true;
+
+  // 🔹 Cached internet status
+  static bool _lastStatus = false; // safer default
+
+  /// 🔹 Initialize listener ONCE
+  static void initListener() {
+    _checker.onStatusChange.listen((status) {
+      _lastStatus = status == InternetStatus.connected;
+    });
+  }
+
+  /// 🔹 Fast access (no async)
+  static bool get lastStatus => _lastStatus;
+
   /// One-time check
   static Future<bool> hasInternet() async {
     return await _checker.hasInternetAccess;

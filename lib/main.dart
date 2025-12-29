@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-// import 'package:samruddha_kirana/api/session/token_storage.dart';
 import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
+import 'package:samruddha_kirana/services/internet_service.dart';
 
 void main() {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  debugPrint('🎬 App Starting...');
+  // ✅ Start internet listener globally
+  InternetService.initListener();
 
-  // // 🔐 LOAD SAVED TOKEN
-  // await TokenStorage.init();
+  debugPrint('🎬 App Starting...');
 
   runApp(
     MultiProvider(
