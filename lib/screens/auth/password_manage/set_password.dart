@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/validation/validation.dart';
@@ -43,8 +44,8 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
     if (res.success) {
       auth.resetForgotPasswordState();
 
-      /// Clear entire navigation stack & go to login
-      context.go('/login');
+
+      context.go(Routes.login);
     } else {
       ScaffoldMessenger.of(
         context,

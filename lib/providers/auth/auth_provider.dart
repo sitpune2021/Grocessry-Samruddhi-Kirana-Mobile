@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
+import 'package:samruddha_kirana/api/session/token_storage.dart';
 import 'package:samruddha_kirana/models/auth/user_model.dart';
 import 'package:samruddha_kirana/services/auth/auth_service.dart';
 
@@ -51,6 +52,21 @@ class AuthProvider extends ChangeNotifier {
 
     if (response.success && response.data != null) {
       _user = UserModel.fromJson(response.data);
+
+      debugPrint('User Role: ${_user!.user.role}');
+
+      // ✅ SAVE TOKEN FROM UserModel
+      final token = _user!.token;
+
+      if (token.isNotEmpty) {
+        debugPrint('💾 Saving token from AuthProvider...');
+        await TokenStorage.setToken(token);
+        debugPrint('✅ Token saved successfully in AuthProvider');
+      } else {
+        debugPrint('❌ Token is EMPTY in UserModel');
+      }
+    } else {
+      debugPrint('❌ Login failed: ${response.message}');
     }
 
     _isLoading = false;
@@ -78,6 +94,21 @@ class AuthProvider extends ChangeNotifier {
 
     if (response.success && response.data != null) {
       _user = UserModel.fromJson(response.data);
+
+      debugPrint('User Role: ${_user!.user.role}');
+
+      // ✅ SAVE TOKEN FROM UserModel
+      final token = _user!.token;
+
+      if (token.isNotEmpty) {
+        debugPrint('💾 Saving token from AuthProvider...');
+        await TokenStorage.setToken(token);
+        debugPrint('✅ Token saved successfully in AuthProvider');
+      } else {
+        debugPrint('❌ Token is EMPTY in UserModel');
+      }
+    } else {
+      debugPrint('❌ Login failed: ${response.message}');
     }
 
     _isLoading = false;
@@ -120,6 +151,20 @@ class AuthProvider extends ChangeNotifier {
 
     if (response.success && response.data != null) {
       _user = UserModel.fromJson(response.data);
+      debugPrint('User Role: ${_user!.user.role}');
+
+      // ✅ SAVE TOKEN FROM UserModel
+      final token = _user!.token;
+
+      if (token.isNotEmpty) {
+        debugPrint('💾 Saving token from AuthProvider...');
+        await TokenStorage.setToken(token);
+        debugPrint('✅ Token saved successfully in AuthProvider');
+      } else {
+        debugPrint('❌ Token is EMPTY in UserModel');
+      }
+    } else {
+      debugPrint('❌ Login failed: ${response.message}');
     }
 
     _isLoading = false;
@@ -131,6 +176,19 @@ class AuthProvider extends ChangeNotifier {
   void resetOtp() {
     _otpSent = false;
     notifyListeners();
+  }
+
+  // ================= LOGOUT METHOD ================= //
+  void logout() async {
+    _user = null;
+    _otpSent = false;
+    await TokenStorage.clear(); // 🔐 REMOVE TOKEN
+    notifyListeners();
+  }
+
+  // ================= AUTO LOGOUT =================
+  void handleUnauthorized() {
+    logout();
   }
 
   // ========================= Forgot PASSWORD METHODS ========================= //
@@ -163,6 +221,13 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    if (_forgotPasswordMobile == null) {
+      return ApiResponse(
+        success: false,
+        message: 'Invalid session. Please restart process.',
+      );
     }
 
     _isLoading = true;
@@ -217,6 +282,13 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    if (_forgotPasswordMobile == null) {
+      return ApiResponse(
+        success: false,
+        message: 'Invalid session. Please restart process.',
+      );
     }
 
     _isLoading = true;
