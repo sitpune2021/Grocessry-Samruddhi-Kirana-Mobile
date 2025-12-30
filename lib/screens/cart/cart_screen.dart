@@ -64,413 +64,391 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: const Color(0xffF8F9FB),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0.3,
-          title: const Text(
-            "Cart",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
+    return Scaffold(
+      backgroundColor: const Color(0xffF8F9FB),
+      appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        elevation: 0.3,
+        title: const Text(
+          "Cart",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
         ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
 
-        // *******************************
-        // BODY
-        // *******************************
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              // TOP SAVING STRIP
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                color: const Color(0xffE9F8EC),
+      // *******************************
+      // BODY
+      // *******************************
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // TOP SAVING STRIP
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              color: const Color(0xffE9F8EC),
+              child: const Center(
+                child: Text(
+                  "Yay! You saved ₹30 on this order",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 5),
+
+            // DELIVERY ETA
+            Container(
+              padding: const EdgeInsets.all(18),
+              margin: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Colors.white,
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.flash_on, color: Colors.green),
+                  SizedBox(width: 8),
+                  Text(
+                    "Delivery in 12 mins",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+
+            // **************** CART ITEMS ****************
+            ..._cartItems.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              return _cartItem(
+                index: index,
+                image: item['image'],
+                title: item['title'],
+                subtitle: item['subtitle'],
+                price: item['price'],
+                quantity: item['quantity'],
+              );
+            }),
+
+            const SizedBox(height: 10),
+
+            // ADD MORE ITEMS BUTTON
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Container(
+                height: 42,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.black),
+                ),
                 child: const Center(
                   child: Text(
-                    "Yay! You saved ₹30 on this order",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                    "+ Add More Items",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 5),
+            const SizedBox(height: 15),
 
-              // DELIVERY ETA
-              Container(
-                padding: const EdgeInsets.all(18),
-                margin: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  color: Colors.white,
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.flash_on, color: Colors.green),
-                    SizedBox(width: 8),
-                    Text(
-                      "Delivery in 12 mins",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            // COUPONS SECTION
+            _sectionTile(icon: Icons.percent, title: "View Coupons & Offers"),
 
-              // **************** CART ITEMS ****************
-              ..._cartItems.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                return _cartItem(
-                  index: index,
-                  image: item['image'],
-                  title: item['title'],
-                  subtitle: item['subtitle'],
-                  price: item['price'],
-                  quantity: item['quantity'],
-                );
-              }),
+            // BILL SUMMARY
+            _billSummary(),
 
-              const SizedBox(height: 10),
-
-              // ADD MORE ITEMS BUTTON
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Container(
-                  height: 42,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "+ Add More Items",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // COUPONS SECTION
-              _sectionTile(icon: Icons.percent, title: "View Coupons & Offers"),
-
-              // BILL SUMMARY
-              _billSummary(),
-
-              const SizedBox(height: 120),
-            ],
-          ),
+            const SizedBox(height: 120),
+          ],
         ),
+      ),
 
-        // *******************************
-        // BOTTOM PAY BUTTON
-        // *******************************
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ROW: ADDRESS + DOWN ARROW
-              GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
+      // *******************************
+      // BOTTOM PAY BUTTON
+      // *******************************
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ROW: ADDRESS + DOWN ARROW
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
                     ),
-                    builder: (context) {
-                      return Container(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Title
-                            const Text(
-                              "Select Address",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                  ),
+                  builder: (context) {
+                    return Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          const Text(
+                            "Select Address",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
 
-                            const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                            // Add New Address Button
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        SelectLocationScreen(),
-                                  ),
-                                );
-                              },
+                          // Add New Address Button
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SelectLocationScreen(),
+                                ),
+                              );
+                            },
 
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: const [
-                                    Icon(
-                                      Icons.add,
-                                      color: Colors.pink,
-                                      size: 26,
-                                    ),
-                                    SizedBox(width: 12),
-                                    Text(
-                                      "Add New Address",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.pink,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 12,
                               ),
-                            ),
-
-                            const SizedBox(height: 25),
-
-                            // Saved Addresses Title
-                            const Text(
-                              "Saved Addresses",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 15),
-
-                            // Address Card
-                            Container(
-                              padding: const EdgeInsets.all(15),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.grey.shade300),
-                                color: Colors.grey.shade100,
                               ),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.home, size: 28),
-
-                                  const SizedBox(width: 12),
-
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Home + Selected badge
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              "Home",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.green.shade100,
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: const Text(
-                                                "Selected",
-                                                style: TextStyle(
-                                                  color: Colors.green,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 5),
-
-                                        const Text(
-                                          "Lakshmi Bai colony",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black54,
-                                          ),
-                                        ),
-
-                                        const Text(
-                                          "...",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black45,
-                                          ),
-                                        ),
-                                      ],
+                                children: const [
+                                  Icon(Icons.add, color: Colors.pink, size: 26),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    "Add New Address",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.pink,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: Row(
-                  children: [
-                    const Icon(Icons.home, size: 20),
-                    const SizedBox(width: 6),
-
-                    // ADDRESS TEXT
-                    Expanded(
-                      child: Text(
-                        "Home - lakshmi Bai colony, Raghunandan hall",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    // DISTANCE TAG
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.yellow.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: Colors.orange,
                           ),
-                          SizedBox(width: 4),
-                          Text(
-                            "21.1 km away",
+
+                          const SizedBox(height: 25),
+
+                          // Saved Addresses Title
+                          const Text(
+                            "Saved Addresses",
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black87,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          // Address Card
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.home, size: 28),
+
+                                const SizedBox(width: 12),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Home + Selected badge
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "Home",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green.shade100,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: const Text(
+                                              "Selected",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 5),
+
+                                      const Text(
+                                        "Lakshmi Bai colony",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+
+                                      const Text(
+                                        "...",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
+                    );
+                  },
+                );
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.home, size: 20),
+                  const SizedBox(width: 6),
 
-                    const SizedBox(width: 8),
-
-                    const Icon(Icons.keyboard_arrow_down, size: 28),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // PINK BUTTON
-              GestureDetector(
-                onTap: () {
-                  // Handle payment
-                },
-                child: Container(
-                  height: 55,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xffFF2E63),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Center(
+                  // ADDRESS TEXT
+                  Expanded(
                     child: Text(
-                      "Click to Pay ₹${totalPrice.toInt()} ($totalItems)",
+                      "Home - lakshmi Bai colony, Raghunandan hall",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SelectLocationScreen(),
+                  const SizedBox(width: 6),
+
+                  // DISTANCE TAG
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                  );
-                },
-                child: Container(
-                  height: 55,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xffFF2E63),
-                    borderRadius: BorderRadius.circular(30),
+                    decoration: BoxDecoration(
+                      color: Colors.yellow.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: const [
+                        Icon(Icons.access_time, size: 14, color: Colors.orange),
+                        SizedBox(width: 4),
+                        Text(
+                          "21.1 km away",
+                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: const Center(
-                    child: Text(
-                      "ADD Address To Procced (1)",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+
+                  const SizedBox(width: 8),
+
+                  const Icon(Icons.keyboard_arrow_down, size: 28),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // PINK BUTTON
+            GestureDetector(
+              onTap: () {
+                // Handle payment
+              },
+              child: Container(
+                height: 55,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xffFF2E63),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Center(
+                  child: Text(
+                    "Click to Pay ₹${totalPrice.toInt()} ($totalItems)",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SelectLocationScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                height: 55,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xffFF2E63),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Center(
+                  child: Text(
+                    "ADD Address To Procced (1)",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

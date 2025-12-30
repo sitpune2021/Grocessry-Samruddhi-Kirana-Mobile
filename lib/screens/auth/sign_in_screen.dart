@@ -154,7 +154,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                               Center(
                                 child: Image.asset(
-                                  "assets/images/login_screen_logo.png",
+                                  "assets/images/app_logi.png",
                                   height: 180,
                                 ),
                               ),

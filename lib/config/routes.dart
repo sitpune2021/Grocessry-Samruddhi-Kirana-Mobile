@@ -7,4 +7,7 @@ class Routes {
   static const forgotPassword = '/forgot-password';
   static const setPassword = '/set-password';
   static const dashboard = '/dashboard';
+  static const product = '/products';
+  static const productDetails = '/product-details';
+  static const brandListDetails = '/brand-list-details';
 }

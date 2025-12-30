@@ -135,11 +135,40 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 /// LOGO
+                // ScaleTransition(
+                //   scale: _logoScale,
+                //   child: Image.asset(
+                //     'assets/images/samrudhi kirana bajar icon.jpg',
+                //     height: isTablet ? 160 : 120,
+                //   ),
+                // ),
+                // ScaleTransition(
+                //   scale: _logoScale,
+                //   child: Container(
+                //     height: isTablet ? 160 : 120,
+                //     width: isTablet ? 160 : 120,
+                //     decoration: BoxDecoration(
+                //       shape: BoxShape.circle,
+                //       color: Colors.transparent,
+                //     ),
+                //     child: ClipOval(
+                //       child: Image.asset(
+                //         'assets/images/samrudhi kirana bajar icon.jpg',
+                //         fit: BoxFit.cover,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 ScaleTransition(
                   scale: _logoScale,
-                  child: Image.asset(
-                    'assets/images/rabbi_roots_logo.png',
-                    height: isTablet ? 160 : 120,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(60),
+                    child: Image.asset(
+                      'assets/images/app_logi.png',
+                      height: isTablet ? 160 : 120,
+                      width: isTablet ? 160 : 120,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
 

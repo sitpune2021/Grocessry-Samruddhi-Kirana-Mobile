@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.35:8000/api'; //local url
+  static const baseUrl = 'http://192.168.1.15:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -21,5 +21,16 @@ class ApiConstants {
   static const verifyForgotPasswordOtp = '/verify-otp/forgot_password_otp';
   static const resetPassword = '/reset-password';
 
+  static const logout = '/logout';
+
   static const dashboard = '/dashboard';
+
+  static const categories = '/categories';
+  static String subCategoriesById(int id) => '/categories/$id/subcategories';
+  static String productsBySubCategoryId(int id) =>
+      '/subcategories/$id/products';
+  static String productDetailsById(int id) => '/products/$id';
+
+  static const brands = '/brands';
+  static String productsByBrandId(int id) => '/brands/$id/products';
 }

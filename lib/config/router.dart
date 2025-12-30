@@ -2,9 +2,12 @@ import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/forgot_password.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/set_password.dart';
 import 'package:samruddha_kirana/screens/auth/sign_up_screen.dart';
+import 'package:samruddha_kirana/screens/brand/brand_list_details_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
 import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
+import 'package:samruddha_kirana/screens/product/product_details_screen.dart';
+import 'package:samruddha_kirana/screens/product/product_list_screen.dart';
 import 'package:samruddha_kirana/screens/splash/splash_screen.dart';
 import 'package:samruddha_kirana/widgets/no_internet_view.dart';
 
@@ -60,6 +63,31 @@ class AppRouter {
         path: Routes.dashboard,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const DashboardScreen()),
+      ),
+      GoRoute(
+        path: Routes.product,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const ProductsListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.productDetails,
+        pageBuilder: (context, state) {
+          final productId = state.extra as int;
+
+          return PageTransitions.slide(
+            state: state,
+            child: ProductDetailsScreen(productId: productId),
+          );
+        },
+      ),
+      GoRoute(
+        path: Routes.brandListDetails,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const BrandProductsListScreen(),
+        ),
       ),
     ],
   );

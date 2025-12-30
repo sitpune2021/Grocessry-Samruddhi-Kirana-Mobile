@@ -81,4 +81,13 @@ class AuthService {
       "password_confirmation": confirmPassword,
     });
   }
+
+  // logout
+  static Future<ApiResponse> logout() async {
+    return await ApiClient.post(
+      ApiConstants.logout,
+      {},
+      authRequired: true, // 🔐 token based
+    );
+  }
 }

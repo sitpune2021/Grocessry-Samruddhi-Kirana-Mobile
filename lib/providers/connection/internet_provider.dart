@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../services/internet_service.dart';
+import '../../services/internet_service.dart';
 
 class InternetProvider extends ChangeNotifier {
   bool isConnected = true;

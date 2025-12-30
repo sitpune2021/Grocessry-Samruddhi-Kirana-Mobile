@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/api/session/token_storage.dart';
+import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/models/auth/user_model.dart';
 import 'package:samruddha_kirana/services/auth/auth_service.dart';
 
@@ -179,17 +182,46 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // ================= LOGOUT METHOD ================= //
-  void logout() async {
-    _user = null;
-    _otpSent = false;
-    await TokenStorage.clear(); // 🔐 REMOVE TOKEN
-    notifyListeners();
+  // void logout() async {
+  //   _user = null;
+  //   _otpSent = false;
+  //   await TokenStorage.clear(); // 🔐 REMOVE TOKEN
+  //   notifyListeners();
+  // }
+
+  // ================= LOGOUT =================
+  Future<void> logout(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      // 🔥 Call logout API
+      await AuthService.logout();
+    } catch (e) {
+      debugPrint('Logout API failed: $e');
+    } finally {
+      // 🔐 Clear ALL local/session data
+      await _clearLocalData();
+
+      _isLoading = false;
+      notifyListeners();
+      if (context.mounted) {
+        context.go(Routes.login);
+      }
+    }
+  }
+
+  // ================= CLEAR DATA =================
+  Future<void> _clearLocalData() async {
+    await TokenStorage.clear();
   }
 
   // ================= AUTO LOGOUT =================
-  void handleUnauthorized() {
-    logout();
-  }
+  // void handleUnauthorized() {
+  //   logout(
+
+  //   );
+  // }
 
   // ========================= Forgot PASSWORD METHODS ========================= //
   // forget password OTP

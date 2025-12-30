@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
+import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
+import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
 import 'package:samruddha_kirana/services/internet_service.dart';
 
 void main() {
@@ -16,7 +18,12 @@ void main() {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AllProductProvider()),
+        ChangeNotifierProvider(create: (_) => ProductBrandProvider()),
+      ],
+
       child: const MyApp(),
     ),
   );
@@ -32,7 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'Samruddha Kirana',
       routerConfig: AppRouter.router,
 
-      // ✅ CORRECT for responsive_framework ^1.5.1
+      // ✅ CORRECT for responsive_framework
       builder: (context, child) {
         return ResponsiveBreakpoints.builder(
           child: child!,
