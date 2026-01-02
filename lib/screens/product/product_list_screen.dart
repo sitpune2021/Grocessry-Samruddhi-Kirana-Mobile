@@ -269,7 +269,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   child: CachedNetworkImage(
                     imageUrl: product.imageUrls.isNotEmpty
                         ? product.imageUrls.first
-                        : '',
+                        : 'invalid_url', // force error if empty
                     height: 120,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -278,9 +278,11 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                       highlightColor: Colors.grey.shade100,
                       child: Container(color: Colors.white),
                     ),
-                    errorWidget: (_, _, _) => Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.image_not_supported),
+                    errorWidget: (_, _, _) => Image.asset(
+                      'assets/images/no_image.png',
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

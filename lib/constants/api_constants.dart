@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.15:8000/api'; //local url
+  static const baseUrl = 'http://192.168.1.35:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -30,6 +30,7 @@ class ApiConstants {
   static String productsBySubCategoryId(int id) =>
       '/subcategories/$id/products';
   static String productDetailsById(int id) => '/products/$id';
+  static String similarProducts(int id) => '/products/$id/similar';
 
   static const brands = '/brands';
   static String productsByBrandId(int id) => '/brands/$id/products';

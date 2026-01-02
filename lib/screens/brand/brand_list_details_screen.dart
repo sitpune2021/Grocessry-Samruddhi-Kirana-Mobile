@@ -42,6 +42,7 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
           /// ================= APP BAR =================
           appBar: AppBar(
             backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
             elevation: 0,
             title: Text(
               provider.selectedBrand?.name ?? 'Products',
@@ -56,22 +57,21 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
           body: provider.isBrandProductLoading
               ? const _BrandProductGridShimmer()
               : provider.brandProducts.isEmpty
-                  ? _noProductsUI()
-                  : GridView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: provider.brandProducts.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisExtent: 220,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
-                      itemBuilder: (context, index) {
-                        final product = provider.brandProducts[index];
-                        return _productCard(product, context);
-                      },
-                    ),
+              ? _noProductsUI()
+              : GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: provider.brandProducts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisExtent: 220,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemBuilder: (context, index) {
+                    final product = provider.brandProducts[index];
+                    return _productCard(product, context);
+                  },
+                ),
         );
       },
     );
@@ -81,10 +81,7 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
   Widget _productCard(product, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push(
-          Routes.productDetails,
-          extra: product.id,
-        );
+        context.push(Routes.productDetails, extra: product.id);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -92,7 +89,7 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
             ),
           ],
@@ -106,19 +103,22 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
                 top: Radius.circular(12),
               ),
               child: CachedNetworkImage(
-                imageUrl:
-                    product.imageUrls.isNotEmpty ? product.imageUrls.first : '',
+                imageUrl: product.imageUrls.isNotEmpty
+                    ? product.imageUrls.first
+                    : '',
                 height: 120,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                placeholder: (_, __) => Shimmer.fromColors(
+                placeholder: (_, _) => Shimmer.fromColors(
                   baseColor: Colors.grey.shade300,
                   highlightColor: Colors.grey.shade100,
                   child: Container(color: Colors.white),
                 ),
-                errorWidget: (_, __, ___) => Container(
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image_not_supported),
+                errorWidget: (_, _, _) => Image.asset(
+                  'assets/images/no_image.png',
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -161,10 +161,7 @@ class _BrandProductsListScreenState extends State<BrandProductsListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/images/no_product.png',
-            height: 180,
-          ),
+          Image.asset('assets/images/no_product.png', height: 180),
           const SizedBox(height: 16),
           Text(
             "No products found",
