@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/widgets/custom_search_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
@@ -20,6 +21,10 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
   bool _initialized = false;
   late int subCategoryId;
 
+  bool _isSearchOpen = false;
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -31,6 +36,29 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AllProductProvider>().fetchProducts(subCategoryId);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _searchFocusNode.addListener(() {
+      if (!_searchFocusNode.hasFocus && _isSearchOpen) {
+        setState(() {
+          _isSearchOpen = false;
+          _searchController.clear();
+        });
+
+        context.read<AllProductProvider>().searchProducts('');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -67,20 +95,72 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
             backgroundColor: Colors.white,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
-            title: AutoSizeText(
-              provider.subcategory?.name ?? '',
-              maxLines: 1,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: titleFontSize,
-                color: Colors.black,
-              ),
+
+            title: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) {
+                final offsetAnimation = Tween<Offset>(
+                  begin: const Offset(1.0, 0.0), // 👉 Right → Left
+                  end: Offset.zero,
+                ).animate(animation);
+
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: FadeTransition(opacity: animation, child: child),
+                );
+              },
+              child: _isSearchOpen
+                  ? SizedBox(
+                      key: const ValueKey('search'),
+                      height: 46,
+                      child: CustomSearchBar(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        hintText: 'Search products',
+                        onChanged: (value) {
+                          context.read<AllProductProvider>().searchProducts(
+                            value,
+                          );
+                        },
+                        onFocusLost: () {
+                          setState(() {
+                            _isSearchOpen = false;
+                            _searchController.clear();
+                          });
+                          context.read<AllProductProvider>().searchProducts('');
+                        },
+                      ),
+                    )
+                  : AutoSizeText(
+                      provider.subcategory?.name ?? '',
+                      key: const ValueKey('title'),
+                      maxLines: 1,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: titleFontSize,
+                        color: Colors.black,
+                      ),
+                    ),
             ),
+
             actions: [
-              IconButton(
-                icon: const Icon(Icons.search, color: Colors.black),
-                onPressed: () {},
-              ),
+              if (!_isSearchOpen)
+                IconButton(
+                  icon: const Icon(Icons.search, color: Colors.black),
+                  onPressed: () {
+                    setState(() {
+                      _isSearchOpen = true;
+                    });
+
+                    // auto open keyboard
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      _searchFocusNode.requestFocus();
+                    });
+                  },
+                ),
+
               IconButton(
                 icon: const Icon(
                   Icons.shopping_cart_outlined,
@@ -194,7 +274,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                         itemCount: provider.products.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                              crossAxisCount: 3,
                               mainAxisExtent: 240,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,

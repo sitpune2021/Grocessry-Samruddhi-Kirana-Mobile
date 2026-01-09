@@ -36,6 +36,7 @@ class AllProductProvider extends ChangeNotifier {
   Subcategory? _subcategory;
   Subcategory? get subcategory => _subcategory;
 
+  List<Product> _allProducts = []; // 👈 MASTER LIST
   List<Product> _products = [];
   List<Product> get products => _products;
 
@@ -177,7 +178,9 @@ class AllProductProvider extends ChangeNotifier {
         final model = ProductModel.fromJson(response.data);
 
         _subcategory = model.subcategory;
-        _products = model.data;
+        // _products = model.data;
+        _allProducts = model.data;
+        _products = List.from(_allProducts);
       } else {
         _products = [];
         _errorMessage = response.message;
@@ -193,6 +196,21 @@ class AllProductProvider extends ChangeNotifier {
     }
 
     return response;
+  }
+
+  // ================= SEARCH PRODUCTS =================
+  void searchProducts(String query) {
+    if (query.isEmpty) {
+      _products = List.from(_allProducts);
+    } else {
+      _products = _allProducts
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(query.toLowerCase()),
+          )
+          .toList();
+    }
+    notifyListeners();
   }
 
   // ================== Product Details ===================

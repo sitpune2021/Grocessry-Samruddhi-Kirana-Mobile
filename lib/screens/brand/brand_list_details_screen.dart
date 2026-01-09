@@ -191,7 +191,7 @@ class _BrandProductGridShimmer extends StatelessWidget {
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
-      itemBuilder: (_, __) {
+      itemBuilder: (_, _) {
         return Shimmer.fromColors(
           baseColor: Colors.grey.shade300,
           highlightColor: Colors.grey.shade100,
