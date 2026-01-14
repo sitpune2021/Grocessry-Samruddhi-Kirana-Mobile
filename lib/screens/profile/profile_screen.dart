@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -75,7 +77,13 @@ class ProfileScreen extends StatelessWidget {
 
             // ---------------- YOUR INFO ----------------
             _sectionCard("Your Information", [
-              _itemTile(Icons.location_on_outlined, "Address Book"),
+              _itemTile(
+                Icons.location_on_outlined,
+                "Address Book",
+                onTap: () {
+                  context.push(Routes.getAddress);
+                },
+              ),
               _itemTile(Icons.favorite_border, "Wishlist"),
             ]),
 
@@ -166,7 +174,21 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            ...items,
+            // ITEMS WITH DIVIDER (EXCEPT LAST)
+            ...List.generate(items.length, (index) {
+              return Column(
+                children: [
+                  items[index],
+                  if (index != items.length - 1)
+                    const Divider(
+                      height: 1,
+                      thickness: 1,
+                      indent: 20, // left padding
+                      endIndent: 30, // right padding
+                    ),
+                ],
+              );
+            }),
           ],
         ),
       ),
@@ -185,10 +207,10 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Logout',
-      barrierColor: Colors.black.withOpacity(0.55),
+      barrierColor: Colors.black.withValues(alpha: 0.55),
       transitionDuration: const Duration(milliseconds: 320),
-      pageBuilder: (_, __, ___) => const SizedBox.shrink(),
-      transitionBuilder: (ctx, animation, _, __) {
+      pageBuilder: (_, _, _) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, animation, _, _) {
         final scaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
           CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
         );
@@ -317,164 +339,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  // void showLogoutDialog(BuildContext context) {
-  //   final size = MediaQuery.of(context).size;
-  //   final isTablet = size.width > 600;
-  //   const primaryGreen = Color(0xFF2E7D32); // 🌿 Theme Green
-
-  //   showGeneralDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     barrierLabel: 'Logout',
-  //     barrierColor: Colors.black54,
-  //     transitionDuration: const Duration(milliseconds: 280),
-  //     pageBuilder: (_, _, _) => const SizedBox.shrink(),
-  //     transitionBuilder: (ctx, animation, _, _) {
-  //       final curved = CurvedAnimation(
-  //         parent: animation,
-  //         curve: Curves.easeOutBack,
-  //       );
-
-  //       return Center(
-  //         child: ScaleTransition(
-  //           scale: curved,
-  //           child: FadeTransition(
-  //             opacity: animation,
-  //             child: Material(
-  //               color: Colors.transparent,
-  //               child: Container(
-  //                 width: isTablet ? 420 : size.width * 0.85,
-  //                 padding: const EdgeInsets.all(20),
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.white,
-  //                   borderRadius: BorderRadius.circular(18),
-  //                 ),
-  //                 child: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: [
-  //                     // ---------------- ICON ----------------
-  //                     const CircleAvatar(
-  //                       radius: 26,
-  //                       backgroundColor: Color(0xFFE8F5E9),
-  //                       child: Icon(
-  //                         Icons.logout_rounded,
-  //                         size: 28,
-  //                         color: primaryGreen,
-  //                       ),
-  //                     ),
-  //                     const SizedBox(height: 14),
-
-  //                     // ---------------- TITLE ----------------
-  //                     const Text(
-  //                       "Logout",
-  //                       style: TextStyle(
-  //                         fontSize: 18,
-  //                         fontWeight: FontWeight.bold,
-  //                       ),
-  //                     ),
-  //                     const SizedBox(height: 8),
-
-  //                     // ---------------- MESSAGE ----------------
-  //                     const Text(
-  //                       "Are you sure you want to logout?",
-  //                       textAlign: TextAlign.center,
-  //                       style: TextStyle(fontSize: 14, color: Colors.black54),
-  //                     ),
-  //                     const SizedBox(height: 22),
-
-  //                     // ---------------- BUTTONS ----------------
-  //                     Row(
-  //                       children: [
-  //                         Expanded(
-  //                           child: OutlinedButton(
-  //                             onPressed: () => Navigator.pop(ctx),
-  //                             style: OutlinedButton.styleFrom(
-  //                               foregroundColor: primaryGreen,
-  //                               side: const BorderSide(color: primaryGreen),
-  //                               padding: const EdgeInsets.symmetric(
-  //                                 vertical: 12,
-  //                               ),
-  //                               shape: RoundedRectangleBorder(
-  //                                 borderRadius: BorderRadius.circular(12),
-  //                               ),
-  //                             ),
-  //                             child: const Text("Cancel"),
-  //                           ),
-  //                         ),
-  //                         const SizedBox(width: 12),
-  //                         Expanded(
-  //                           child: ElevatedButton(
-  //                             style: ElevatedButton.styleFrom(
-  //                               backgroundColor: primaryGreen,
-  //                               padding: const EdgeInsets.symmetric(
-  //                                 vertical: 12,
-  //                               ),
-  //                               shape: RoundedRectangleBorder(
-  //                                 borderRadius: BorderRadius.circular(12),
-  //                               ),
-  //                             ),
-  //                             onPressed: () {
-  //                               Navigator.pop(ctx);
-  //                               context.read<AuthProvider>().logout(context);
-  //                             },
-  //                             child: const Text(
-  //                               "Confirm",
-  //                               style: TextStyle(color: Colors.white),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // void showLogoutDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (ctx) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(16),
-  //         ),
-  //         title: const Center(
-  //           child: Text(
-  //             "Logout",
-  //             style: TextStyle(fontWeight: FontWeight.bold),
-  //           ),
-  //         ),
-  //         content: const Text(
-  //           "Are you sure you want to logout?",
-  //           textAlign: TextAlign.center,
-  //         ),
-  //         actionsAlignment: MainAxisAlignment.spaceEvenly,
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.pop(ctx),
-  //             child: const Text("Cancel"),
-  //           ),
-  //           ElevatedButton(
-  //             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-  //             onPressed: () {
-  //               Navigator.pop(ctx);
-  //               context.read<AuthProvider>().logout(context);
-  //             },
-  //             child: const Text("Confirm"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget _itemTiles(
     BuildContext context,
     IconData icon,
@@ -505,16 +369,20 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.grey,
             ),
           ),
-          const Divider(height: 1),
         ],
       ),
     );
   }
 
   // ----------------------------- LIST TILE UI ------------------------------
-  Widget _itemTile(IconData icon, String label, {bool isLogout = false}) {
+  Widget _itemTile(
+    IconData icon,
+    String label, {
+    bool isLogout = false,
+    VoidCallback? onTap,
+  }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Column(
         children: [
           ListTile(
@@ -533,7 +401,6 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.grey,
             ),
           ),
-          const Divider(height: 1),
         ],
       ),
     );

@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/screens/cart/cart_screen.dart';
+import 'package:samruddha_kirana/widgets/cached_image_view.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final int productId;
@@ -40,7 +41,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final provider = context.watch<AllProductProvider>();
 
     if (provider.isProductDetailsLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: Loader()));
     }
 
     if (provider.productDetails == null) {
@@ -94,11 +95,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             bottomLeft: Radius.circular(20),
             bottomRight: Radius.circular(20),
           ),
-          child: Image.network(
-            product.images.isNotEmpty ? product.images.first : '',
-            width: double.infinity,
+          child: CachedImageView(
+            imageUrl: product.images.isNotEmpty ? product.images.first : null,
             height: 260,
-            fit: BoxFit.cover,
+            width: double.infinity,
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
           ),
         ),
         Positioned(
@@ -282,11 +286,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       child: Column(
         children: [
-          Image.network(
-            p.image,
+          CachedImageView(
+            imageUrl: p.images.isNotEmpty ? p.images.first : null,
             height: 110,
             width: double.infinity,
-            fit: BoxFit.cover,
+            borderRadius: BorderRadius.circular(16),
           ),
           Padding(
             padding: const EdgeInsets.all(8),

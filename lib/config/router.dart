@@ -1,8 +1,12 @@
 import 'package:go_router/go_router.dart';
+import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
+import 'package:samruddha_kirana/screens/address/address_list_screen.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/forgot_password.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/set_password.dart';
 import 'package:samruddha_kirana/screens/auth/sign_up_screen.dart';
 import 'package:samruddha_kirana/screens/brand/brand_list_details_screen.dart';
+import 'package:samruddha_kirana/screens/cart/coupones/offers_promo_screen.dart';
+import 'package:samruddha_kirana/screens/cart/new_cart_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
 import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
@@ -65,6 +69,20 @@ class AppRouter {
             PageTransitions.slide(state: state, child: const DashboardScreen()),
       ),
       GoRoute(
+        path: Routes.getAddress,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const ManageAddressesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.addAddress,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const AddAddressScreen(),
+        ),
+      ),
+      GoRoute(
         path: Routes.product,
         pageBuilder: (context, state) => PageTransitions.slide(
           state: state,
@@ -87,6 +105,19 @@ class AppRouter {
         pageBuilder: (context, state) => PageTransitions.slide(
           state: state,
           child: const BrandProductsListScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.newcart,
+        pageBuilder: (context, state) =>
+            PageTransitions.slide(state: state, child: const NewCartScreen()),
+      ),
+
+      GoRoute(
+        path: Routes.couponOffer,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const OffersPromoScreen(),
         ),
       ),
     ],

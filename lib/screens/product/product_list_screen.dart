@@ -166,7 +166,9 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   Icons.shopping_cart_outlined,
                   color: Colors.black,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  context.push(Routes.newcart);
+                },
               ),
             ],
           ),

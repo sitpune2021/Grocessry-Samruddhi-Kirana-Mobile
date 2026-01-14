@@ -20,4 +20,7 @@ class AppColors {
 
   // Progress / Loader
   static const Color progressIndicator = darkGreen;
+
+  // ❗ Danger / Delete
+  static const Color danger = Color(0xFFD32F2F);
 }

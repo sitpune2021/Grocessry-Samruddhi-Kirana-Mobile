@@ -110,6 +110,41 @@ class ApiClient {
     }
   }
 
+  // ---------------- DELETE Method ----------------
+  static Future<ApiResponse<dynamic>> delete(
+    String endpoint, {
+    bool authRequired = false,
+  }) async {
+    // ✅ INTERNET CHECK FIRST
+    final internetCheck = await _checkInternet();
+    if (!internetCheck.success) return internetCheck;
+
+    final url = ApiConstants.baseUrl + endpoint;
+
+    try {
+      ApiLogger.request(
+        method: 'DELETE',
+        url: url,
+        headers: _headers(authRequired: authRequired),
+      );
+
+      final response = await http
+          .delete(Uri.parse(url), headers: _headers(authRequired: authRequired))
+          .timeout(timeout);
+
+      ApiLogger.response(
+        url: url,
+        statusCode: response.statusCode,
+        body: response.body,
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      ApiLogger.error(url: url, error: e);
+      return ApiResponse(success: false, message: e.toString());
+    }
+  }
+
   // ---------------- PUT Method ----------------
   static Future<ApiResponse<dynamic>> put(
     String endpoint,

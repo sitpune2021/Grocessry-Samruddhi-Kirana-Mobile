@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.36:8000/api'; //local url
+  static const baseUrl = 'http://192.168.1.50:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -25,6 +25,11 @@ class ApiConstants {
 
   static const dashboard = '/dashboard';
 
+  static const addAddress = '/customer/addresses';
+  static const updateAddress = '/customer/addresses/';
+  static String deleteAddress(int id) => '/customer/addresses/$id';
+  static const getAllAddress = '/customer/addresses';
+
   static const categories = '/categories';
   static String subCategoriesById(int id) => '/categories/$id/subcategories';
   static String productsBySubCategoryId(int id) =>
@@ -43,6 +48,4 @@ class ApiConstants {
   static const allAvailableCoupons = '/';
   static const applyCoupon = '/';
   static const removeAppliedCoupon = '/';
-
-  
 }
