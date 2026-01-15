@@ -90,18 +90,27 @@ class AddressCard extends StatelessWidget {
                   ),
                   // const SizedBox(height: 4),
                   /// Name
-                  if (hasText(data.firstName)) ...[
+                  if (hasText(data.name)) ...[
                     Text(
-                      data.firstName,
+                      data.name,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 4),
                   ],
 
                   /// Address (Street)
-                  if (hasText(data.address)) ...[
+                  if (hasText(data.addressLine)) ...[
                     Text(
-                      data.address,
+                      data.addressLine,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 2),
+                  ],
+
+                  /// Address (Area)
+                  if (hasText(data.landmark)) ...[
+                    Text(
+                      data.landmark,
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 2),
@@ -109,25 +118,26 @@ class AddressCard extends StatelessWidget {
 
                   /// Address (City, Country, Postcode)
                   if (hasText(data.city) ||
-                      hasText(data.country) ||
-                      hasText(data.postcode)) ...[
+                      hasText(data.state) ||
+                      hasText(data.pincode)) ...[
                     Text(
                       [
                             data.city,
-                            data.country,
+                            data.state,
                           ].where((e) => hasText(e)).join(', ') +
-                          (hasText(data.postcode) ? ' - ${data.postcode}' : ''),
+                          (hasText(data.pincode) ? ' - ${data.pincode}' : ''),
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 4),
                   ],
 
                   /// Contact
-                  if (hasText(data.phone) || hasText(data.email)) ...[
+                  if (hasText(data.mobile)) ...[
                     Text(
                       [
-                        hasText(data.phone) ? 'Phone: ${data.phone}' : null,
-                        hasText(data.email) ? 'Email: ${data.email}' : null,
+                        hasText(data.mobile)
+                            ? 'MobileNo : ${data.mobile}'
+                            : null,
                       ].whereType<String>().join('\n'),
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),

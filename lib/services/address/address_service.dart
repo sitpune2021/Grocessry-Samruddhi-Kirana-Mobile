@@ -29,8 +29,8 @@ class AddressService {
     required String city,
     required String state,
     required String pincode,
-    double? latitude,
-    double? longitude,
+    required double latitude,
+    required double longitude,
   }) async {
     return await ApiClient.put(
       ApiConstants.updateAddress(id),

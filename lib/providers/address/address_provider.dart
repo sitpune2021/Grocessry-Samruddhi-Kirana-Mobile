@@ -22,6 +22,10 @@ class AddressProvider extends ChangeNotifier {
 
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Already loading');
+    }
+
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -32,17 +36,18 @@ class AddressProvider extends ChangeNotifier {
       response = await AddressService.fetchAllAddresses();
 
       if (response.success && response.data != null) {
-        final model = AllAddressListModel.fromJson({
-          "status": true,
-          "data": response.data['data'], // ✅ extract list
-        });
-
+        final model = AllAddressListModel.fromJson(response.data);
         _addresses = model.data;
       } else {
         _addresses = [];
         _errorMessage = response.message;
       }
-    } catch (e) {
+
+      return response;
+    } catch (e, s) {
+      debugPrint('FETCH ADDRESS ERROR: $e');
+      debugPrintStack(stackTrace: s);
+
       _addresses = [];
       _errorMessage = e.toString();
       response = ApiResponse(success: false, message: _errorMessage);
@@ -93,8 +98,8 @@ class AddressProvider extends ChangeNotifier {
     required String city,
     required String state,
     required String pincode,
-    String? latitude,
-    String? longitude,
+    required String latitude,
+    required String longitude,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
@@ -137,8 +142,8 @@ class AddressProvider extends ChangeNotifier {
     required String city,
     required String state,
     required String pincode,
-    double? latitude,
-    double? longitude,
+    required double latitude,
+    required double longitude,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');

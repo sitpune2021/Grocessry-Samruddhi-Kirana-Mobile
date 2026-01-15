@@ -133,7 +133,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                                       .fetchAllAddresses();
                                 }
                               },
-                              
+
                               onDelete: () {
                                 _showDeleteBottomSheet(
                                   context: context,

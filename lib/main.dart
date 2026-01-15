@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/providers/address/location_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
@@ -24,6 +25,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AllProductProvider()),
         ChangeNotifierProvider(create: (_) => ProductBrandProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => LocationProvider()),
       ],
 
       child: const MyApp(),

@@ -6,6 +6,8 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/providers/address/location_provider.dart';
+import 'package:samruddha_kirana/widgets/animation_location.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 
 enum AddressType { home, work, other }
@@ -32,19 +34,33 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final TextEditingController areaController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController stateController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
 
-    // if (widget.address != null) {
-    //   nameController.text = widget.address!.name ?? '';
-    //   phoneController.text = widget.address!.mobile ?? '';
-    //   pincodeController.text = widget.address!.pincode ?? '';
-    //   cityController.text = widget.address!.city ?? '';
-    //   areaController.text = widget.address!
-    //   stateController.text = widget.address!.state ?? '';
-    //   houseController.text = widget.address!.addressLine ?? '';
-    // }
+    if (widget.address != null) {
+      // ✏️ EDIT ADDRESS
+      nameController.text = widget.address!.name;
+      phoneController.text = widget.address!.mobile;
+      pincodeController.text = widget.address!.pincode;
+      cityController.text = widget.address!.city;
+      areaController.text = widget.address!.landmark;
+      stateController.text = widget.address!.state;
+      houseController.text = widget.address!.addressLine;
+
+      // ✅ EDIT FALLBACK FOR LOCATION
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final lp = context.read<LocationProvider>();
+        lp.latitude = widget.address!.latitude;
+        lp.longitude = widget.address!.longitude;
+      });
+    } else {
+      // ➕ ADD ADDRESS → AUTO FETCH LOCATION
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<LocationProvider>().fetchCurrentLocation();
+      });
+    }
   }
 
   @override
@@ -62,6 +78,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   Widget build(BuildContext context) {
     final addressProvider = context.watch<AddressProvider>();
+    final locationProvider = context.watch<LocationProvider>(); // ✅ ADD THIS
 
     /// ================= RESPONSIVE VALUES =================
     final horizontalPadding = ResponsiveValue<double>(
@@ -158,7 +175,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           validator: _requiredValidator,
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 6),
                         Row(
                           children: [
                             Expanded(
@@ -189,6 +206,93 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 12),
+                        // location
+                        GestureDetector(
+                          onTap: locationProvider.isLoading
+                              ? null
+                              : () async {
+                                  await context
+                                      .read<LocationProvider>()
+                                      .fetchCurrentLocation();
+                                  if (!context.mounted) return;
+                                  final lp = context.read<LocationProvider>();
+                                  debugPrint('Saved Lat: ${lp.latitude}');
+                                  debugPrint('Saved Lng: ${lp.longitude}');
+
+                                  setState(() {
+                                    cityController.text = lp.city;
+                                    stateController.text = lp.state;
+                                    pincodeController.text = lp.pincode;
+                                    areaController.text = lp.area;
+                                  });
+                                },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+
+                                child: Row(
+                                  children: [
+                                    locationProvider.isLoading
+                                        ? const SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: Loader(),
+                                          )
+                                        : const AnimatedLocationIcon(),
+
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Use my current location',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    // ✅ RIGHT SIDE TICK
+                                    if (locationProvider.hasLocation &&
+                                        !locationProvider.isLoading)
+                                      const Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 22,
+                                      ),
+                                    // if (locationProvider.latitude != null &&
+                                    //     locationProvider.longitude != null &&
+                                    //     !locationProvider.isLoading)
+                                    //   const Icon(
+                                    //     Icons.check_circle_outline_outlined,
+                                    //     color: Colors.green,
+                                    //     size: 22,
+                                    //   ),
+                                  ],
+                                ),
+                              ),
+                              // ✅ GREEN HINT TEXT
+                              if (locationProvider.locationMessage.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 10,
+                                    top: 4,
+                                  ),
+                                  child: Text(
+                                    locationProvider.locationMessage,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 24),
@@ -285,7 +389,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
 
               /// ================= SAVE BUTTON =================
-              /// ================= SAVE BUTTON =================
               SizedBox(
                 width: double.infinity,
                 height: buttonHeight,
@@ -295,6 +398,18 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       : () async {
                           if (!_formKey.currentState!.validate()) return;
 
+                          final lp = context.read<LocationProvider>();
+
+                          // 🚨 REQUIRED LOCATION CHECK
+                          if (lp.latitude == null || lp.longitude == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please use current location'),
+                              ),
+                            );
+                            return;
+                          }
+
                           // ================= ADD =================
                           if (widget.address == null) {
                             final response = await context
@@ -302,12 +417,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                 .addAddress(
                                   name: nameController.text,
                                   mobile: phoneController.text,
-                                  addressLine:
-                                      '${houseController.text}, ${areaController.text}',
-                                  landmark: '',
+                                  addressLine: houseController.text,
+                                  landmark: areaController.text,
                                   city: cityController.text,
                                   state: stateController.text,
                                   pincode: pincodeController.text,
+                                  latitude: lp.latitude!.toString(),
+                                  longitude: lp.longitude!.toString(),
                                 );
 
                             if (response.success && context.mounted) {
@@ -326,12 +442,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   id: widget.address!.id,
                                   name: nameController.text,
                                   mobile: phoneController.text,
-                                  addressLine:
-                                      '${houseController.text}, ${areaController.text}',
-                                  landmark: '',
+                                  addressLine: houseController.text,
+                                  landmark: areaController.text,
                                   city: cityController.text,
                                   state: stateController.text,
                                   pincode: pincodeController.text,
+                                  latitude: lp.latitude!,
+                                  longitude: lp.longitude!,
                                 );
 
                             if (response.success && context.mounted) {
@@ -351,8 +468,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   ),
                   child: addressProvider.isLoading
                       ? const Loader()
-                      : const Text(
-                          'Save Address',
+                      : Text(
+                          widget.address == null
+                              ? 'Save Address'
+                              : 'Update Address',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -362,77 +481,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 ),
               ),
 
-              // SizedBox(
-              //   width: double.infinity,
-              //   height: buttonHeight,
-              //   child: ElevatedButton(
-              //     onPressed: addressProvider.isLoading
-              //         ? null
-              //         : () async {
-              //             if (!_formKey.currentState!.validate()) return;
-
-              //             if (widget.address == null) {
-              //               final response = await context
-              //                   .read<AddressProvider>()
-              //                   .addAddress(
-              //                     name: nameController.text,
-              //                     mobile: phoneController.text,
-              //                     addressLine:
-              //                         '${houseController.text}, ${areaController.text}',
-              //                     landmark: '',
-              //                     city: cityController.text,
-              //                     state: stateController.text,
-              //                     pincode: pincodeController.text,
-              //                   );
-              //               // if (!context.mounted) return;
-              //               if (response.success && context.mounted) {
-              //                 context.pop(true);
-              //               }
-              //               // else if (mounted) {
-              //               //   ScaffoldMessenger.of(context).showSnackBar(
-              //               //     SnackBar(content: Text(response.message)),
-              //               //   );
-              //               // }
-              //               else {
-              //                 // ✅ EDIT
-              //                 final response = await context
-              //                     .read<AddressProvider>()
-              //                     .updateAddress(
-              //                       id: widget.address!.id,
-              //                       name: nameController.text,
-              //                       mobile: phoneController.text,
-              //                       addressLine:
-              //                           '${houseController.text}, ${areaController.text}',
-              //                       landmark: '',
-              //                       city: cityController.text,
-              //                       state: stateController.text,
-              //                       pincode: pincodeController.text,
-              //                     );
-
-              //                 if (response.success && context.mounted) {
-              //                   context.pop(true);
-              //                 }
-              //               }
-              //             }
-              //           },
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.green,
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(14),
-              //       ),
-              //     ),
-              //     child: addressProvider.isLoading
-              //         ? const Loader()
-              //         : const Text(
-              //             'Save Address',
-              //             style: TextStyle(
-              //               fontSize: 16,
-              //               fontWeight: FontWeight.w600,
-              //               color: AppColors.appBarText,
-              //             ),
-              //           ),
-              //   ),
-              // ),
               const SizedBox(height: 16),
             ],
           ),
