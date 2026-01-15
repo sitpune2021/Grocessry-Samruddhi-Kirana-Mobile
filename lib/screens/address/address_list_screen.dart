@@ -82,9 +82,9 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Consumer<AddressProvider>(
           builder: (context, provider, _) {
-            if (provider.isLoading) {
-              return const Center(child: Loader());
-            }
+            // if (provider.isLoading) {
+            //   return const Center(child: Loader());
+            // }
 
             final List<GetAddress> addresses = provider.addresses;
 
@@ -94,7 +94,9 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
 
                 /// ================= ADDRESS LIST =================
                 Expanded(
-                  child: addresses.isEmpty
+                  child: provider.isLoading && addresses.isEmpty
+                      ? const Center(child: Loader())
+                      : addresses.isEmpty
                       ? const Center(
                           child: Text(
                             'No address found',
@@ -117,35 +119,27 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                                   selectedIndex = index;
                                 });
                               },
+
+                              /// ✅ EDIT
+                              onEdit: () async {
+                                final result = await context.push(
+                                  Routes.addAddress,
+                                  extra: item, // ✅ PASS ADDRESS
+                                );
+
+                                if (context.mounted && result == true) {
+                                  context
+                                      .read<AddressProvider>()
+                                      .fetchAllAddresses();
+                                }
+                              },
+                              
                               onDelete: () {
                                 _showDeleteBottomSheet(
                                   context: context,
                                   address: item,
                                 );
                               },
-
-                              // onDelete: () async {
-                              //   final provider = context
-                              //       .read<AddressProvider>();
-
-                              //   final response = await provider.deleteAddress(
-                              //     item.id,
-                              //   );
-
-                              //   if (!context.mounted) return;
-
-                              //   ScaffoldMessenger.of(context).showSnackBar(
-                              //     SnackBar(content: Text(response.message)),
-                              //   );
-
-                              //   // ✅ keep selection safe
-                              //   if (selectedIndex >=
-                              //       provider.addresses.length) {
-                              //     setState(() {
-                              //       selectedIndex = 0;
-                              //     });
-                              //   }
-                              // },
                             );
                           },
                         ),
@@ -198,6 +192,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
     required GetAddress address,
   }) {
     showModalBottomSheet(
+      backgroundColor: AppColors.white,
       context: context,
       isDismissible: false,
       enableDrag: false,
@@ -301,8 +296,12 @@ class _AddNewAddressButton extends StatelessWidget {
         border: Border.all(color: Colors.green, width: 2),
       ),
       child: TextButton.icon(
-        onPressed: () {
-          context.push(Routes.addAddress);
+        onPressed: () async {
+          final result = await context.push(Routes.addAddress);
+
+          if (context.mounted && result == true) {
+            context.read<AddressProvider>().fetchAllAddresses();
+          }
         },
         icon: const Icon(Icons.add, color: Colors.green),
         label: const Text(

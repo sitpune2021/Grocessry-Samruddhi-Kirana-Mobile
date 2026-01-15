@@ -26,7 +26,7 @@ class ApiConstants {
   static const dashboard = '/dashboard';
 
   static const addAddress = '/customer/addresses';
-  static const updateAddress = '/customer/addresses/';
+  static String updateAddress(int id) => '/customer/addresses/$id';
   static String deleteAddress(int id) => '/customer/addresses/$id';
   static const getAllAddress = '/customer/addresses';
 

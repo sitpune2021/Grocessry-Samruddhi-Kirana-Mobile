@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../address/add_address_screen.dart';
 
-
-
 class SelectLocationScreen extends StatelessWidget {
   const SelectLocationScreen({super.key});
 
@@ -14,7 +12,6 @@ class SelectLocationScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-
             // TOP BAR
             Row(
               children: [
@@ -27,10 +24,7 @@ class SelectLocationScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Text(
                   "Select Your Location",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -44,8 +38,9 @@ class SelectLocationScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 height: 52,
                 decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12)),
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Row(
                   children: [
                     const Icon(Icons.search, color: Colors.black54),
@@ -56,7 +51,9 @@ class SelectLocationScreen extends StatelessWidget {
                           hintText: "Search for apartment, street name...",
                           border: InputBorder.none,
                           hintStyle: TextStyle(
-                              color: Colors.black54, fontSize: 16),
+                            color: Colors.black54,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -72,7 +69,6 @@ class SelectLocationScreen extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-
                   Container(
                     width: double.infinity,
                     height: double.infinity,
@@ -90,7 +86,9 @@ class SelectLocationScreen extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black87,
                           borderRadius: BorderRadius.circular(10),
@@ -121,9 +119,10 @@ class SelectLocationScreen extends StatelessWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.black12,
-                      offset: Offset(0, -2),
-                      blurRadius: 10)
+                    color: Colors.black12,
+                    offset: Offset(0, -2),
+                    blurRadius: 10,
+                  ),
                 ],
               ),
               child: Column(
@@ -131,8 +130,7 @@ class SelectLocationScreen extends StatelessWidget {
                 children: const [
                   Text(
                     "Konark Icon",
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 2),
                   Text(
@@ -172,11 +170,9 @@ class SelectLocationScreen extends StatelessWidget {
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 }
-

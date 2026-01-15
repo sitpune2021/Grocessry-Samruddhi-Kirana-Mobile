@@ -1,94 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:samruddha_kirana/config/routes.dart';
-// import 'package:samruddha_kirana/screens/address/address_list_screen.dart';
-
-// class AddressCard extends StatelessWidget {
-//   final AddressModel data;
-//   final bool isSelected;
-//   final VoidCallback onTap;
-
-//   const AddressCard({
-//     super.key,
-//     required this.data,
-//     required this.isSelected,
-//     required this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final borderColor = isSelected ? Colors.green : Colors.grey.shade300;
-
-//     return InkWell(
-//       onTap: onTap,
-//       borderRadius: BorderRadius.circular(16),
-//       child: Container(
-//         padding: const EdgeInsets.all(16),
-//         decoration: BoxDecoration(
-//           color: Colors.white,
-//           borderRadius: BorderRadius.circular(16),
-//           border: Border.all(color: borderColor, width: 2),
-//         ),
-//         child: Row(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             /// Radio
-//             Icon(
-//               isSelected
-//                   ? Icons.radio_button_checked
-//                   : Icons.radio_button_unchecked,
-//               color: isSelected ? Colors.green : Colors.grey,
-//             ),
-
-//             const SizedBox(width: 12),
-
-//             /// Content
-//             Expanded(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     children: [
-//                       Icon(data.icon, color: Colors.green, size: 20),
-//                       const SizedBox(width: 8),
-//                       Text(
-//                         data.title,
-//                         style: const TextStyle(
-//                           fontSize: 16,
-//                           fontWeight: FontWeight.w600,
-//                           color: Colors.green,
-//                         ),
-//                       ),
-//                       const Spacer(),
-//                       TextButton(onPressed: () {}, child: const Text('Edit')),
-//                       IconButton(
-//                         onPressed: () {
-//                           context.push(Routes.addAddress);
-//                         },
-//                         icon: const Icon(Icons.delete_outline),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     data.address,
-//                     style: const TextStyle(fontSize: 14, color: Colors.grey),
-//                   ),
-//                   const SizedBox(height: 8),
-//                   Text(
-//                     'Phone: ${data.phone}',
-//                     style: const TextStyle(fontSize: 14, color: Colors.grey),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/config/routes.dart';
@@ -98,14 +7,16 @@ class AddressCard extends StatelessWidget {
   final GetAddress data;
   final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onDelete; // ✅ ADD
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   const AddressCard({
     super.key,
     required this.data,
     required this.isSelected,
     required this.onTap,
-    required this.onDelete, // ✅ ADD
+    required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -229,5 +140,4 @@ class AddressCard extends StatelessWidget {
       ),
     );
   }
-  
 }

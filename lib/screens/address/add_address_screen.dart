@@ -1,281 +1,68 @@
-// import 'package:flutter/material.dart';
-
-// class AddAddressScreen extends StatefulWidget {
-//   const AddAddressScreen({super.key});
-
-//   @override
-//   State<AddAddressScreen> createState() => _AddAddressScreenState();
-// }
-
-// class _AddAddressScreenState extends State<AddAddressScreen> {
-//   String selectedLabel = "Home";
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       appBar: AppBar(
-//         backgroundColor: Colors.white,
-//         surfaceTintColor: Colors.transparent,
-//         elevation: 0,
-//         centerTitle: true,
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.black),
-//           onPressed: () {
-//             Navigator.pop(context);
-//           },
-//         ),
-//         title: const Text(
-//           "Add Address",
-//           style: TextStyle(
-//             color: Colors.black,
-//             fontSize: 22,
-//             fontWeight: FontWeight.w600,
-//           ),
-//         ),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             // // APP BAR
-//             // Row(
-//             //   children: [
-//             //     IconButton(
-//             //       icon: const Icon(Icons.arrow_back),
-//             //       onPressed: () {},
-//             //     ),
-//             //     const Expanded(
-//             //       child: Center(
-//             //         child: Text(
-//             //           "Add Address...",
-//             //           style: TextStyle(
-//             //             fontSize: 22,
-//             //             fontWeight: FontWeight.w600,
-//             //           ),
-//             //         ),
-//             //       ),
-//             //     ),
-//             //     const SizedBox(width: 48), // to balance center alignment
-//             //   ],
-//             // ),
-
-//             // MAP PREVIEW BOX
-//             Container(
-//               margin: const EdgeInsets.symmetric(horizontal: 16),
-//               height: 220,
-//               decoration: BoxDecoration(
-//                 color: Colors.grey.shade200,
-//                 borderRadius: BorderRadius.circular(16),
-//               ),
-//               child: const Center(
-//                 child: Text(
-//                   "Google Map Preview",
-//                   style: TextStyle(color: Colors.black54),
-//                 ),
-//               ),
-//             ),
-
-//             const SizedBox(height: 12),
-
-//             // LOCATION TITLE + CHANGE
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   const Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         "Kirtane Baugh",
-//                         style: TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.w600,
-//                         ),
-//                       ),
-//                       SizedBox(height: 4),
-//                       Text(
-//                         "Hadapsar, Magarpatta, Pune",
-//                         style: TextStyle(color: Colors.black54, fontSize: 14),
-//                       ),
-//                     ],
-//                   ),
-//                   OutlinedButton(
-//                     onPressed: () {},
-//                     style: OutlinedButton.styleFrom(
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                     ),
-//                     child: const Text("Change"),
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 25),
-
-//             // ADD ADDRESS HEADING
-//             const Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 16),
-//               child: Text(
-//                 "Add Address",
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-//               ),
-//             ),
-
-//             const SizedBox(height: 12),
-
-//             // INPUT FIELDS
-//             buildInputField("House No. & Floor *"),
-//             buildInputField("Building & Block No. (Optional)"),
-//             buildInputField("Landmark & Area Name (Optional)"),
-
-//             const SizedBox(height: 25),
-
-//             // LABEL SELECTOR
-//             const Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 16),
-//               child: Text(
-//                 "Add Address Label",
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-//               ),
-//             ),
-
-//             const SizedBox(height: 15),
-
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.start,
-//                 children: [
-//                   labelChip("Home"),
-//                   const SizedBox(width: 10),
-//                   labelChip("Work"),
-//                   const SizedBox(width: 10),
-//                   labelChip("Other"),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 25),
-
-//             // RECEIVER DETAILS
-//             const Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 16),
-//               child: Text(
-//                 "Receiver Details",
-//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-//               ),
-//             ),
-
-//             const SizedBox(height: 12),
-
-//             buildInputField("Receiver’s Name"),
-//             buildInputField("Receiver’s Phone Number"),
-
-//             const SizedBox(height: 100),
-//           ],
-//         ),
-//       ),
-
-//       // SAVE ADDRESS BUTTON
-//       bottomNavigationBar: Container(
-//         padding: const EdgeInsets.all(16),
-//         color: Colors.white,
-//         child: SizedBox(
-//           height: 55,
-//           child: ElevatedButton(
-//             onPressed: () {},
-//             style: ElevatedButton.styleFrom(
-//               backgroundColor: Colors.pink,
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(14),
-//               ),
-//             ),
-//             child: const Text(
-//               "SAVE ADDRESS",
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 18,
-//                 letterSpacing: 1,
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   // Common input field widget
-//   Widget buildInputField(String title) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             title,
-//             style: const TextStyle(fontSize: 14, color: Colors.black54),
-//           ),
-//           const SizedBox(height: 8),
-//           TextFormField(
-//             decoration: InputDecoration(
-//               filled: true,
-//               fillColor: const Color(0xffF3F4F6),
-//               contentPadding: const EdgeInsets.symmetric(
-//                 horizontal: 16,
-//                 vertical: 14,
-//               ),
-//               border: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(12),
-//                 borderSide: BorderSide.none,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   // Address label selector chip
-//   Widget labelChip(String label) {
-//     bool isSelected = selectedLabel == label;
-
-//     return InkWell(
-//       onTap: () {
-//         setState(() {
-//           selectedLabel = label;
-//         });
-//       },
-//       child: Container(
-//         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-//         decoration: BoxDecoration(
-//           color: isSelected ? Colors.black : Colors.white,
-//           borderRadius: BorderRadius.circular(30),
-//           border: Border.all(color: Colors.black26),
-//         ),
-//         child: Text(
-//           label,
-//           style: TextStyle(
-//             color: isSelected ? Colors.white : Colors.black,
-//             fontSize: 15,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:samruddha_kirana/constants/app_colors.dart';
+import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
+import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
-class AddAddressScreen extends StatelessWidget {
-  const AddAddressScreen({super.key});
+enum AddressType { home, work, other }
+
+class AddAddressScreen extends StatefulWidget {
+  final GetAddress? address; // 👈 nullable
+  const AddAddressScreen({super.key, this.address});
+
+  @override
+  State<AddAddressScreen> createState() => _AddAddressScreenState();
+}
+
+class _AddAddressScreenState extends State<AddAddressScreen> {
+  /// ================= FORM & STATE =================
+  final _formKey = GlobalKey<FormState>();
+
+  AddressType selectedType = AddressType.home;
+  bool isDefaultAddress = true;
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController pincodeController = TextEditingController();
+  final TextEditingController houseController = TextEditingController();
+  final TextEditingController areaController = TextEditingController();
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController stateController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+
+    // if (widget.address != null) {
+    //   nameController.text = widget.address!.name ?? '';
+    //   phoneController.text = widget.address!.mobile ?? '';
+    //   pincodeController.text = widget.address!.pincode ?? '';
+    //   cityController.text = widget.address!.city ?? '';
+    //   areaController.text = widget.address!
+    //   stateController.text = widget.address!.state ?? '';
+    //   houseController.text = widget.address!.addressLine ?? '';
+    // }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    phoneController.dispose();
+    pincodeController.dispose();
+    houseController.dispose();
+    areaController.dispose();
+    cityController.dispose();
+    stateController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final addressProvider = context.watch<AddressProvider>();
+
     /// ================= RESPONSIVE VALUES =================
     final horizontalPadding = ResponsiveValue<double>(
       context,
@@ -289,25 +76,23 @@ class AddAddressScreen extends StatelessWidget {
     final titleFontSize = ResponsiveValue<double>(
       context,
       defaultValue: 20,
-      conditionalValues: const [
-        Condition.largerThan(name: TABLET, value: 24),
-      ],
+      conditionalValues: const [Condition.largerThan(name: TABLET, value: 24)],
     ).value;
 
     final buttonHeight = ResponsiveValue<double>(
       context,
       defaultValue: 56,
-      conditionalValues: const [
-        Condition.largerThan(name: TABLET, value: 64),
-      ],
+      conditionalValues: const [Condition.largerThan(name: TABLET, value: 64)],
     ).value;
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: const BackButton(),
         title: Text(
-          'Add Address',
+          widget.address == null ? 'Add Address' : 'Edit Address',
           style: TextStyle(
             fontSize: titleFontSize,
             fontWeight: FontWeight.w600,
@@ -321,101 +106,333 @@ class AddAddressScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _sectionTitle('CONTACT INFORMATION'),
-                      _inputField(
-                        hint: 'Full Name',
-                        icon: Icons.person_outline,
-                      ),
-                      _inputField(
-                        hint: 'Phone Number',
-                        icon: Icons.phone_outlined,
-                        keyboardType: TextInputType.phone,
-                      ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 6),
+                        _sectionTitle('CONTACT INFORMATION'),
+                        _inputField(
+                          controller: nameController,
+                          hint: 'Full Name',
+                          icon: Icons.person_outline,
+                          validator: _requiredValidator,
+                        ),
+                        _inputField(
+                          controller: phoneController,
+                          hint: 'Phone Number',
+                          icon: Icons.phone_outlined,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          validator: _phoneValidator,
+                        ),
 
-                      const SizedBox(height: 24),
-                      _sectionTitle('ADDRESS DETAILS'),
-                      _inputField(
-                        hint: 'Pincode / ZIP',
-                        icon: Icons.location_on_outlined,
-                        keyboardType: TextInputType.number,
-                      ),
-                      _inputField(
-                        hint: 'Flat / House No. / Floor',
-                        icon: Icons.tag,
-                      ),
-                      _inputField(
-                        hint: 'Building Name / Area / Street',
-                        icon: Icons.apartment_outlined,
-                      ),
+                        const SizedBox(height: 24),
+                        _sectionTitle('ADDRESS DETAILS'),
+                        _inputField(
+                          controller: pincodeController,
+                          hint: 'Pincode / ZIP',
+                          icon: Icons.location_on_outlined,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(6),
+                          ],
+                          validator: _pincodeValidator,
+                          // onChanged: _sanitizePincode,
+                        ),
+                        _inputField(
+                          controller: houseController,
+                          hint: 'Flat / House No. / Floor',
+                          icon: Icons.tag,
+                          validator: _requiredValidator,
+                        ),
+                        _inputField(
+                          controller: areaController,
+                          hint: 'Building Name / Area / Street',
+                          icon: Icons.apartment_outlined,
+                          validator: _requiredValidator,
+                        ),
 
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _inputField(
-                              hint: 'City',
-                              icon: Icons.location_city_outlined,
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _inputField(
+                                controller: cityController,
+                                hint: 'City',
+                                icon: Icons.location_city_outlined,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[a-zA-Z ]'),
+                                  ),
+                                ],
+                                validator: _alphaValidator,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _inputField(
+                                controller: stateController,
+                                hint: 'State',
+                                icon: Icons.map_outlined,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[a-zA-Z ]'),
+                                  ),
+                                ],
+                                validator: _alphaValidator,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+                        _sectionTitle('SAVE ADDRESS AS'),
+
+                        /// ================= ADDRESS TYPE =================
+                        Row(
+                          children: [
+                            _AddressTypeChip(
+                              label: 'Home',
+                              icon: Icons.home,
+                              isSelected: selectedType == AddressType.home,
+                              onTap: () => setState(
+                                () => selectedType = AddressType.home,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _AddressTypeChip(
+                              label: 'Work',
+                              icon: Icons.work_outline,
+                              isSelected: selectedType == AddressType.work,
+                              onTap: () => setState(
+                                () => selectedType = AddressType.work,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            _AddressTypeChip(
+                              label: 'Other',
+                              icon: Icons.more_horiz,
+                              isSelected: selectedType == AddressType.other,
+                              onTap: () => setState(
+                                () => selectedType = AddressType.other,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        /// ================= DEFAULT TOGGLE =================
+                        const SizedBox(height: 16),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isDefaultAddress = !isDefaultAddress;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF6FFF8),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  isDefaultAddress
+                                      ? Icons.check_circle
+                                      : Icons.radio_button_unchecked,
+                                  color: isDefaultAddress
+                                      ? Colors.green
+                                      : Colors.grey,
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    'Set as default address',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Switch(
+                                  value: isDefaultAddress,
+                                  activeThumbColor: Colors.green,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      isDefaultAddress = v;
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _inputField(
-                              hint: 'State',
-                              icon: Icons.map_outlined,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
 
-                      const SizedBox(height: 24),
-                      _sectionTitle('SAVE ADDRESS AS'),
-                      Row(
-                        children: const [
-                          _AddressTypeChip(
-                            label: 'Home',
-                            icon: Icons.home,
-                            isSelected: true,
-                          ),
-                          SizedBox(width: 12),
-                          _AddressTypeChip(
-                            label: 'Work',
-                            icon: Icons.work_outline,
-                          ),
-                          SizedBox(width: 12),
-                          _AddressTypeChip(
-                            label: 'Other',
-                            icon: Icons.more_horiz,
-                          ),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(height: 24),
+                      ],
+                    ),
                   ),
                 ),
               ),
 
+              /// ================= SAVE BUTTON =================
+              /// ================= SAVE BUTTON =================
               SizedBox(
                 width: double.infinity,
                 height: buttonHeight,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: addressProvider.isLoading
+                      ? null
+                      : () async {
+                          if (!_formKey.currentState!.validate()) return;
+
+                          // ================= ADD =================
+                          if (widget.address == null) {
+                            final response = await context
+                                .read<AddressProvider>()
+                                .addAddress(
+                                  name: nameController.text,
+                                  mobile: phoneController.text,
+                                  addressLine:
+                                      '${houseController.text}, ${areaController.text}',
+                                  landmark: '',
+                                  city: cityController.text,
+                                  state: stateController.text,
+                                  pincode: pincodeController.text,
+                                );
+
+                            if (response.success && context.mounted) {
+                              context.pop(true);
+                            } else if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(response.message)),
+                              );
+                            }
+                          }
+                          // ================= EDIT =================
+                          else {
+                            final response = await context
+                                .read<AddressProvider>()
+                                .updateAddress(
+                                  id: widget.address!.id,
+                                  name: nameController.text,
+                                  mobile: phoneController.text,
+                                  addressLine:
+                                      '${houseController.text}, ${areaController.text}',
+                                  landmark: '',
+                                  city: cityController.text,
+                                  state: stateController.text,
+                                  pincode: pincodeController.text,
+                                );
+
+                            if (response.success && context.mounted) {
+                              context.pop(true);
+                            } else if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(response.message)),
+                              );
+                            }
+                          }
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Save & Continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: addressProvider.isLoading
+                      ? const Loader()
+                      : const Text(
+                          'Save Address',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.appBarText,
+                          ),
+                        ),
                 ),
               ),
+
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: buttonHeight,
+              //   child: ElevatedButton(
+              //     onPressed: addressProvider.isLoading
+              //         ? null
+              //         : () async {
+              //             if (!_formKey.currentState!.validate()) return;
+
+              //             if (widget.address == null) {
+              //               final response = await context
+              //                   .read<AddressProvider>()
+              //                   .addAddress(
+              //                     name: nameController.text,
+              //                     mobile: phoneController.text,
+              //                     addressLine:
+              //                         '${houseController.text}, ${areaController.text}',
+              //                     landmark: '',
+              //                     city: cityController.text,
+              //                     state: stateController.text,
+              //                     pincode: pincodeController.text,
+              //                   );
+              //               // if (!context.mounted) return;
+              //               if (response.success && context.mounted) {
+              //                 context.pop(true);
+              //               }
+              //               // else if (mounted) {
+              //               //   ScaffoldMessenger.of(context).showSnackBar(
+              //               //     SnackBar(content: Text(response.message)),
+              //               //   );
+              //               // }
+              //               else {
+              //                 // ✅ EDIT
+              //                 final response = await context
+              //                     .read<AddressProvider>()
+              //                     .updateAddress(
+              //                       id: widget.address!.id,
+              //                       name: nameController.text,
+              //                       mobile: phoneController.text,
+              //                       addressLine:
+              //                           '${houseController.text}, ${areaController.text}',
+              //                       landmark: '',
+              //                       city: cityController.text,
+              //                       state: stateController.text,
+              //                       pincode: pincodeController.text,
+              //                     );
+
+              //                 if (response.success && context.mounted) {
+              //                   context.pop(true);
+              //                 }
+              //               }
+              //             }
+              //           },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.green,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(14),
+              //       ),
+              //     ),
+              //     child: addressProvider.isLoading
+              //         ? const Loader()
+              //         : const Text(
+              //             'Save Address',
+              //             style: TextStyle(
+              //               fontSize: 16,
+              //               fontWeight: FontWeight.w600,
+              //               color: AppColors.appBarText,
+              //             ),
+              //           ),
+              //   ),
+              // ),
               const SizedBox(height: 16),
             ],
           ),
@@ -424,8 +441,7 @@ class AddAddressScreen extends StatelessWidget {
     );
   }
 
-  /// ================= UI HELPERS =================
-
+  /// ================= HELPERS =================
   Widget _sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -442,14 +458,23 @@ class AddAddressScreen extends StatelessWidget {
   }
 
   Widget _inputField({
+    required TextEditingController controller,
     required String hint,
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+    void Function(String)? onChanged,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
+      child: TextFormField(
+        controller: controller,
         keyboardType: keyboardType,
+        cursorColor: AppColors.appBarBackground,
+        validator: validator,
+        onChanged: onChanged,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hint,
           prefixIcon: Icon(icon, size: 20),
@@ -463,6 +488,21 @@ class AddAddressScreen extends StatelessWidget {
       ),
     );
   }
+
+  String? _requiredValidator(String? v) =>
+      v == null || v.trim().isEmpty ? 'This field is required' : null;
+
+  String? _phoneValidator(String? v) =>
+      v != null && v.length == 10 ? null : 'Enter valid phone number';
+
+  String? _pincodeValidator(String? v) =>
+      v != null && v.length == 6 ? null : 'Enter 6 digit pincode';
+
+  String? _alphaValidator(String? v) => v == null || v.trim().isEmpty
+      ? 'This field is required'
+      : RegExp(r'^[a-zA-Z ]+$').hasMatch(v)
+      ? null
+      : 'Only alphabets allowed';
 }
 
 /// ================= ADDRESS TYPE CHIP =================
@@ -470,39 +510,44 @@ class _AddressTypeChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isSelected;
+  final VoidCallback onTap;
 
   const _AddressTypeChip({
     required this.label,
     required this.icon,
-    this.isSelected = false,
+    required this.isSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        height: 48,
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.green : const Color(0xFFF2F2F2),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? Colors.white : Colors.black54,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: FontWeight.w600,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 48,
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.green : const Color(0xFFF2F2F2),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: isSelected ? Colors.white : Colors.black54,
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

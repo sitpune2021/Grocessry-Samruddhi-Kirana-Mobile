@@ -22,10 +22,6 @@ class AddressProvider extends ChangeNotifier {
 
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
-    if (_isLoading) {
-      return ApiResponse(success: false, message: 'Please wait');
-    }
-
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -82,6 +78,99 @@ class AddressProvider extends ChangeNotifier {
       response = ApiResponse(success: false, message: e.toString());
     } finally {
       _isDeleting = false;
+      notifyListeners();
+    }
+
+    return response;
+  }
+
+  // ================= ADD ADDRESS =================
+  Future<ApiResponse> addAddress({
+    required String name,
+    required String mobile,
+    required String addressLine,
+    required String landmark,
+    required String city,
+    required String state,
+    required String pincode,
+    String? latitude,
+    String? longitude,
+  }) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    ApiResponse response;
+
+    try {
+      response = await AddressService.addAddress(
+        name: name.trim(),
+        mobile: mobile.trim(),
+        addressLine: addressLine.trim(),
+        landmark: landmark.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        latitude: latitude,
+        longitude: longitude,
+      );
+    } catch (e) {
+      response = ApiResponse(success: false, message: e.toString());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+    return response;
+  }
+
+  // ================= UPDATE ADDRESS =================
+  Future<ApiResponse> updateAddress({
+    required int id,
+    required String name,
+    required String mobile,
+    required String addressLine,
+    required String landmark,
+    required String city,
+    required String state,
+    required String pincode,
+    double? latitude,
+    double? longitude,
+  }) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    ApiResponse response;
+
+    try {
+      response = await AddressService.updateAddress(
+        id: id,
+        name: name.trim(),
+        mobile: mobile.trim(),
+        addressLine: addressLine.trim(),
+        landmark: landmark.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      if (response.success) {
+        // 🔁 Refresh list after update
+        await fetchAllAddresses();
+      }
+    } catch (e) {
+      response = ApiResponse(success: false, message: e.toString());
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
 

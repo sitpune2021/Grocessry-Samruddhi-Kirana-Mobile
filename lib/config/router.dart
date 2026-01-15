@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
 import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
 import 'package:samruddha_kirana/screens/address/address_list_screen.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/forgot_password.dart';
@@ -79,7 +80,7 @@ class AppRouter {
         path: Routes.addAddress,
         pageBuilder: (context, state) => PageTransitions.slide(
           state: state,
-          child: const AddAddressScreen(),
+          child: AddAddressScreen(address: state.extra as GetAddress?),
         ),
       ),
       GoRoute(

@@ -19,11 +19,62 @@ class AddressService {
     );
   }
 
-  // edit / update address
-  // static Future<ApiResponse> updateAddress(int id) async {
-  //   return await ApiClient.put(
-  //     ApiConstants.deleteAddress(id),
-  //     authRequired: true, // 🔐 token based
-  //   );
-  // }
+  // ================= UPDATE / EDIT ADDRESS =================
+  static Future<ApiResponse> updateAddress({
+    required int id,
+    required String name,
+    required String mobile,
+    required String addressLine,
+    required String landmark,
+    required String city,
+    required String state,
+    required String pincode,
+    double? latitude,
+    double? longitude,
+  }) async {
+    return await ApiClient.put(
+      ApiConstants.updateAddress(id),
+      {
+        "name": name,
+        "mobile": mobile,
+        "address_line": addressLine,
+        "landmark": landmark,
+        "city": city,
+        "state": state,
+        "pincode": pincode,
+        "latitude": latitude,
+        "longitude": longitude,
+      },
+      authRequired: true, // 🔐 token based
+    );
+  }
+
+  // ================= ADD ADDRESS =================
+  static Future<ApiResponse> addAddress({
+    required String name,
+    required String mobile,
+    required String addressLine,
+    required String landmark,
+    required String city,
+    required String state,
+    required String pincode,
+    String? latitude,
+    String? longitude,
+  }) async {
+    return await ApiClient.post(
+      ApiConstants.addAddress,
+      {
+        "name": name,
+        "mobile": mobile,
+        "address_line": addressLine,
+        "landmark": landmark,
+        "city": city,
+        "state": state,
+        "pincode": pincode,
+        "latitude": latitude ?? "",
+        "longitude": longitude ?? "",
+      },
+      authRequired: true, // 🔐 token based
+    );
+  }
 }
