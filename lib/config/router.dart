@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
 import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
@@ -83,13 +84,27 @@ class AppRouter {
           child: AddAddressScreen(address: state.extra as GetAddress?),
         ),
       ),
+      // GoRoute(
+      //   path: Routes.product,
+      //   pageBuilder: (context, state) => PageTransitions.slide(
+      //     state: state,
+      //     child: const ProductsListScreen(),
+      //   ),
+      // ),
       GoRoute(
         path: Routes.product,
-        pageBuilder: (context, state) => PageTransitions.slide(
-          state: state,
-          child: const ProductsListScreen(),
-        ),
+        pageBuilder: (context, state) {
+          final subCategoryId = state.extra as int;
+
+          return PageTransitions.slide(
+            state: state,
+            child: ProductsListScreen(
+              key: ValueKey(subCategoryId), // ⭐ VERY IMPORTANT
+            ),
+          );
+        },
       ),
+
       GoRoute(
         path: Routes.productDetails,
         pageBuilder: (context, state) {

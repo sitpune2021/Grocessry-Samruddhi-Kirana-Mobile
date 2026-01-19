@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-/// Decode JSON string to model
 ProductModel productModelFromJson(String str) =>
     ProductModel.fromJson(json.decode(str));
 
-/// Encode model to JSON string
 String productModelToJson(ProductModel data) => json.encode(data.toJson());
 
 class ProductModel {
@@ -51,6 +49,8 @@ class Product {
   final String mrp;
   final String gstPercentage;
   final int stock;
+  final int quantity;
+  final int maxQuantity;
   final List<String> imageUrls;
 
   const Product({
@@ -63,20 +63,24 @@ class Product {
     required this.mrp,
     required this.gstPercentage,
     required this.stock,
+    required this.quantity,
+    required this.maxQuantity,
     required this.imageUrls,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] ?? 0,
-      categoryId: json['category_id'] ?? 0,
-      subCategoryId: json['sub_category_id'] ?? 0,
-      name: json['name'] ?? '',
-      basePrice: json['base_price'] ?? '',
-      retailerPrice: json['retailer_price'] ?? '',
-      mrp: json['mrp'] ?? '',
-      gstPercentage: json['gst_percentage'] ?? '',
-      stock: json['stock'] ?? 0,
+      id: _toInt(json['id']),
+      categoryId: _toInt(json['category_id']),
+      subCategoryId: _toInt(json['sub_category_id']),
+      name: json['name']?.toString() ?? '',
+      basePrice: json['base_price']?.toString() ?? '0',
+      retailerPrice: json['retailer_price']?.toString() ?? '0',
+      mrp: json['mrp']?.toString() ?? '0',
+      gstPercentage: json['gst_percentage']?.toString() ?? '0',
+      stock: _toInt(json['stock']),
+      quantity: _toInt(json['quantity']),
+      maxQuantity: _toInt(json['max_quantity']),
       imageUrls:
           (json['image_urls'] as List<dynamic>?)
               ?.map((e) => e.toString())
@@ -95,8 +99,19 @@ class Product {
     'mrp': mrp,
     'gst_percentage': gstPercentage,
     'stock': stock,
+    'quantity': quantity,
+    'max_quantity': maxQuantity,
     'image_urls': imageUrls,
   };
+
+  // 🔑 SAFE PARSER
+  static int _toInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    if (value is double) return value.toInt();
+    return 0;
+  }
 }
 
 class Subcategory {
