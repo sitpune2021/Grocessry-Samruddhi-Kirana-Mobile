@@ -193,17 +193,36 @@ class AllProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= CART =================
+  // ================= ADD CART =================
   void addToCart(int productId) {
-    _quantities[productId] = (_quantities[productId] ?? 0) + 1;
+    final product = _allProducts.firstWhere(
+      (p) => p.id == productId,
+      orElse: () => throw Exception('Product not found'),
+    );
+
+    final currentQty = _quantities[productId] ?? 0;
+
+    // ❌ Stop if max quantity reached
+    if (currentQty >= product.maxQuantity) return;
+
+    // ❌ Stop if stock reached
+    if (currentQty >= product.stock) return;
+
+    _quantities[productId] = currentQty + 1;
     notifyListeners();
   }
 
+ // =================REMOVED CART =================
   void removeFromCart(int productId) {
-    if ((_quantities[productId] ?? 0) > 0) {
-      _quantities[productId] = _quantities[productId]! - 1;
-      notifyListeners();
+    final currentQty = _quantities[productId] ?? 0;
+
+    if (currentQty <= 1) {
+      _quantities.remove(productId);
+    } else {
+      _quantities[productId] = currentQty - 1;
     }
+
+    notifyListeners();
   }
 
   // ================= CLEAR =================

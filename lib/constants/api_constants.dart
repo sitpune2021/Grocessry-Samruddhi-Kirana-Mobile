@@ -42,8 +42,8 @@ class ApiConstants {
 
   static const productAddCart = '/cart/add';
   static const viewCart = '/cart';
-  static const clearCart = '/';
-  static const removeProductInCart = '/';
+  static const clearCart = '/cart/clear';
+  static const removeProductInCart = '/cart/single/product/remove';
 
   static const allAvailableCoupons = '/';
   static const applyCoupon = '/';
