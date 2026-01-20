@@ -5,6 +5,7 @@ import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/address/location_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
+import 'package:samruddha_kirana/providers/orders/order_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
@@ -32,6 +33,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
 
       child: const MyApp(),

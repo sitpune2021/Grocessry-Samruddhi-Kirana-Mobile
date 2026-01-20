@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class OrderAgainScreen extends StatefulWidget {
   const OrderAgainScreen({super.key});
 
@@ -41,7 +40,6 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-
           // ========================= TOP 50% ==========================
           Expanded(
             flex: 1,
@@ -50,7 +48,6 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-
                   /// BACKGROUND IMAGE
                   Image.asset(
                     "assets/images/reorder.png",
@@ -109,7 +106,6 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   _sectionTitle("Bestsellers"),
                   _topProductsList(),
                   _seeAllButton(),
@@ -132,10 +128,7 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
       child: ShaderMask(
         shaderCallback: (Rect bounds) {
           return LinearGradient(
-            colors: [
-              Colors.orange.shade700,
-              Colors.green.shade700,
-            ],
+            colors: [Colors.orange.shade700, Colors.green.shade700],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ).createShader(bounds);
@@ -185,13 +178,12 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
             blurRadius: 6,
             spreadRadius: 2,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(16),
@@ -212,9 +204,10 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
-                  Text(product.weight,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(
+                    product.weight,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                   const SizedBox(height: 2),
 
                   Text(
@@ -222,15 +215,19 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   Row(
                     children: const [
                       Icon(Icons.timer, size: 14, color: Colors.green),
                       SizedBox(width: 3),
-                      Text("10 Mins",
-                          style: TextStyle(fontSize: 12, color: Colors.green)),
+                      Text(
+                        "10 Mins",
+                        style: TextStyle(fontSize: 12, color: Colors.green),
+                      ),
                     ],
                   ),
 
@@ -240,79 +237,91 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
                       Text(
                         "₹${product.price}",
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
 
                       SizedBox(
                         width: 80,
                         child: product.quantity == 0
                             ? GestureDetector(
-                          onTap: () => _incrementQuantity(product),
-                          child: Container(
-                            height: 32,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: Colors.green, width: 1.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "ADD",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.w600,
+                                onTap: () => _incrementQuantity(product),
+                                child: Container(
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.green,
+                                      width: 1.2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "ADD",
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        )
+                              )
                             : Container(
-                          height: 32,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.green, width: 1.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      _decrementQuantity(product),
-                                  child: const Center(
-                                    child: Icon(Icons.remove,
-                                        size: 18, color: Colors.green),
-                                  ),
-                                ),
-                              ),
-
-                              Center(
-                                child: Text(
-                                  product.quantity.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
                                     color: Colors.green,
+                                    width: 1.2,
                                   ),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            _decrementQuantity(product),
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.remove,
+                                            size: 18,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
 
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () =>
-                                      _incrementQuantity(product),
-                                  child: const Center(
-                                    child: Icon(Icons.add,
-                                        size: 18, color: Colors.green),
-                                  ),
+                                    Center(
+                                      child: Text(
+                                        product.quantity.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            _incrementQuantity(product),
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.add,
+                                            size: 18,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -342,7 +351,6 @@ class _OrderAgainScreenState extends State<OrderAgainScreen> {
   }
 }
 
-
 // ====================================================================
 // PRODUCT MODEL (Adjust according to your real model)
 // ====================================================================
@@ -353,12 +361,5 @@ class Product {
   String image;
   int quantity;
 
-  Product(this.name, this.weight, this.price, this.image,
-      {this.quantity = 0});
+  Product(this.name, this.weight, this.price, this.image, {this.quantity = 0});
 }
-
-
-
-
-
-

@@ -61,7 +61,9 @@ class ProfileScreen extends StatelessWidget {
                   _actionButton(
                     icon: Icons.shopping_bag_outlined,
                     label: "Orders",
-                    onTap: () {},
+                    onTap: () {
+                      context.push(Routes.order);
+                    },
                   ),
                   const SizedBox(width: 12),
                   _actionButton(

@@ -48,4 +48,7 @@ class ApiConstants {
   static const allAvailableCoupons = '/';
   static const applyCoupon = '/';
   static const removeAppliedCoupon = '/';
+
+  static const newOrderList = '/orders/new-order';
+  static const pastOrderList = '/orders/history';
 }

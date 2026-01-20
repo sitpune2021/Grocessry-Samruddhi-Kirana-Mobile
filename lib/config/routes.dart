@@ -18,4 +18,7 @@ class Routes {
 
   static const newcart = '/cart';
   static const couponOffer = '/couponOffer';
+
+  static const order = '/order';
+  static const orderDetails = '/order-details';
 }

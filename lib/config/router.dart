@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
+import 'package:samruddha_kirana/models/orders/new_order_list_model.dart';
 import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
 import 'package:samruddha_kirana/screens/address/address_list_screen.dart';
 import 'package:samruddha_kirana/screens/auth/password_manage/forgot_password.dart';
@@ -12,6 +13,8 @@ import 'package:samruddha_kirana/screens/cart/new_cart_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
 import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
+import 'package:samruddha_kirana/screens/orders/order_details_screen.dart';
+import 'package:samruddha_kirana/screens/orders/orders_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_details_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_list_screen.dart';
 import 'package:samruddha_kirana/screens/splash/splash_screen.dart';
@@ -127,6 +130,21 @@ class AppRouter {
         path: Routes.newcart,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const NewCartScreen()),
+      ),
+      GoRoute(
+        path: Routes.order,
+        pageBuilder: (context, state) =>
+            PageTransitions.slide(state: state, child: const OrdersScreen()),
+      ),
+      GoRoute(
+        path: Routes.orderDetails,
+        pageBuilder: (context, state) {
+          final order = state.extra as OrdersData?;
+          return PageTransitions.slide(
+            state: state,
+            child: OrderDetailsScreen(order: order),
+          );
+        },
       ),
 
       GoRoute(
