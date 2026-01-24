@@ -1,173 +1,136 @@
-// import 'package:flutter/material.dart';
-// import 'package:samruddha_kirana/api/api_response.dart';
-// import 'package:samruddha_kirana/models/products/product_model.dart';
-// import 'package:samruddha_kirana/services/product_services/cart_service.dart';
-
-// /// CART ACTION RESULT
-// enum CartActionResult { success, outOfStock, maxReached, apiError }
-
-// class CartProvider extends ChangeNotifier {
-//   // ================= CART STATE =================
-//   final Map<int, int> _cartQuantities = {};
-//   final Map<int, Product> _productCache = {};
-
-//   Map<int, int> get cartQuantities => _cartQuantities;
-
-//   int get totalItems => _cartQuantities.values.fold(0, (sum, qty) => sum + qty);
-
-//   double get totalPrice {
-//     double total = 0;
-//     _cartQuantities.forEach((id, qty) {
-//       final product = _productCache[id];
-//       if (product != null) {
-//         total += qty * double.parse(product.retailerPrice);
-//       }
-//     });
-//     return total;
-//   }
-
-//   // ================= ADD TO CART =================
-//   Future<CartActionResult> addToCart({
-//     required int productId,
-//     required int stock,
-//     required int maxQuantity,
-//   }) async {
-//     final currentQty = _cartQuantities[productId] ?? 0;
-
-//     // ❌ Out of stock
-//     if (stock == 0 || currentQty >= stock) {
-//       return CartActionResult.outOfStock;
-//     }
-
-//     // ❌ Max quantity reached
-//     if (currentQty >= maxQuantity) {
-//       return CartActionResult.maxReached;
-//     }
-
-//     // 🔗 CALL API (increment by 1)
-//     final ApiResponse response = await CartService.addProductInCart(
-//       productid: productId.toString(),
-//       stock: "1",
-//     );
-
-//     if (!response.success) {
-//       return CartActionResult.apiError;
-//     }
-
-//     // ✅ Update local cart after API success
-//     _cartQuantities[productId] = currentQty + 1;
-//     notifyListeners();
-
-//     return CartActionResult.success;
-//   }
-
-//   // ================= REMOVE FROM CART =================
-//   void removeFromCart(int productId) {
-//     final currentQty = _cartQuantities[productId] ?? 0;
-
-//     if (currentQty <= 1) {
-//       _cartQuantities.remove(productId);
-//     } else {
-//       _cartQuantities[productId] = currentQty - 1;
-//     }
-
-//     notifyListeners();
-//   }
-
-//   // ================= CLEAR CART =================
-//   void clearCart() {
-//     _cartQuantities.clear();
-//     notifyListeners();
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
+import 'package:samruddha_kirana/models/cart/cart_view_model.dart';
 import 'package:samruddha_kirana/models/products/product_model.dart';
 import 'package:samruddha_kirana/services/product_services/cart_service.dart';
 
-/// CART ACTION RESULT
 enum CartActionResult { success, outOfStock, maxReached, apiError }
 
 class CartProvider extends ChangeNotifier {
   // ================= CART STATE =================
-  final Map<int, int> _cartQuantities = {};
-  final Map<int, Product> _productCache = {};
+  List<Item> _items = [];
 
-  Map<int, int> get cartQuantities => _cartQuantities;
+  List<Item> get items => _items;
 
-  int get totalItems =>
-      _cartQuantities.values.fold(0, (sum, qty) => sum + qty);
+  String _subtotal = "0";
+  String _taxTotal = "0";
+  String _discount = "0";
+  String _total = "0";
 
-  double get totalPrice {
-    double total = 0;
-    _cartQuantities.forEach((id, qty) {
-      final product = _productCache[id];
-      if (product != null) {
-        total += qty * double.parse(product.retailerPrice);
-      }
-    });
-    return total;
+  String get subtotal => _subtotal;
+  String get taxTotal => _taxTotal;
+  String get discount => _discount;
+  String get total => _total;
+
+  int get totalItems => _items.fold(0, (sum, item) => sum + item.qty);
+
+  // ================= VIEW CART =================
+  Future<void> viewCart() async {
+    ApiResponse response = await CartService.viewCart();
+    if (!response.success || response.data == null) return;
+
+    final model = ViewCartModel.fromJson(response.data);
+
+    _items = model.data?.items ?? [];
+
+    _subtotal = model.data?.subtotal ?? "0";
+    _taxTotal = model.data?.taxTotal ?? "0";
+    _discount = model.data?.discount ?? "0";
+    _total = model.data?.total ?? "0";
+
+    notifyListeners();
   }
 
-  // ================= ADD TO CART =================
-  Future<CartActionResult> addToCart({
-    required Product product,
-  }) async {
-    final int productId = product.id;
-    final int stock = product.stock;
-    final int maxQuantity = product.maxQuantity;
+  // ================= ADD FROM LISTING =================
+  Future<CartActionResult> addToCart({required Product product}) async {
+    final existing = _items.where((i) => i.product.id == product.id);
 
-    final currentQty = _cartQuantities[productId] ?? 0;
+    final currentQty = existing.isEmpty ? 0 : existing.first.qty;
 
-    // ❌ Out of stock
-    if (stock == 0 || currentQty >= stock) {
+    if (product.stock == 0 || currentQty >= product.stock) {
       return CartActionResult.outOfStock;
     }
 
-    // ❌ Max quantity reached
-    if (currentQty >= maxQuantity) {
+    if (currentQty >= product.maxQuantity) {
       return CartActionResult.maxReached;
     }
 
-    // 🔗 CALL API (increment by 1)
-    final ApiResponse response = await CartService.addProductInCart(
-      productid: productId.toString(),
-      stock: "1",
-    );
+    ApiResponse response;
 
-    if (!response.success) {
-      return CartActionResult.apiError;
+    if (currentQty == 0) {
+      response = await CartService.addProductInCart(
+        productid: product.id.toString(),
+        stock: "1",
+      );
+    } else {
+      response = await CartService.cartProductIncrment(
+        productid: product.id.toString(),
+      );
     }
 
-    // ✅ CACHE PRODUCT (IMPORTANT)
-    _productCache[productId] = product;
+    if (!response.success) return CartActionResult.apiError;
 
-    // ✅ UPDATE QUANTITY
-    _cartQuantities[productId] = currentQty + 1;
-
-    notifyListeners();
+    // 🔥 Always resync from backend
+    await viewCart();
     return CartActionResult.success;
   }
 
-  // ================= REMOVE FROM CART =================
-  void removeFromCart(int productId) {
-    final currentQty = _cartQuantities[productId] ?? 0;
+  // ================= INCREMENT FROM CART =================
+  Future<CartActionResult> incrementFromCart(int productId) async {
+    ApiResponse response = await CartService.cartProductIncrment(
+      productid: productId.toString(),
+    );
 
-    if (currentQty <= 1) {
-      _cartQuantities.remove(productId);
-      _productCache.remove(productId);
-    } else {
-      _cartQuantities[productId] = currentQty - 1;
-    }
+    if (!response.success) return CartActionResult.apiError;
 
+    await viewCart();
+    return CartActionResult.success;
+  }
+
+  // ================= DECREMENT =================
+  Future<void> removeFromCart(int productId) async {
+    final response = await CartService.cartProductDecrement(
+      productid: productId.toString(),
+    );
+
+    if (!response.success) return;
+
+    await viewCart();
+  }
+
+  // ================= REMOVE SINGLE PRODUCT =================
+  Future<void> removeSingleProduct(int productId) async {
+    final response = await CartService.cartSingleProductRemove(
+      productid: productId.toString(),
+    );
+
+    if (!response.success) return;
+
+    await viewCart();
+  }
+
+  // ================= CLEAR FROM BACKEND =================
+  Future<void> clearAllFromCart() async {
+    final response = await CartService.clearAllProductInCart();
+
+    if (!response.success) return;
+
+    // sync local state
+    _items.clear();
+    _subtotal = "0";
+    _taxTotal = "0";
+    _discount = "0";
+    _total = "0";
     notifyListeners();
   }
 
-  // ================= CLEAR CART =================
-  void clearCart() {
-    _cartQuantities.clear();
-    _productCache.clear();
-    notifyListeners();
-  }
+  // // ================= CLEAR =================
+  // void clearCart() {
+  //   _items.clear();
+  //   _subtotal = "0";
+  //   _taxTotal = "0";
+  //   _discount = "0";
+  //   _total = "0";
+  //   notifyListeners();
+  // }
 }

@@ -31,6 +31,7 @@ class AddressService {
     required String pincode,
     required double latitude,
     required double longitude,
+    required int type,
   }) async {
     return await ApiClient.put(
       ApiConstants.updateAddress(id),
@@ -44,6 +45,7 @@ class AddressService {
         "pincode": pincode,
         "latitude": latitude,
         "longitude": longitude,
+        "type": type,
       },
       authRequired: true, // 🔐 token based
     );
@@ -58,8 +60,9 @@ class AddressService {
     required String city,
     required String state,
     required String pincode,
-    String? latitude,
-    String? longitude,
+    required String latitude,
+    required String longitude,
+    required int type,
   }) async {
     return await ApiClient.post(
       ApiConstants.addAddress,
@@ -71,8 +74,9 @@ class AddressService {
         "city": city,
         "state": state,
         "pincode": pincode,
-        "latitude": latitude ?? "",
-        "longitude": longitude ?? "",
+        "latitude": latitude,
+        "longitude": longitude,
+        "type": type,
       },
       authRequired: true, // 🔐 token based
     );

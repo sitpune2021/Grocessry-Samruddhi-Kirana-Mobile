@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -13,93 +14,150 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F9FB),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ---------------- PROFILE HEADER ----------------
+            // ---------------- HEADER ----------------
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 60, bottom: 25),
+              padding: const EdgeInsets.only(top: 50, bottom: 60),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xffF06B2D), Color(0xffFFF1EB)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                color: AppColors.darkGreen,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
                 ),
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 42,
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 50, color: Colors.grey),
+                  Container(
+                    padding: const EdgeInsets.all(4), // outer ring thickness
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white54, width: 2),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(6), // inner glow space
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white24,
+                      ),
+                      child: const CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.transparent,
+                        child: Icon(
+                          Icons.person,
+                          size: 44,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Text(
                     "Your Account",
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 21,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "7899463980",
-                    style: TextStyle(color: Colors.grey[800], fontSize: 15),
+                    "ID: 7899463980",
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 15),
-
-            // ---------------- QUICK ACTIONS ----------------
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  _actionButton(
-                    icon: Icons.shopping_bag_outlined,
-                    label: "Orders",
-                    onTap: () {
-                      context.push(Routes.order);
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  _actionButton(
-                    icon: Icons.headset_mic_outlined,
-                    label: "Help",
-                    onTap: () {},
-                  ),
-                ],
+            // ---------------- QUICK ACTIONS FLOAT ----------------
+            Transform.translate(
+              offset: const Offset(0, -50),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _actionButton(
+                      icon: Icons.shopping_bag,
+                      label: "ORDERS",
+                      onTap: () => context.push(Routes.order),
+                    ),
+                    const SizedBox(width: 12),
+                    _actionButton(
+                      icon: Icons.shopping_cart,
+                      label: "CART",
+                      onTap: () => context.push(Routes.newcart),
+                    ),
+                    const SizedBox(width: 12),
+                    _actionButton(
+                      icon: Icons.headset_mic,
+                      label: "HELP",
+                      onTap: () {},
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            // const SizedBox(height: 2),
 
-            // ---------------- YOUR INFO ----------------
-            _sectionCard("Your Information", [
+            // ---------------- YOUR ACTIVITY ----------------
+            _sectionCard("YOUR ACTIVITY", [
               _itemTile(
-                Icons.location_on_outlined,
+                Icons.location_on_rounded,
                 "Address Book",
-                onTap: () {
-                  context.push(Routes.getAddress);
-                },
+                onTap: () => context.push(Routes.getAddress),
               ),
-              _itemTile(Icons.favorite_border, "Wishlist"),
+              _itemTile(Icons.favorite_rounded, "Wishlist"),
             ]),
 
             const SizedBox(height: 18),
 
-            // ---------------- OTHER ----------------
-            _sectionCard("Other Options", [
-              _itemTile(Icons.person_outline, "Edit Profile"),
-              _itemTile(Icons.share_outlined, "Share App"),
-              _itemTile(Icons.info_outline, "About Us"),
-              _itemTiles(context, Icons.logout, "Logout", isLogout: true),
+            // ---------------- SETTINGS ----------------
+            _sectionCard("SETTINGS & INFO", [
+              _itemTile(Icons.person_sharp, "Edit Profile"),
+              _itemTile(Icons.share_rounded, "Share App"),
+              _itemTile(Icons.info_rounded, "About Us"),
+              _itemTiles(
+                context,
+                Icons.logout_outlined,
+                "Logout",
+                isLogout: true,
+              ),
+              // DELETE ACCOUNT (disabled style)
+              InkWell(
+                child: ListTile(
+                  leading: Icon(Icons.delete_outline, color: Colors.grey),
+                  title: Text(
+                    "Delete Account",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  trailing: const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.grey,
+                    size: 22,
+                  ),
+                ),
+              ),
             ]),
+            const SizedBox(height: 24),
 
-            const SizedBox(height: 35),
+            // ---------------- APP VERSION ----------------
+            const Text(
+              "APP VERSION 2.0.1",
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                letterSpacing: 0.8,
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // const SizedBox(height: 30),
           ],
         ),
       ),
@@ -151,48 +209,54 @@ class ProfileScreen extends StatelessWidget {
   Widget _sectionCard(String title, List<Widget> items) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ---------- TITLE OUTSIDE ----------
+          Padding(
+            padding: const EdgeInsets.only(left: 6, bottom: 8),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey,
+                letterSpacing: 0.6,
               ),
             ),
-            // ITEMS WITH DIVIDER (EXCEPT LAST)
-            ...List.generate(items.length, (index) {
-              return Column(
-                children: [
-                  items[index],
-                  if (index != items.length - 1)
-                    const Divider(
-                      height: 1,
-                      thickness: 1,
-                      indent: 20, // left padding
-                      endIndent: 30, // right padding
-                    ),
-                ],
-              );
-            }),
-          ],
-        ),
+          ),
+
+          // ---------- CARD ----------
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: List.generate(items.length, (index) {
+                return Column(
+                  children: [
+                    items[index],
+                    if (index != items.length - 1)
+                      const Divider(
+                        height: 1,
+                        thickness: 0.20,
+                        indent: 20,
+                        endIndent: 30,
+                      ),
+                  ],
+                );
+              }),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -356,12 +420,12 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            leading: Icon(icon, color: isLogout ? Colors.red : Colors.black87),
+            leading: Icon(icon, color: Colors.grey),
             title: Text(
               label,
               style: TextStyle(
                 fontSize: 15,
-                color: isLogout ? Colors.red : Colors.black87,
+                color: Colors.black87,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -377,26 +441,14 @@ class ProfileScreen extends StatelessWidget {
   }
 
   // ----------------------------- LIST TILE UI ------------------------------
-  Widget _itemTile(
-    IconData icon,
-    String label, {
-    bool isLogout = false,
-    VoidCallback? onTap,
-  }) {
+  Widget _itemTile(IconData icon, String label, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       child: Column(
         children: [
           ListTile(
-            leading: Icon(icon, color: isLogout ? Colors.red : Colors.black87),
-            title: Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                color: isLogout ? Colors.red : Colors.black87,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            leading: Icon(icon, color: Colors.grey),
+            title: Text(label),
             trailing: const Icon(
               Icons.chevron_right,
               size: 22,

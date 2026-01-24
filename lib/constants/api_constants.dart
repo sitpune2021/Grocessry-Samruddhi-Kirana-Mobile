@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.21:8000/api'; //local url
+  static const baseUrl = 'http://192.168.1.49:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -41,9 +41,13 @@ class ApiConstants {
   static String productsByBrandId(int id) => '/brands/$id/products';
 
   static const productAddCart = '/cart/add';
+  static const productAddincrement = '/cart/increment';
+  static const productAddDecrement = '/cart/decrement';
   static const viewCart = '/cart';
   static const clearCart = '/cart/clear';
-  static const removeProductInCart = '/cart/single/product/remove';
+  static const removeProductInCart = '/cart/remove';
+
+  static const checkOut = '/cart/checkout';
 
   static const allAvailableCoupons = '/';
   static const applyCoupon = '/';

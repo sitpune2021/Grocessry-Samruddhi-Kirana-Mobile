@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
+import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
 import 'package:samruddha_kirana/services/address/address_service.dart';
+import 'package:samruddha_kirana/utils/address_type_mapper.dart';
 
 class AddressProvider extends ChangeNotifier {
   // ================= LOADING =================
@@ -19,6 +21,30 @@ class AddressProvider extends ChangeNotifier {
   // ================= ERROR =================
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
+
+  // ================= ADDRESS TYPE (PROVIDER STATE) =================
+  AddressType _selectedType = AddressType.home;
+  AddressType get selectedType => _selectedType;
+
+  void setAddressType(AddressType type) {
+    _selectedType = type;
+    notifyListeners();
+  }
+
+  void setTypeFromBackend(int type) {
+    _selectedType = intToAddressType(type);
+    notifyListeners();
+  }
+
+  void resetType() {
+    _selectedType = AddressType.home;
+    notifyListeners();
+  }
+
+  // 🔥 GENERIC CHECK FOR ALL TYPES
+  bool hasType(int type) {
+    return _addresses.any((e) => e.type == type);
+  }
 
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
@@ -100,6 +126,7 @@ class AddressProvider extends ChangeNotifier {
     required String pincode,
     required String latitude,
     required String longitude,
+    required AddressType type,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
@@ -121,7 +148,11 @@ class AddressProvider extends ChangeNotifier {
         pincode: pincode.trim(),
         latitude: latitude,
         longitude: longitude,
+        type: addressTypeToInt(_selectedType),
       );
+      if (response.success) {
+        resetType(); // reset after add
+      }
     } catch (e) {
       response = ApiResponse(success: false, message: e.toString());
     } finally {
@@ -144,6 +175,7 @@ class AddressProvider extends ChangeNotifier {
     required String pincode,
     required double latitude,
     required double longitude,
+    required AddressType type,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
@@ -166,6 +198,7 @@ class AddressProvider extends ChangeNotifier {
         pincode: pincode.trim(),
         latitude: latitude,
         longitude: longitude,
+        type: addressTypeToInt(_selectedType),
       );
 
       if (response.success) {
@@ -186,6 +219,7 @@ class AddressProvider extends ChangeNotifier {
   void clearAddresses() {
     _addresses = [];
     _errorMessage = '';
+    resetType();
     notifyListeners();
   }
 }

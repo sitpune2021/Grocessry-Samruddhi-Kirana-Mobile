@@ -222,16 +222,21 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 80),
+
+                /// LOADER BELOW FEATURES
+                if (_showCenterLoader) const Loader(size: 30, strokeWidth: 3),
               ],
             ),
           ),
 
-          /// CENTER LOADER (AFTER ALL ANIMATIONS)
-          if (_showCenterLoader)
-            const IgnorePointer(
-              ignoring: true,
-              child: Center(child: Loader(size: 30, strokeWidth: 3)),
-            ),
+          // /// CENTER LOADER (AFTER ALL ANIMATIONS)
+          // if (_showCenterLoader)
+          //   const IgnorePointer(
+          //     ignoring: true,
+          //     child: Center(child: Loader(size: 30, strokeWidth: 3)),
+          //   ),
         ],
       ),
     );

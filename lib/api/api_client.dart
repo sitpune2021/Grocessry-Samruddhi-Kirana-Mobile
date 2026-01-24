@@ -113,6 +113,7 @@ class ApiClient {
   // ---------------- DELETE Method ----------------
   static Future<ApiResponse<dynamic>> delete(
     String endpoint, {
+    Map<String, dynamic>? body,
     bool authRequired = false,
   }) async {
     // ✅ INTERNET CHECK FIRST
@@ -126,11 +127,22 @@ class ApiClient {
         method: 'DELETE',
         url: url,
         headers: _headers(authRequired: authRequired),
+        body: body,
       );
 
-      final response = await http
-          .delete(Uri.parse(url), headers: _headers(authRequired: authRequired))
-          .timeout(timeout);
+      // final response = await http
+      //     .delete(Uri.parse(url), headers: _headers(authRequired: authRequired))
+      //     .timeout(timeout);
+
+      final request = http.Request('DELETE', Uri.parse(url));
+      request.headers.addAll(_headers(authRequired: authRequired));
+
+      if (body != null) {
+        request.body = jsonEncode(body);
+      }
+
+      final streamed = await request.send().timeout(timeout);
+      final response = await http.Response.fromStream(streamed);
 
       ApiLogger.response(
         url: url,

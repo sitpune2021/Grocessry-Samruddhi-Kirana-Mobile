@@ -49,6 +49,7 @@ class GetAddress {
   final String mobile;
   final double latitude;
   final double longitude;
+  final int type;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDefault;
@@ -64,6 +65,7 @@ class GetAddress {
     required this.mobile,
     required this.latitude,
     required this.longitude,
+    required this.type,
     required this.createdAt,
     required this.updatedAt,
     required this.isDefault,
@@ -97,6 +99,7 @@ class GetAddress {
       mobile: json['mobile'] ?? '',
       latitude: parseDouble(json['latitude']),
       longitude: parseDouble(json['longitude']),
+      type: json["type"],
       createdAt: parseDate(json['created_at']),
       updatedAt: parseDate(json['updated_at']),
       isDefault: json['is_default'] == true,
@@ -114,6 +117,7 @@ class GetAddress {
     "mobile": mobile,
     "latitude": latitude,
     "longitude": longitude,
+    "type": type,
     "created_at": createdAt.toIso8601String(),
     "updated_at": updatedAt.toIso8601String(),
     "is_default": isDefault,

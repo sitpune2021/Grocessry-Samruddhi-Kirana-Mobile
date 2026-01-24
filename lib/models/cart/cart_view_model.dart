@@ -3,8 +3,6 @@ import 'dart:convert';
 ViewCartModel viewCartModelFromJson(String str) =>
     ViewCartModel.fromJson(json.decode(str));
 
-String viewCartModelToJson(ViewCartModel data) => json.encode(data.toJson());
-
 class ViewCartModel {
   final bool status;
   final Data? data;
@@ -17,10 +15,9 @@ class ViewCartModel {
       data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
-
-  Map<String, dynamic> toJson() => {"status": status, "data": data?.toJson()};
 }
 
+// ================= DATA =================
 class Data {
   final int id;
   final int userId;
@@ -52,15 +49,15 @@ class Data {
 
   factory Data.fromJson(Map<String, dynamic> json) {
     return Data(
-      id: json["id"],
-      userId: json["user_id"],
+      id: json["id"] ?? 0,
+      userId: json["user_id"] ?? 0,
       productId: json["product_id"],
-      quantity: json["quantity"],
-      price: json["price"],
-      subtotal: json["subtotal"],
-      taxTotal: json["tax_total"],
-      discount: json["discount"],
-      total: json["total"],
+      quantity: json["quantity"] ?? 0,
+      price: json["price"]?.toString(),
+      subtotal: json["subtotal"]?.toString() ?? "0",
+      taxTotal: json["tax_total"]?.toString() ?? "0",
+      discount: json["discount"]?.toString() ?? "0",
+      total: json["total"]?.toString() ?? "0",
       createdAt: DateTime.parse(json["created_at"]),
       updatedAt: DateTime.parse(json["updated_at"]),
       items: json["items"] == null
@@ -68,23 +65,9 @@ class Data {
           : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "user_id": userId,
-    "product_id": productId,
-    "quantity": quantity,
-    "price": price,
-    "subtotal": subtotal,
-    "tax_total": taxTotal,
-    "discount": discount,
-    "total": total,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-    "items": items.map((x) => x.toJson()).toList(),
-  };
 }
 
+// ================= ITEM =================
 class Item {
   final int id;
   final int cartId;
@@ -99,7 +82,7 @@ class Item {
   final String? lineTotal;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Product product;
+  final CartProduct product;
 
   Item({
     required this.id,
@@ -120,149 +103,114 @@ class Item {
 
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
-      id: json["id"],
-      cartId: json["cart_id"],
-      productId: json["product_id"],
+      id: json["id"] ?? 0,
+      cartId: json["cart_id"] ?? 0,
+      productId: json["product_id"] ?? 0,
       batchId: json["batch_id"],
-      qty: json["qty"],
-      price: json["price"],
-      cgstAmount: json["cgst_amount"],
-      sgstAmount: json["sgst_amount"],
-      taxTotal: json["tax_total"],
-      itemTotal: json["item_total"],
-      lineTotal: json["line_total"],
+      qty: json["qty"] ?? 0,
+      price: json["price"]?.toString() ?? "0",
+      cgstAmount: json["cgst_amount"]?.toString() ?? "0",
+      sgstAmount: json["sgst_amount"]?.toString() ?? "0",
+      taxTotal: json["tax_total"]?.toString() ?? "0",
+      itemTotal: json["item_total"]?.toString() ?? "0",
+      lineTotal: json["line_total"]?.toString(),
       createdAt: DateTime.parse(json["created_at"]),
       updatedAt: DateTime.parse(json["updated_at"]),
-      product: Product.fromJson(json["product"]),
+      product: CartProduct.fromJson(json["product"]),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "cart_id": cartId,
-    "product_id": productId,
-    "batch_id": batchId,
-    "qty": qty,
-    "price": price,
-    "cgst_amount": cgstAmount,
-    "sgst_amount": sgstAmount,
-    "tax_total": taxTotal,
-    "item_total": itemTotal,
-    "line_total": lineTotal,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-    "product": product.toJson(),
-  };
 }
 
-class Product {
+// ================= PRODUCT =================
+class CartProduct {
   final int id;
   final int categoryId;
   final int subCategoryId;
   final int brandId;
+  final int unitId;
+  final String unitValue;
   final String name;
   final String sku;
   final String description;
   final String basePrice;
   final String retailerPrice;
   final String mrp;
-  final String discountType;
-  final String? discountValue;
-  final int taxId;
   final String gstPercentage;
+  final String gstAmount;
+  final String finalPrice;
   final int stock;
   final List<String> productImages;
+  final List<String> productImageUrls;
   final DateTime createdAt;
   final DateTime updatedAt;
   final dynamic deletedAt;
-  final List<String> productImageUrls;
   final Tax tax;
 
-  Product({
+  CartProduct({
     required this.id,
     required this.categoryId,
     required this.subCategoryId,
     required this.brandId,
+    required this.unitId,
+    required this.unitValue,
     required this.name,
     required this.sku,
     required this.description,
     required this.basePrice,
     required this.retailerPrice,
     required this.mrp,
-    required this.discountType,
-    required this.discountValue,
-    required this.taxId,
     required this.gstPercentage,
+    required this.gstAmount,
+    required this.finalPrice,
     required this.stock,
     required this.productImages,
+    required this.productImageUrls,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
-    required this.productImageUrls,
     required this.tax,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json["id"],
-      categoryId: json["category_id"],
-      subCategoryId: json["sub_category_id"],
-      brandId: json["brand_id"],
-      name: json["name"],
-      sku: json["sku"],
-      description: json["description"],
-      basePrice: json["base_price"],
-      retailerPrice: json["retailer_price"],
-      mrp: json["mrp"],
-      discountType: json["discount_type"],
-      discountValue: json["discount_value"],
-      taxId: json["tax_id"],
-      gstPercentage: json["gst_percentage"],
-      stock: json["stock"],
+  factory CartProduct.fromJson(Map<String, dynamic> json) {
+    return CartProduct(
+      id: json["id"] ?? 0,
+      categoryId: json["category_id"] ?? 0,
+      subCategoryId: json["sub_category_id"] ?? 0,
+      brandId: json["brand_id"] ?? 0,
+      unitId: json["unit_id"] ?? 0,
+      unitValue: json["unit_value"]?.toString() ?? "",
+      name: json["name"] ?? "",
+      sku: json["sku"] ?? "",
+      description: json["description"] ?? "",
+      basePrice: json["base_price"]?.toString() ?? "0",
+      retailerPrice: json["retailer_price"]?.toString() ?? "0",
+      mrp: json["mrp"]?.toString() ?? "0",
+      gstPercentage: json["gst_percentage"]?.toString() ?? "0",
+      gstAmount: json["gst_amount"]?.toString() ?? "0",
+      finalPrice: json["final_price"]?.toString() ?? "0",
+      stock: json["stock"] ?? 0,
       productImages: json["product_images"] == null
           ? []
           : List<String>.from(json["product_images"]),
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
-      deletedAt: json["deleted_at"],
       productImageUrls: json["product_image_urls"] == null
           ? []
           : List<String>.from(json["product_image_urls"]),
+      createdAt: DateTime.parse(json["created_at"]),
+      updatedAt: DateTime.parse(json["updated_at"]),
+      deletedAt: json["deleted_at"],
       tax: Tax.fromJson(json["tax"]),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "category_id": categoryId,
-    "sub_category_id": subCategoryId,
-    "brand_id": brandId,
-    "name": name,
-    "sku": sku,
-    "description": description,
-    "base_price": basePrice,
-    "retailer_price": retailerPrice,
-    "mrp": mrp,
-    "discount_type": discountType,
-    "discount_value": discountValue,
-    "tax_id": taxId,
-    "gst_percentage": gstPercentage,
-    "stock": stock,
-    "product_images": productImages,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-    "deleted_at": deletedAt,
-    "product_image_urls": productImageUrls,
-    "tax": tax.toJson(),
-  };
 }
 
+// ================= TAX =================
 class Tax {
   final int id;
   final String name;
-  final int cgst;
-  final int sgst;
-  final int igst;
+  final double cgst;
+  final double sgst;
+  final double igst;
+  final double gst;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -273,6 +221,7 @@ class Tax {
     required this.cgst,
     required this.sgst,
     required this.igst,
+    required this.gst,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -280,25 +229,15 @@ class Tax {
 
   factory Tax.fromJson(Map<String, dynamic> json) {
     return Tax(
-      id: json["id"],
-      name: json["name"],
-      cgst: json["cgst"],
-      sgst: json["sgst"],
-      igst: json["igst"],
-      isActive: json["is_active"],
+      id: json["id"] ?? 0,
+      name: json["name"] ?? "",
+      cgst: (json["cgst"] ?? 0).toDouble(),
+      sgst: (json["sgst"] ?? 0).toDouble(),
+      igst: (json["igst"] ?? 0).toDouble(),
+      gst: (json["gst"] ?? 0).toDouble(),
+      isActive: json["is_active"] ?? false,
       createdAt: DateTime.parse(json["created_at"]),
       updatedAt: DateTime.parse(json["updated_at"]),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "cgst": cgst,
-    "sgst": sgst,
-    "igst": igst,
-    "is_active": isActive,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-  };
 }

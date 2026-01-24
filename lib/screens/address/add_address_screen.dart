@@ -13,7 +13,7 @@ import 'package:samruddha_kirana/widgets/loader.dart';
 enum AddressType { home, work, other }
 
 class AddAddressScreen extends StatefulWidget {
-  final GetAddress? address; // 👈 nullable
+  final GetAddress? address;
   const AddAddressScreen({super.key, this.address});
 
   @override
@@ -24,7 +24,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   /// ================= FORM & STATE =================
   final _formKey = GlobalKey<FormState>();
 
-  AddressType selectedType = AddressType.home;
   bool isDefaultAddress = true;
 
   final TextEditingController nameController = TextEditingController();
@@ -51,6 +50,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
       // ✅ EDIT FALLBACK FOR LOCATION
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AddressProvider>().setTypeFromBackend(
+          widget.address!.type,
+        );
+
         final lp = context.read<LocationProvider>();
         lp.latitude = widget.address!.latitude;
         lp.longitude = widget.address!.longitude;
@@ -59,6 +62,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       // ➕ ADD ADDRESS → AUTO FETCH LOCATION
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<LocationProvider>().fetchCurrentLocation();
+        context.read<AddressProvider>().resetType();
       });
     }
   }
@@ -264,14 +268,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         color: Colors.green,
                                         size: 22,
                                       ),
-                                    // if (locationProvider.latitude != null &&
-                                    //     locationProvider.longitude != null &&
-                                    //     !locationProvider.isLoading)
-                                    //   const Icon(
-                                    //     Icons.check_circle_outline_outlined,
-                                    //     color: Colors.green,
-                                    //     size: 22,
-                                    //   ),
                                   ],
                                 ),
                               ),
@@ -299,33 +295,49 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         _sectionTitle('SAVE ADDRESS AS'),
 
                         /// ================= ADDRESS TYPE =================
+                        ///
                         Row(
                           children: [
                             _AddressTypeChip(
                               label: 'Home',
                               icon: Icons.home,
-                              isSelected: selectedType == AddressType.home,
-                              onTap: () => setState(
-                                () => selectedType = AddressType.home,
-                              ),
+                              isSelected:
+                                  addressProvider.selectedType ==
+                                  AddressType.home,
+                              onTap: addressProvider.hasType(1)
+                                  ? null // 🚫 disable if already exists
+                                  : () => addressProvider.setAddressType(
+                                      AddressType.home,
+                                    ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             _AddressTypeChip(
                               label: 'Work',
-                              icon: Icons.work_outline,
-                              isSelected: selectedType == AddressType.work,
-                              onTap: () => setState(
-                                () => selectedType = AddressType.work,
-                              ),
+                              icon: Icons.work,
+                              isSelected:
+                                  addressProvider.selectedType ==
+                                  AddressType.work,
+                              onTap: addressProvider.hasType(2)
+                                  ? null
+                                  : () => addressProvider.setAddressType(
+                                      AddressType.work,
+                                    ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             _AddressTypeChip(
                               label: 'Other',
                               icon: Icons.more_horiz,
-                              isSelected: selectedType == AddressType.other,
-                              onTap: () => setState(
-                                () => selectedType = AddressType.other,
-                              ),
+                              isSelected:
+                                  addressProvider.selectedType ==
+                                  AddressType.other,
+                              onTap:
+                                  addressProvider.hasType(3) ||
+                                      addressProvider.hasType(4) ||
+                                      addressProvider.hasType(5)
+                                  ? null
+                                  : () => addressProvider.setAddressType(
+                                      AddressType.other,
+                                    ),
                             ),
                           ],
                         ),
@@ -424,6 +436,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   pincode: pincodeController.text,
                                   latitude: lp.latitude!.toString(),
                                   longitude: lp.longitude!.toString(),
+                                  type: addressProvider.selectedType,
                                 );
 
                             if (response.success && context.mounted) {
@@ -449,6 +462,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   pincode: pincodeController.text,
                                   latitude: lp.latitude!,
                                   longitude: lp.longitude!,
+                                  type: addressProvider.selectedType,
                                 );
 
                             if (response.success && context.mounted) {
@@ -558,43 +572,47 @@ class _AddressTypeChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _AddressTypeChip({
     required this.label,
     required this.icon,
     required this.isSelected,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final disabled = onTap == null;
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.green : const Color(0xFFF2F2F2),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 18,
-                color: isSelected ? Colors.white : Colors.black54,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black87,
-                  fontWeight: FontWeight.w600,
+        child: Opacity(
+          opacity: disabled ? 0.4 : 1,
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.green : const Color(0xFFF2F2F2),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isSelected ? Colors.white : Colors.black54,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

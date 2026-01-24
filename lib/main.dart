@@ -32,7 +32,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ProductBrandProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
-        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()..viewCart()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
 

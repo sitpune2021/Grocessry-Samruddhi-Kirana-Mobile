@@ -23,4 +23,6 @@ class AppColors {
 
   // ❗ Danger / Delete
   static const Color danger = Color(0xFFD32F2F);
+
+  static const Color preGreen = Color(0xFF00C853);
 }
