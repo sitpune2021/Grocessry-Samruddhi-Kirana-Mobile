@@ -24,10 +24,13 @@ class AddressCard extends StatelessWidget {
     final borderColor = isSelected ? Colors.green : Colors.grey.shade300;
 
     /// Title & Icon mapping (NO UI change)
-    final String title = data.isDefault == true ? 'Default Address' : 'Address';
-    final IconData icon = data.isDefault == true
-        ? Icons.home
-        : Icons.location_on;
+    // final String title = data.isDefault == true ? 'Default Address' : 'Address';
+    // final IconData icon = data.isDefault == true
+    //     ? Icons.home
+    //     : Icons.location_on;
+
+    final String title = getTitle(data.type);
+    final IconData icon = getIcon(data.type);
 
     /// Helpers
     bool hasText(String? value) => value != null && value.trim().isNotEmpty;
@@ -88,7 +91,7 @@ class AddressCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // const SizedBox(height: 4),
+
                   /// Name
                   if (hasText(data.name)) ...[
                     Text(
@@ -134,11 +137,7 @@ class AddressCard extends StatelessWidget {
                   /// Contact
                   if (hasText(data.mobile)) ...[
                     Text(
-                      [
-                        hasText(data.mobile)
-                            ? 'MobileNo : ${data.mobile}'
-                            : null,
-                      ].whereType<String>().join('\n'),
+                      'MobileNo : ${data.mobile}',
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
@@ -149,5 +148,31 @@ class AddressCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// 👇 PUT HERE (below the widget)
+String getTitle(int? type) {
+  switch (type) {
+    case 1:
+      return 'Home';
+    case 2:
+      return 'Work';
+    case 3:
+    case 4:
+    case 5:
+    default:
+      return 'Other';
+  }
+}
+
+IconData getIcon(int? type) {
+  switch (type) {
+    case 1:
+      return Icons.home;
+    case 2:
+      return Icons.work;
+    default:
+      return Icons.location_on;
   }
 }

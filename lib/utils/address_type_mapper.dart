@@ -11,7 +11,7 @@ int addressTypeToInt(AddressType type) {
   }
 }
 
-AddressType intToAddressType(int type) {
+AddressType intToAddressType(int? type) {
   switch (type) {
     case 1:
       return AddressType.home;

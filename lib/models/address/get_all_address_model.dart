@@ -102,7 +102,7 @@ class GetAddress {
       type: json["type"],
       createdAt: parseDate(json['created_at']),
       updatedAt: parseDate(json['updated_at']),
-      isDefault: json['is_default'] == true,
+      isDefault: json['is_default'],
     );
   }
 

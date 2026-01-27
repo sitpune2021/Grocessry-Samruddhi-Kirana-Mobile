@@ -18,6 +18,7 @@ class ManageAddressesScreen extends StatefulWidget {
 
 class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
   int selectedIndex = 0;
+  bool _isDefaultApplied = false;
 
   @override
   void initState() {
@@ -86,7 +87,21 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
             //   return const Center(child: Loader());
             // }
 
-            final List<GetAddress> addresses = provider.addresses;
+            // final List<GetAddress> addresses = provider.addresses;
+            final addresses = provider.addresses;
+
+            // 🔥 AUTO SELECT DEFAULT ADDRESS (ONCE)
+            if (addresses.isNotEmpty && !_isDefaultApplied) {
+              final defaultIndex = addresses.indexWhere(
+                (e) => e.isDefault == true,
+              );
+
+              if (defaultIndex != -1) {
+                selectedIndex = defaultIndex;
+              }
+
+              _isDefaultApplied = true;
+            }
 
             return Column(
               children: [
@@ -128,6 +143,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                                 );
 
                                 if (context.mounted && result == true) {
+                                  _isDefaultApplied = false;
                                   context
                                       .read<AddressProvider>()
                                       .fetchAllAddresses();
@@ -146,7 +162,11 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                 ),
 
                 /// ================= ADD NEW ADDRESS =================
-                _AddNewAddressButton(),
+                _AddNewAddressButton(
+                  onAdded: () {
+                    _isDefaultApplied = false;
+                  },
+                ),
 
                 const SizedBox(height: 16),
 
@@ -158,8 +178,8 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                     onPressed: addresses.isEmpty
                         ? null
                         : () {
-                            final selectedAddress = addresses[selectedIndex];
-                            // use selectedAddress where needed
+                            final selected = addresses[selectedIndex];
+                            debugPrint('Deliver to: ${selected.addressLine}');
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -286,6 +306,8 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
 }
 
 class _AddNewAddressButton extends StatelessWidget {
+  final VoidCallback onAdded;
+  const _AddNewAddressButton({required this.onAdded});
   @override
   Widget build(BuildContext context) {
     return Container(
