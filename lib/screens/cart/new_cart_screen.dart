@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 import 'package:samruddha_kirana/screens/cart/cart_address_buttomsheet.dart';
+import 'package:samruddha_kirana/widgets/address_card.dart';
 import 'package:samruddha_kirana/widgets/animation_cart_item.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 
@@ -122,14 +124,28 @@ class _NewCartScreenState extends State<NewCartScreen> {
   void _openDeliveryAddressSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // important for full height
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => const SavedAddressSheet(),
+      builder: (_) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.50, // 55% screen
+        child: const SavedAddressSheet(),
+      ),
     );
   }
+
+  // void _openDeliveryAddressSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: false, // important for full height
+  //     backgroundColor: Colors.white,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  //     ),
+  //     builder: (_) => const SavedAddressSheet(),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -178,16 +194,34 @@ class _NewCartScreenState extends State<NewCartScreen> {
             InkWell(
               onTap: () => _openDeliveryAddressSheet(context),
               child: Row(
-                children: const [
+                children: [
                   Icon(Icons.location_on, size: 14, color: Colors.green),
                   SizedBox(width: 4),
-                  Text(
-                    "Home, Bangalore",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Consumer<AddressProvider>(
+                    builder: (context, provider, _) {
+                      final address = provider.defaultAddress;
+
+                      if (address == null) {
+                        return const Text("Select address");
+                      }
+
+                      final title = getTitle(address.type);
+                      final subtitle = [
+                        address.landmark,
+                        address.addressLine,
+                      ].where((e) => e.trim().isNotEmpty).join(", ");
+
+                      return Text(
+                        "$title, $subtitle",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      );
+                    },
                   ),
                   SizedBox(width: 4),
                   Icon(
@@ -201,19 +235,6 @@ class _NewCartScreenState extends State<NewCartScreen> {
           ],
         ),
 
-        // title: Column(
-        //   crossAxisAlignment: CrossAxisAlignment.start,
-        //   children: [
-        //     Text(
-        //       "My Basket",
-        //       style: TextStyle(
-        //         fontSize: titleFontSize,
-        //         fontWeight: FontWeight.w600,
-        //         color: Colors.black,
-        //       ),
-        //     ),
-        //   ],
-        // ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),

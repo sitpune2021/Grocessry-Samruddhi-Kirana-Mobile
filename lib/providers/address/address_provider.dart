@@ -46,6 +46,15 @@ class AddressProvider extends ChangeNotifier {
     return _addresses.any((e) => e.type == type);
   }
 
+  // ================= DEFAULT ADDRESS =================
+  GetAddress? get defaultAddress {
+    try {
+      return _addresses.firstWhere((e) => e.isDefault == true);
+    } catch (_) {
+      return _addresses.isNotEmpty ? _addresses.first : null;
+    }
+  }
+
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
     if (_isLoading) {
