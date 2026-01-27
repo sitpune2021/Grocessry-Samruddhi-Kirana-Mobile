@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/cart/cart_view_model.dart';
+import 'package:samruddha_kirana/models/cart/checkout_order_model.dart';
 import 'package:samruddha_kirana/models/products/product_model.dart';
 import 'package:samruddha_kirana/services/product_services/cart_service.dart';
 
@@ -107,6 +108,25 @@ class CartProvider extends ChangeNotifier {
     if (!response.success) return;
 
     await viewCart();
+  }
+
+  // ================= CHECKOUT =================
+  Future<CheckoutOrderModel?> checkout({required String addressId}) async {
+    ApiResponse response = await CartService.cartCheckOut(addressid: addressId);
+
+    if (!response.success || response.data == null) return null;
+
+    final model = CheckoutOrderModel.fromJson(response.data);
+
+    // clear cart
+    _items.clear();
+    _subtotal = "0";
+    _taxTotal = "0";
+    _discount = "0";
+    _total = "0";
+    notifyListeners();
+
+    return model;
   }
 
   // ================= CLEAR FROM BACKEND =================

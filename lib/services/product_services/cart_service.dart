@@ -70,7 +70,7 @@ class CartService {
   // =================== Checkout Cart ========================checkOut
   static Future<ApiResponse> cartCheckOut({required String addressid}) async {
     return await ApiClient.post(
-      ApiConstants.productAddDecrement,
+      ApiConstants.checkOut,
       {"address_id": addressid},
       authRequired: true, // 🔐 token based
     );

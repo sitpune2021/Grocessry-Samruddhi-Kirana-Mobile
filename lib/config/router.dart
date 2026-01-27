@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
+import 'package:samruddha_kirana/models/cart/checkout_order_model.dart';
 import 'package:samruddha_kirana/models/orders/new_order_list_model.dart';
 import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
 import 'package:samruddha_kirana/screens/address/address_list_screen.dart';
@@ -10,6 +11,7 @@ import 'package:samruddha_kirana/screens/auth/sign_up_screen.dart';
 import 'package:samruddha_kirana/screens/brand/brand_list_details_screen.dart';
 import 'package:samruddha_kirana/screens/cart/coupones/offers_promo_screen.dart';
 import 'package:samruddha_kirana/screens/cart/new_cart_screen.dart';
+import 'package:samruddha_kirana/screens/cart/order_confirmation_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
 import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
@@ -153,6 +155,18 @@ class AppRouter {
           state: state,
           child: const OffersPromoScreen(),
         ),
+      ),
+
+      // OrderConfirmationScreen
+      GoRoute(
+        path: Routes.checkoutOrder,
+        pageBuilder: (context, state) {
+          final order = state.extra as CheckoutOrderModel;
+          return PageTransitions.slide(
+            state: state,
+            child: OrderConfirmationScreen(order: order),
+          );
+        },
       ),
     ],
   );

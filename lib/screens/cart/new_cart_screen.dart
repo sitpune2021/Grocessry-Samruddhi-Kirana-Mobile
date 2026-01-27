@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 import 'package:samruddha_kirana/screens/cart/cart_address_buttomsheet.dart';
@@ -88,7 +89,10 @@ class _NewCartScreenState extends State<NewCartScreen> {
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("Cancel"),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(color: AppColors.preGreen),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -101,7 +105,10 @@ class _NewCartScreenState extends State<NewCartScreen> {
                             context.read<CartProvider>().clearAllFromCart();
                             Navigator.pop(context);
                           },
-                          child: const Text("Clear"),
+                          child: const Text(
+                            "Clear",
+                            style: TextStyle(color: AppColors.appBarText),
+                          ),
                         ),
                       ),
                     ],
@@ -134,18 +141,6 @@ class _NewCartScreenState extends State<NewCartScreen> {
       ),
     );
   }
-
-  // void _openDeliveryAddressSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: false, // important for full height
-  //     backgroundColor: Colors.white,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-  //     ),
-  //     builder: (_) => const SavedAddressSheet(),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -664,7 +659,39 @@ class _NewCartScreenState extends State<NewCartScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        onPressed: () {},
+        onPressed: () async {
+          final addressProvider = context.read<AddressProvider>();
+          final cartProvider = context.read<CartProvider>();
+
+          final address = addressProvider.defaultAddress;
+
+          // 1. No address selected
+          if (address == null) {
+            _openDeliveryAddressSheet(context);
+            return;
+          }
+
+          // 2. Address exists → checkout
+          final orderModel = await cartProvider.checkout(
+            addressId: address.id.toString(),
+          );
+
+          // 🔑 guard after async
+          if (!mounted) return;
+
+          if (orderModel != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Order placed successfully")),
+            );
+
+            context.go(Routes.checkoutOrder, extra: orderModel);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Failed to place order")),
+            );
+          }
+        },
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
