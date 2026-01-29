@@ -13,6 +13,7 @@ class AppStartupService {
     await TokenStorage.init();
 
     final prefs = await SharedPreferences.getInstance();
+    // final prefs = TokenStorage.prefs; // 👈 use same instance
     final hasSeenOnboarding = prefs.getBool(_onboardingKey) ?? false;
 
     debugPrint('👀 Has seen onboarding: $hasSeenOnboarding');

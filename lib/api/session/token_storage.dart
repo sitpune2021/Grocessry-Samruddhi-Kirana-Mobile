@@ -3,11 +3,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenStorage {
   static const _key = 'auth_token';
+  static const _userKey = 'auth_user';
+
   static final _storage = FlutterSecureStorage();
 
   static String? _token;
 
-  // static String? get token => _token;
+  // ---------- TOKEN ----------
   static String? get token {
     debugPrint(
       '🔍 Getting token: ${_token != null ? "EXISTS (${_token!.substring(0, 10)}...)" : "NULL"}',
@@ -63,6 +65,7 @@ class TokenStorage {
     debugPrint('🗑️ Clearing token from storage...');
     _token = null;
     await _storage.delete(key: _key);
+    await _storage.delete(key: _userKey);
     debugPrint('✅ Token cleared');
   }
 
@@ -71,5 +74,13 @@ class TokenStorage {
     final loggedIn = _token != null && _token!.isNotEmpty;
     debugPrint('🔐 isLoggedIn check: $loggedIn');
     return loggedIn;
+  }
+
+  static Future<void> setUser(String userJson) async {
+    await _storage.write(key: _userKey, value: userJson);
+  }
+
+  static Future<String?> getUserAsync() async {
+    return await _storage.read(key: _userKey);
   }
 }

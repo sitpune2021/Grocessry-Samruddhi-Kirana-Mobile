@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +11,7 @@ import 'package:samruddha_kirana/services/auth/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
-
+  bool _isInitialized = false;
   bool _otpSent = false;
 
   UserModel? _user;
@@ -18,9 +19,11 @@ class AuthProvider extends ChangeNotifier {
   int _otpTimer = 0;
   Timer? _timer;
 
-  String? _forgotPasswordMobile; // ✅ SINGLE SOURCE OF TRUTH
+  String? _forgotPasswordMobile;
 
+  // ================= GETTERS =================
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
 
   bool get otpSent => _otpSent;
 
@@ -30,8 +33,26 @@ class AuthProvider extends ChangeNotifier {
 
   String get forgotPasswordMobile => _forgotPasswordMobile ?? '';
 
+  bool get isLoggedIn => TokenStorage.isLoggedIn;
+
+  // ✅ Add constructor to initialize TokenStorage
+  AuthProvider() {
+    _initializeAuth();
+  }
+
+Future<void> _initializeAuth() async {
+  await TokenStorage.init();
+
+  final userJson = await TokenStorage.getUserAsync();
+    if (userJson != null) {
+      _user = UserModel.fromJson(jsonDecode(userJson));
+    }
+
+  _isInitialized = true;
+  notifyListeners();
+}
+
   // ========================= Register METHODS ========================= //
-  // new user registration
   Future<ApiResponse> signup({
     required String firstName,
     required String lastName,
@@ -180,14 +201,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= LOGOUT METHOD ================= //
-  // void logout() async {
-  //   _user = null;
-  //   _otpSent = false;
-  //   await TokenStorage.clear(); // 🔐 REMOVE TOKEN
-  //   notifyListeners();
-  // }
-
   // ================= LOGOUT =================
   Future<void> logout(BuildContext context) async {
     try {
@@ -202,6 +215,9 @@ class AuthProvider extends ChangeNotifier {
       // 🔐 Clear ALL local/session data
       await _clearLocalData();
 
+      _user = null; // 🔥 MISSING LINE (IMPORTANT)
+      _otpSent = false; // optional but correct
+
       _isLoading = false;
       notifyListeners();
       if (context.mounted) {
@@ -214,13 +230,6 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _clearLocalData() async {
     await TokenStorage.clear();
   }
-
-  // ================= AUTO LOGOUT =================
-  // void handleUnauthorized() {
-  //   logout(
-
-  //   );
-  // }
 
   // ========================= Forgot PASSWORD METHODS ========================= //
   // forget password OTP

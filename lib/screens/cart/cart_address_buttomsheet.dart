@@ -5,6 +5,7 @@ import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
 import 'package:samruddha_kirana/widgets/address_card.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class SavedAddressSheet extends StatefulWidget {
   const SavedAddressSheet({super.key});
@@ -17,12 +18,24 @@ class _SavedAddressSheetState extends State<SavedAddressSheet> {
   int? selectedIndex;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AddressProvider>().fetchAllAddresses();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
       child: Consumer<AddressProvider>(
         builder: (context, provider, _) {
           final addresses = provider.addresses;
+
+          if (provider.isLoading) {
+            return const Center(child: Loader());
+          }
 
           if (addresses.isEmpty) {
             return const Center(child: Text("No address found"));
@@ -63,11 +76,38 @@ class _SavedAddressSheetState extends State<SavedAddressSheet> {
                   ),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push(Routes.addAddress);
-                  // navigate to add screen
+
+                onTap: () async {
+                  final ctx = context; // capture once
+                  final mediaQuery = MediaQuery.of(ctx);
+                  final addressProvider = ctx.read<AddressProvider>();
+                  final navigator = Navigator.of(ctx);
+
+                  navigator.pop();
+
+                  final result = await ctx.push(Routes.addAddress);
+
+                  // if (!ctx.mounted) return;
+
+                  if (result == true) {
+                    await addressProvider.fetchAllAddresses();
+                    if (!ctx.mounted) return;
+                    showModalBottomSheet(
+                      context: ctx,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                      ),
+                      builder: (_) => SizedBox(
+                        height: mediaQuery.size.height * 0.50,
+                        child: SavedAddressSheet(),
+                      ),
+                    );
+                  }
                 },
+
               ),
 
               const SizedBox(height: 8),
@@ -122,6 +162,9 @@ class _SavedAddressSheetState extends State<SavedAddressSheet> {
                       : () {
                           Navigator.pop(context);
                         },
+                  // : () {
+                  //     Navigator.pop(context);
+                  //   },
                   child: const Text(
                     "Confirm Address",
                     style: TextStyle(fontSize: 16, color: Colors.white),

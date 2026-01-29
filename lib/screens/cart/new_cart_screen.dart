@@ -139,7 +139,7 @@ class _NewCartScreenState extends State<NewCartScreen> {
       ),
       builder: (_) => SizedBox(
         height: MediaQuery.of(context).size.height * 0.50, // 55% screen
-        child: const SavedAddressSheet(),
+        child: SavedAddressSheet(),
       ),
     );
   }

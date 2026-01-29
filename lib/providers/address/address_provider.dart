@@ -14,6 +14,10 @@ class AddressProvider extends ChangeNotifier {
   bool _isDeleting = false;
   bool get isDeleting => _isDeleting;
 
+  // ================= FIRST LOAD FLAG =================
+  bool _hasLoadedOnce = false;
+  bool get hasLoadedOnce => _hasLoadedOnce;
+
   // ================= DATA =================
   List<GetAddress> _addresses = [];
   List<GetAddress> get addresses => _addresses;
@@ -25,6 +29,11 @@ class AddressProvider extends ChangeNotifier {
   // ================= ADDRESS TYPE (PROVIDER STATE) =================
   AddressType _selectedType = AddressType.home;
   AddressType get selectedType => _selectedType;
+
+  // 🔥 AUTO LOAD ON PROVIDER INIT
+  AddressProvider() {
+    fetchAllAddresses();
+  }
 
   void setAddressType(AddressType type) {
     _selectedType = type;
@@ -55,6 +64,8 @@ class AddressProvider extends ChangeNotifier {
     }
   }
 
+  bool get hasSelectedAddress => _addresses.isNotEmpty;
+
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
     if (_isLoading) {
@@ -77,7 +88,7 @@ class AddressProvider extends ChangeNotifier {
         _addresses = [];
         _errorMessage = response.message;
       }
-
+      _hasLoadedOnce = true;
       return response;
     } catch (e, s) {
       debugPrint('FETCH ADDRESS ERROR: $e');
@@ -85,6 +96,7 @@ class AddressProvider extends ChangeNotifier {
 
       _addresses = [];
       _errorMessage = e.toString();
+      _hasLoadedOnce = true;
       response = ApiResponse(success: false, message: _errorMessage);
     } finally {
       _isLoading = false;
@@ -160,6 +172,7 @@ class AddressProvider extends ChangeNotifier {
         type: addressTypeToInt(_selectedType),
       );
       if (response.success) {
+        await fetchAllAddresses();
         resetType(); // reset after add
       }
     } catch (e) {
@@ -228,6 +241,7 @@ class AddressProvider extends ChangeNotifier {
   void clearAddresses() {
     _addresses = [];
     _errorMessage = '';
+    _hasLoadedOnce = false;
     resetType();
     notifyListeners();
   }

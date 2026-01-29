@@ -135,30 +135,6 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 /// LOGO
-                // ScaleTransition(
-                //   scale: _logoScale,
-                //   child: Image.asset(
-                //     'assets/images/samrudhi kirana bajar icon.jpg',
-                //     height: isTablet ? 160 : 120,
-                //   ),
-                // ),
-                // ScaleTransition(
-                //   scale: _logoScale,
-                //   child: Container(
-                //     height: isTablet ? 160 : 120,
-                //     width: isTablet ? 160 : 120,
-                //     decoration: BoxDecoration(
-                //       shape: BoxShape.circle,
-                //       color: Colors.transparent,
-                //     ),
-                //     child: ClipOval(
-                //       child: Image.asset(
-                //         'assets/images/samrudhi kirana bajar icon.jpg',
-                //         fit: BoxFit.cover,
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 ScaleTransition(
                   scale: _logoScale,
                   child: ClipRRect(
@@ -231,12 +207,6 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          // /// CENTER LOADER (AFTER ALL ANIMATIONS)
-          // if (_showCenterLoader)
-          //   const IgnorePointer(
-          //     ignoring: true,
-          //     child: Center(child: Loader(size: 30, strokeWidth: 3)),
-          //   ),
         ],
       ),
     );
