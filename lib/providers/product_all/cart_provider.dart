@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/cart/cart_view_model.dart';
 import 'package:samruddha_kirana/models/cart/checkout_order_model.dart';
+import 'package:samruddha_kirana/models/cart/checkout_timer_model.dart';
 import 'package:samruddha_kirana/models/products/product_model.dart';
 import 'package:samruddha_kirana/services/product_services/cart_service.dart';
 
@@ -24,6 +25,13 @@ class CartProvider extends ChangeNotifier {
   String get total => _total;
 
   int get totalItems => _items.fold(0, (sum, item) => sum + item.qty);
+
+  // ================= TIMER STATE =================
+  bool _orderAllowed = true;
+  String _orderMessage = "";
+
+  bool get orderAllowed => _orderAllowed;
+  String get orderMessage => _orderMessage;
 
   // ================= VIEW CART =================
   Future<void> viewCart() async {
@@ -127,6 +135,25 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
 
     return model;
+  }
+
+  // ================= CHECKOUT TIMER =================
+  Future<void> checkCheckoutTimer() async {
+    ApiResponse response = await CartService.cartCheckOutTimer();
+
+    if (!response.success || response.data == null) {
+      _orderAllowed = false;
+      _orderMessage = "Unable to verify order timing";
+      notifyListeners();
+      return;
+    }
+
+    final model = CheckoutTimerModel.fromJson(response.data);
+
+    _orderAllowed = model.orderAllowed;
+    _orderMessage = model.message;
+
+    notifyListeners();
   }
 
   // ================= CLEAR FROM BACKEND =================

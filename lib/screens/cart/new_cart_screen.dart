@@ -26,7 +26,9 @@ class _NewCartScreenState extends State<NewCartScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CartProvider>().viewCart();
+      final cart = context.read<CartProvider>();
+      cart.viewCart();
+      cart.checkCheckoutTimer();
     });
   }
 
@@ -305,7 +307,9 @@ class _NewCartScreenState extends State<NewCartScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
+                  _timerSection(),
+                  const SizedBox(height: 10),
                   _couponCard(),
                   const SizedBox(height: 16),
                   _summarySection(cart),
@@ -318,6 +322,61 @@ class _NewCartScreenState extends State<NewCartScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  // ================= TIMER SECTION =================
+  Widget _timerSection() {
+    return Consumer<CartProvider>(
+      builder: (context, cart, _) {
+        if (!cart.orderAllowed) {
+          return Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.timer_off, color: Colors.red),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    cart.orderMessage,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFFBF5),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: const [
+              Icon(Icons.timer, color: Colors.green),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Orders are open now",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -530,9 +589,16 @@ class _NewCartScreenState extends State<NewCartScreen> {
 
   // ================= COUPON =================
   Widget _couponCard() {
+    final cart = context.read<CartProvider>();
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => context.push(Routes.couponOffer),
+      // onTap: () => context.push(Routes.couponOffer),
+      onTap: () {
+        context.push(
+          Routes.couponOffer,
+          extra: double.tryParse(cart.subtotal) ?? 0.0,
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -649,65 +715,136 @@ class _NewCartScreenState extends State<NewCartScreen> {
 
   // ================= CTA =================
   Widget _placeOrderButton(double height) {
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        onPressed: () async {
-          final addressProvider = context.read<AddressProvider>();
-          final cartProvider = context.read<CartProvider>();
-
-          final address = addressProvider.defaultAddress;
-
-          // 1. No address selected
-          if (address == null) {
-            _openDeliveryAddressSheet(context);
-            return;
-          }
-
-          // 2. Address exists → checkout
-          final orderModel = await cartProvider.checkout(
-            addressId: address.id.toString(),
-          );
-
-          // 🔑 guard after async
-          if (!mounted) return;
-
-          if (orderModel != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Order placed successfully")),
-            );
-
-            context.go(Routes.checkoutOrder, extra: orderModel);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Failed to place order")),
-            );
-          }
-        },
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              "Place Order",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+    return Consumer<CartProvider>(
+      builder: (context, cart, _) {
+        return SizedBox(
+          height: height,
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: cart.orderAllowed ? Colors.green : Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-            SizedBox(width: 8),
-            Icon(Icons.lock, size: 18, color: Colors.white),
-          ],
-        ),
-      ),
+            onPressed: cart.orderAllowed
+                ? () async {
+                    final addressProvider = context.read<AddressProvider>();
+                    final cartProvider = context.read<CartProvider>();
+
+                    final address = addressProvider.defaultAddress;
+
+                    // 1. No address selected
+                    if (address == null) {
+                      _openDeliveryAddressSheet(context);
+                      return;
+                    }
+
+                    // 2. Address exists → checkout
+                    final orderModel = await cartProvider.checkout(
+                      addressId: address.id.toString(),
+                    );
+
+                    // 🔑 guard after async
+                    if (!context.mounted) return;
+
+                    if (orderModel != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Order placed successfully"),
+                        ),
+                      );
+
+                      context.go(Routes.checkoutOrder, extra: orderModel);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Failed to place order")),
+                      );
+                    }
+                  }
+                : null, // 🔒 disabled if backend says no
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  "Place Order",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Icon(Icons.lock, size: 18, color: Colors.white),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
+
+  // // ================= CTA =================
+  // Widget _placeOrderButton(double height) {
+  //   return SizedBox(
+  //     height: height,
+  //     width: double.infinity,
+  //     child: ElevatedButton(
+  //       style: ElevatedButton.styleFrom(
+  //         backgroundColor: Colors.green,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(16),
+  //         ),
+  //       ),
+  //       onPressed: () async {
+  //         final addressProvider = context.read<AddressProvider>();
+  //         final cartProvider = context.read<CartProvider>();
+
+  //         final address = addressProvider.defaultAddress;
+
+  //         // 1. No address selected
+  //         if (address == null) {
+  //           _openDeliveryAddressSheet(context);
+  //           return;
+  //         }
+
+  //         // 2. Address exists → checkout
+  //         final orderModel = await cartProvider.checkout(
+  //           addressId: address.id.toString(),
+  //         );
+
+  //         // 🔑 guard after async
+  //         if (!mounted) return;
+
+  //         if (orderModel != null) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Order placed successfully")),
+  //           );
+
+  //           context.go(Routes.checkoutOrder, extra: orderModel);
+  //         } else {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Failed to place order")),
+  //           );
+  //         }
+  //       },
+
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: const [
+  //           Text(
+  //             "Place Order",
+  //             style: TextStyle(
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.w600,
+  //               color: Colors.white,
+  //             ),
+  //           ),
+  //           SizedBox(width: 8),
+  //           Icon(Icons.lock, size: 18, color: Colors.white),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

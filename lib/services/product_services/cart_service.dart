@@ -75,4 +75,12 @@ class CartService {
       authRequired: true, // 🔐 token based
     );
   }
+
+  // =================== Checkout Timer ========================
+  static Future<ApiResponse> cartCheckOutTimer() async {
+    return await ApiClient.get(
+      ApiConstants.checkOutTimer,
+      authRequired: true, // 🔐 token based
+    );
+  }
 }

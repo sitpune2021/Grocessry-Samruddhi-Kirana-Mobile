@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 
 class PromoInput extends StatelessWidget {
   final double height;
-  const PromoInput({super.key, required this.height});
+  final TextEditingController controller;
+  final VoidCallback onApply;
+
+  const PromoInput({
+    super.key,
+    required this.height,
+    required this.controller,
+    required this.onApply,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +24,27 @@ class PromoInput extends StatelessWidget {
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const TextField(
+            child: TextField(
+              textAlignVertical: TextAlignVertical.center,
+              cursorColor: Colors.green,
+              style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
-                icon: Icon(Icons.local_offer_outlined),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 6),
+                  child: Icon(
+                    Icons.local_offer_outlined,
+                    color: Colors.green,
+                    size: 20,
+                  ),
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 40,
+                ),
                 hintText: "Enter promo code",
+                hintStyle: const TextStyle(color: Colors.grey),
                 border: InputBorder.none,
+                isDense: true,
               ),
             ),
           ),
@@ -35,7 +59,7 @@ class PromoInput extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            onPressed: () {},
+            onPressed: onApply,
             child: const Text("APPLY", style: TextStyle(color: Colors.white)),
           ),
         ),

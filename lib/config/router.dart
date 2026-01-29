@@ -151,10 +151,14 @@ class AppRouter {
 
       GoRoute(
         path: Routes.couponOffer,
-        pageBuilder: (context, state) => PageTransitions.slide(
-          state: state,
-          child: const OffersPromoScreen(),
-        ),
+        pageBuilder: (context, state) {
+          final double subtotal = state.extra as double;
+
+          return PageTransitions.slide(
+            state: state,
+            child: OffersPromoScreen(subtotal: subtotal),
+          );
+        },
       ),
 
       // OrderConfirmationScreen

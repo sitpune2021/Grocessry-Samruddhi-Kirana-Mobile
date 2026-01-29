@@ -5,6 +5,7 @@ import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/address/location_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
+import 'package:samruddha_kirana/providers/cuppon%20_offer/cuppon_&_offer_provider.dart';
 import 'package:samruddha_kirana/providers/orders/order_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
@@ -34,6 +35,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => LocationProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()..viewCart()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => CouponProvider()),
       ],
 
       child: const MyApp(),
