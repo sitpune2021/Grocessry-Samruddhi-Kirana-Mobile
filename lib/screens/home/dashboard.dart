@@ -41,7 +41,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           debugPrint('ADDR_LOADING = ${addressProvider.isLoading}');
           debugPrint('AUTH_INIT  = ${authProvider.isInitialized}');
           debugPrint('LOGGED_IN  = ${authProvider.isLoggedIn}');
-          // debugPrint('HAS_ADDR   = ${addressProvider.hasSelectedAddress}');
 
           debugPrint('ADDR_COUNT = ${addressProvider.addresses.length}');
 
@@ -131,7 +130,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: _currentIndex == index
-              ? const Color(0xffF06B2D).withValues(alpha: 0.1)
+              ? AppColors.preGreen.withValues(alpha: 0.1)
               : Colors.transparent,
         ),
         child: Icon(
