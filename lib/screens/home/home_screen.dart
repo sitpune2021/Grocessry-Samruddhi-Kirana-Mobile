@@ -3,8 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
+import 'package:samruddha_kirana/utils/address_type_mapper.dart';
+import 'package:samruddha_kirana/widgets/address_buttom_sheet.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 import 'package:samruddha_kirana/widgets/moving_text.dart';
 import 'package:shimmer/shimmer.dart';
@@ -22,19 +25,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedTab = 0;
 
-  // final tabs = ["All", "Wedding", "Electronics", "Beauty", "Winter"];
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AllProductProvider>().fetchCategories();
       context.read<ProductBrandProvider>().fetchBrands();
+      context.read<AddressProvider>().fetchAllAddresses();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final addressProvider = context.watch<AddressProvider>();
+    final defaultAddress = addressProvider.defaultAddress;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -60,10 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "10 minutes",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
+                      // const Text(
+                      //   "10 minutes",
+                      //   style: TextStyle(fontSize: 18, color: Colors.white),
+                      // ),
                       CircleAvatar(
                         radius: 20,
                         backgroundImage: AssetImage(
@@ -74,21 +78,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   const SizedBox(height: 6),
+
+                  /// 🔥 DEFAULT ADDRESS SHOWN HERE
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              const HomeSelectLocationScreen(),
-                        ),
-                      );
+                      showAddressBottomSheet(context);
                     },
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(
-                            "WORK - At post Tambave",
+                            defaultAddress == null
+                                ? "Select Address"
+                                : "${intToAddressType(defaultAddress.type).name.toUpperCase()} - ${defaultAddress.addressLine}",
                             style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -98,16 +100,49 @@ class _HomeScreenState extends State<HomeScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Icon(
+                        const Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: Colors.white,
                           size: 22,
                         ),
-                        Spacer(),
+                        const Spacer(),
                       ],
                     ),
                   ),
 
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) =>
+                  //             const HomeSelectLocationScreen(),
+                  //       ),
+                  //     );
+                  //   },
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         child: Text(
+                  //           "WORK - At post Tambave",
+                  //           style: GoogleFonts.poppins(
+                  //             color: Colors.white,
+                  //             fontWeight: FontWeight.w600,
+                  //             fontSize: 16,
+                  //           ),
+                  //           maxLines: 1,
+                  //           overflow: TextOverflow.ellipsis,
+                  //         ),
+                  //       ),
+                  //       Icon(
+                  //         Icons.keyboard_arrow_down_rounded,
+                  //         color: Colors.white,
+                  //         size: 22,
+                  //       ),
+                  //       Spacer(),
+                  //     ],
+                  //   ),
+                  // ),
                   const SizedBox(height: 15),
 
                   // ------------ SEARCH BOX -------------
@@ -119,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),

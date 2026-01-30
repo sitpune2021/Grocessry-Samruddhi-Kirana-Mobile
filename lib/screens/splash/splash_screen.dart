@@ -202,11 +202,16 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 80),
 
                 /// LOADER BELOW FEATURES
-                if (_showCenterLoader) const Loader(size: 30, strokeWidth: 3),
+                SizedBox(
+                  height: 30, // Match loader size
+                  width: 30, // Match loader size
+                  child: _showCenterLoader
+                      ? const Loader(size: 30, strokeWidth: 3)
+                      : const SizedBox.shrink(), // Empty but reserves space
+                ),
               ],
             ),
           ),
-
         ],
       ),
     );

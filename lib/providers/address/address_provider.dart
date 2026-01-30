@@ -26,6 +26,8 @@ class AddressProvider extends ChangeNotifier {
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
 
+  
+
   // ================= ADDRESS TYPE (PROVIDER STATE) =================
   AddressType _selectedType = AddressType.home;
   AddressType get selectedType => _selectedType;

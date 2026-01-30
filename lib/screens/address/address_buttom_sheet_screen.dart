@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class AddressBottomSheet extends StatefulWidget {
   const AddressBottomSheet({super.key});
@@ -78,10 +78,7 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
 
               // Address List (REAL DATA)
               if (provider.isLoading && addresses.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(40),
-                  child: CircularProgressIndicator(),
-                )
+                const Padding(padding: EdgeInsets.all(40), child: Loader())
               else if (addresses.isEmpty)
                 const Padding(
                   padding: EdgeInsets.all(40),

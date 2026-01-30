@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/screens/profile/profile_screen.dart';
@@ -95,7 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             });
           },
           backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xffF06B2D),
+          selectedItemColor: AppColors.preGreen,
           unselectedItemColor: Colors.grey.shade600,
           selectedLabelStyle: GoogleFonts.poppins(
             fontSize: 12,
