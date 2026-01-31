@@ -21,7 +21,11 @@ class ApiConstants {
   static const verifyForgotPasswordOtp = '/verify-otp/forgot_password_otp';
   static const resetPassword = '/reset-password';
 
+  static const getProfile = '/user/profile';
+  static const updateProfile = '/customer/update-profile';
+
   static const logout = '/logout';
+  static const deleteAccount = '/user/account';
 
   static const dashboard = '/dashboard';
 

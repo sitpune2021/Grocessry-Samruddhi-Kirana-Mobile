@@ -90,4 +90,12 @@ class AuthService {
       authRequired: true, // 🔐 token based
     );
   }
+
+  // delete account
+  static Future<ApiResponse> deleteAccount() async {
+    return await ApiClient.delete(
+      ApiConstants.deleteAccount,
+      authRequired: true, // 🔐 token based
+    );
+  }
 }

@@ -125,13 +125,16 @@ class ProfileScreen extends StatelessWidget {
               ),
               // DELETE ACCOUNT (disabled style)
               InkWell(
+                onTap: () {
+                  showDeleteDialog(context);
+                },
                 child: ListTile(
                   leading: Icon(Icons.delete_outline, color: Colors.grey),
                   title: Text(
                     "Delete Account",
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.grey,
+                      color: Colors.black,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -258,6 +261,158 @@ class ProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void showDeleteDialog(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final size = media.size;
+    final shortestSide = size.shortestSide;
+    final isTablet = shortestSide >= 600;
+
+    const dangerRed = Color(0xFFD32F2F);
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: 'Delete',
+      barrierColor: Colors.black.withValues(alpha: 0.55),
+      transitionDuration: const Duration(milliseconds: 320),
+      pageBuilder: (_, _, _) => const SizedBox.shrink(),
+      transitionBuilder: (ctx, animation, _, _) {
+        final scaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+        );
+
+        final fadeAnim = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOut,
+        );
+
+        return SafeArea(
+          child: Center(
+            child: FadeTransition(
+              opacity: fadeAnim,
+              child: ScaleTransition(
+                scale: scaleAnim,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    width: isTablet ? 440 : size.width.clamp(280, 380),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isTablet ? 28 : 20,
+                      vertical: isTablet ? 26 : 22,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // ICON
+                        Container(
+                          height: isTablet ? 56 : 50,
+                          width: isTablet ? 56 : 50,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFDECEA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.delete_forever_rounded,
+                            size: 28,
+                            color: dangerRed,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // TITLE
+                        Text(
+                          "Delete Account",
+                          style: TextStyle(
+                            fontSize: isTablet ? 20 : 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // MESSAGE
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isTablet ? 8 : 4,
+                          ),
+                          child: Text(
+                            "This action is permanent and cannot be undone.\nAre you sure you want to delete your account?",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: isTablet ? 15 : 14,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 26),
+
+                        // BUTTONS
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: dangerRed,
+                                  side: const BorderSide(color: dangerRed),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: isTablet ? 14 : 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                child: const Text("Cancel"),
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: dangerRed,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: isTablet ? 14 : 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  Navigator.pop(ctx);
+                                  final res = await context
+                                      .read<AuthProvider>()
+                                      .deleteAccount(context);
+
+                                  if (!res.success && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(res.message)),
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  "Delete",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

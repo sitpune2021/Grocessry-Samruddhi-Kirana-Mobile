@@ -233,10 +233,10 @@ class _NewCartScreenState extends State<NewCartScreen> {
         ),
 
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),

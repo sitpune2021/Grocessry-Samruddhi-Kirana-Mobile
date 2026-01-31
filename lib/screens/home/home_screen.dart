@@ -16,7 +16,8 @@ import '../category/categories_product_screen.dart';
 import '../location/home_select_location_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final ScrollController scrollController;
+  const HomeScreen({super.key, required this.scrollController});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: widget.scrollController,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -110,39 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             const HomeSelectLocationScreen(),
-                  //       ),
-                  //     );
-                  //   },
-                  //   child: Row(
-                  //     children: [
-                  //       Expanded(
-                  //         child: Text(
-                  //           "WORK - At post Tambave",
-                  //           style: GoogleFonts.poppins(
-                  //             color: Colors.white,
-                  //             fontWeight: FontWeight.w600,
-                  //             fontSize: 16,
-                  //           ),
-                  //           maxLines: 1,
-                  //           overflow: TextOverflow.ellipsis,
-                  //         ),
-                  //       ),
-                  //       Icon(
-                  //         Icons.keyboard_arrow_down_rounded,
-                  //         color: Colors.white,
-                  //         size: 22,
-                  //       ),
-                  //       Spacer(),
-                  //     ],
-                  //   ),
-                  // ),
                   const SizedBox(height: 15),
 
                   // ------------ SEARCH BOX -------------
@@ -635,68 +604,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
-
-            // ============= GROCERY SECTION =============
-            buildCategorySection(
-              title: "Grocery & Kitchen",
-              gradientColors: [Colors.green.shade50, Colors.white],
-              items: [
-                ["Vegetables & Fruits", "assets/fack_img/img_5.png"],
-                ["Atta , Rice & Dal", "assets/fack_img/img_6.png"],
-                ["Oil, Ghee & Masala", "assets/fack_img/img_6.png"],
-                ["Dairy, Bread & Eggs", "assets/fack_img/img_7.png"],
-                ["Bakery & Biscuits", "assets/fack_img/img_8.png"],
-                ["Vegetables & Fruits", "assets/fack_img/img_5.png"],
-                ["Atta , Rice & Dal", "assets/fack_img/img_6.png"],
-                ["Dairy, Bread & Eggs", "assets/fack_img/img_7.png"],
-              ],
-            ),
-
-            // ============= BEAUTY CATEGORY =============
-            buildCategorySection(
-              title: "Beauty & Personal Care",
-              gradientColors: [Colors.pink.shade50, Colors.white],
-              items: [
-                ["Bath & Body", "assets/fack_img/img_9.png"],
-                ["Hair", "assets/fack_img/img_10.png"],
-                ["Skin & Face", "assets/fack_img/img_11.png"],
-                ["Beauty & Cosmetics", "assets/fack_img/img_12.png"],
-                ["Baby Care", "assets/fack_img/img_13.png"],
-                ["Bath & Body", "assets/fack_img/img_9.png"],
-                ["Hair", "assets/fack_img/img_10.png"],
-                ["Skin & Face", "assets/fack_img/img_11.png"],
-              ],
-            ),
-
-            buildCategorySection(
-              title: "Household Essentials",
-              gradientColors: [Colors.blue.shade50, Colors.white],
-              items: [
-                ["Home & Lifestyle", "assets/fack_img/img_14.png"],
-                ["Cleansers & Repelients", "assets/fack_img/img_15.png"],
-                ["Electronics", "assets/fack_img/img_16.png"],
-                ["Stationery & Games", "assets/fack_img/img_17.png"],
-              ],
-            ),
-
-            // ============= SHOP BY STORE =============
-            buildCategorySection(
-              title: "Shop by store",
-              gradientColors: [Colors.purple.shade50, Colors.white],
-              items: [
-                ["Spiritual Store", "assets/fack_img/img_18.png"],
-                ["Pharma Store", "assets/fack_img/img_19.png"],
-                ["E-Gifts Store", "assets/fack_img/img_20.png"],
-                ["Pet Store", "assets/fack_img/img_21.png"],
-                ["Sports Store", "assets/fack_img/img_22.png"],
-                ["Spiritual Store", "assets/fack_img/img_18.png"],
-                ["Pharma Store", "assets/fack_img/img_19.png"],
-                ["E-Gifts Store", "assets/fack_img/img_20.png"],
-              ],
-            ),
-
-            const SizedBox(height: 100),
+            const SizedBox(height: 25),
           ],
         ),
       ),

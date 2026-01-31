@@ -40,17 +40,17 @@ class AuthProvider extends ChangeNotifier {
     _initializeAuth();
   }
 
-Future<void> _initializeAuth() async {
-  await TokenStorage.init();
+  Future<void> _initializeAuth() async {
+    await TokenStorage.init();
 
-  final userJson = await TokenStorage.getUserAsync();
+    final userJson = await TokenStorage.getUserAsync();
     if (userJson != null) {
       _user = UserModel.fromJson(jsonDecode(userJson));
     }
 
-  _isInitialized = true;
-  notifyListeners();
-}
+    _isInitialized = true;
+    notifyListeners();
+  }
 
   // ========================= Register METHODS ========================= //
   Future<ApiResponse> signup({
@@ -224,6 +224,43 @@ Future<void> _initializeAuth() async {
         context.go(Routes.login);
       }
     }
+  }
+
+  // ================= DELETE ACCOUNT =================
+  Future<ApiResponse> deleteAccount(BuildContext context) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    ApiResponse response;
+
+    try {
+      // 🔥 Call delete account API
+      response = await AuthService.deleteAccount();
+
+      if (response.success) {
+        // 🔐 Clear ALL local/session data
+        await _clearLocalData();
+
+        _user = null;
+        _otpSent = false;
+
+        if (context.mounted) {
+          context.go(Routes.login);
+        }
+      }
+    } catch (e) {
+      debugPrint('Delete Account API failed: $e');
+      response = ApiResponse(success: false, message: e.toString());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+    return response;
   }
 
   // ================= CLEAR DATA =================
