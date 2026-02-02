@@ -19,6 +19,7 @@ import 'package:samruddha_kirana/screens/orders/order_details_screen.dart';
 import 'package:samruddha_kirana/screens/orders/orders_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_details_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_list_screen.dart';
+import 'package:samruddha_kirana/screens/profile/update_profile/update_profile_screen.dart';
 import 'package:samruddha_kirana/screens/splash/splash_screen.dart';
 import 'package:samruddha_kirana/widgets/no_internet_view.dart';
 
@@ -74,6 +75,13 @@ class AppRouter {
         path: Routes.dashboard,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const DashboardScreen()),
+      ),
+      GoRoute(
+        path: Routes.updateProfile,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const UpdateProfileScreen(),
+        ),
       ),
       GoRoute(
         path: Routes.getAddress,

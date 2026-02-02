@@ -98,4 +98,29 @@ class AuthService {
       authRequired: true, // 🔐 token based
     );
   }
+
+  // get user profile
+  static Future<ApiResponse> getUserDataProfile() async {
+    return await ApiClient.get(
+      ApiConstants.getProfile,
+      authRequired: true, // 🔐 token based
+    );
+  }
+
+  // update user profile
+  static Future<ApiResponse> updateUserDataProfile({
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) async {
+    return await ApiClient.post(
+      ApiConstants.updateProfile,
+      {
+        if (firstName != null) "first_name": firstName,
+        if (lastName != null) "last_name": lastName,
+        if (email != null) "email": email,
+      },
+      authRequired: true, // 🔐 token based
+    );
+  }
 }

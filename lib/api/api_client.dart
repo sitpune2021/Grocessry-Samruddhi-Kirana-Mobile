@@ -267,6 +267,32 @@ class ApiClient {
         return ApiResponse(
           success: false,
           message: body?['message'] ?? 'Bad request',
+          data: body,
+          code: 400,
+        );
+
+      case 422:
+        String errorMessage = 'Validation error';
+
+        if (body?['message'] != null) {
+          errorMessage = body['message'];
+        } else if (body?['errors'] != null && body['errors'] is Map) {
+          // Take first error message from errors map
+          final errors = body['errors'] as Map<String, dynamic>;
+          if (errors.isNotEmpty) {
+            final firstKey = errors.keys.first;
+            final firstErrorList = errors[firstKey];
+            if (firstErrorList is List && firstErrorList.isNotEmpty) {
+              errorMessage = firstErrorList.first.toString();
+            }
+          }
+        }
+
+        return ApiResponse(
+          success: false,
+          message: errorMessage,
+          data: body,
+          code: 422,
         );
 
       case 401:
@@ -282,7 +308,9 @@ class ApiClient {
       default:
         return ApiResponse(
           success: false,
-          message: 'Server error (${response.statusCode})',
+          message: body?['message'] ?? 'Server error (${response.statusCode})',
+          data: body,
+          code: response.statusCode,
         );
     }
   }

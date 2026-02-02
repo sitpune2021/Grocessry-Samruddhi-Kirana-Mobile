@@ -114,7 +114,8 @@ class ProfileScreen extends StatelessWidget {
 
             // ---------------- SETTINGS ----------------
             _sectionCard("SETTINGS & INFO", [
-              _itemTile(Icons.person_sharp, "Edit Profile"),
+              _itemTile(Icons.person_sharp, "Edit Profile",
+                  onTap: () => context.push(Routes.updateProfile),),
               _itemTile(Icons.share_rounded, "Share App"),
               _itemTile(Icons.info_rounded, "About Us"),
               _itemTiles(

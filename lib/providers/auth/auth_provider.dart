@@ -7,6 +7,7 @@ import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/api/session/token_storage.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/models/auth/user_model.dart';
+import 'package:samruddha_kirana/models/user/get_user_profile_data_model.dart';
 import 'package:samruddha_kirana/services/auth/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -21,6 +22,13 @@ class AuthProvider extends ChangeNotifier {
 
   String? _forgotPasswordMobile;
 
+  GetUserProfileDataModel? _profile;
+
+  GetUserProfileDataModel? get profile => _profile;
+
+  bool _isProfileLoading = false;
+  bool _isUpdateLoading = false;
+
   // ================= GETTERS =================
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
@@ -34,6 +42,9 @@ class AuthProvider extends ChangeNotifier {
   String get forgotPasswordMobile => _forgotPasswordMobile ?? '';
 
   bool get isLoggedIn => TokenStorage.isLoggedIn;
+
+  bool get isProfileLoading => _isProfileLoading;
+  bool get isUpdateLoading => _isUpdateLoading;
 
   // ✅ Add constructor to initialize TokenStorage
   AuthProvider() {
@@ -199,6 +210,72 @@ class AuthProvider extends ChangeNotifier {
   void resetOtp() {
     _otpSent = false;
     notifyListeners();
+  }
+
+  // ========================= get profile user data ========================= //
+  Future<ApiResponse> getUserProfileData() async {
+    if (_isProfileLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isProfileLoading = true;
+    notifyListeners();
+
+    final response = await AuthService.getUserDataProfile();
+
+    if (response.success && response.data != null) {
+      _profile = GetUserProfileDataModel.fromJson(response.data);
+      debugPrint('✅ User Profile Data fetched successfully');
+    } else {
+      debugPrint('❌ Failed to fetch user profile data: ${response.message}');
+    }
+
+    _isProfileLoading = false;
+    notifyListeners();
+    return response;
+  }
+
+  // ================= UPDATE PROFILE =================
+  Future<ApiResponse> updateUserProfile({
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) async {
+    if (_isLoading) {
+      return ApiResponse(success: false, message: 'Please wait');
+    }
+
+    _isProfileLoading = true;
+    notifyListeners();
+
+    final response = await AuthService.updateUserDataProfile(
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+    );
+
+    if (response.success && response.data != null) {
+      // 🔥 This line was missing in your code
+      final updatedUserJson = response.data["user"];
+      // ✅ Update local immutable state
+      // Update local profile safely
+      _profile = _profile?.copyWith(
+        data: _profile!.data.copyWith(
+          firstName: updatedUserJson["first_name"],
+          lastName: updatedUserJson["last_name"],
+          email: updatedUserJson["email"],
+          profilePhoto: updatedUserJson["profile_photo"],
+        ),
+      );
+
+      debugPrint('✅ Profile updated successfully');
+    } else {
+      debugPrint('❌ Update profile failed: ${response.message}');
+    }
+
+    _isUpdateLoading = false;
+    notifyListeners();
+    return response;
   }
 
   // ================= LOGOUT =================
