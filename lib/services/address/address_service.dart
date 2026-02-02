@@ -32,6 +32,7 @@ class AddressService {
     required double latitude,
     required double longitude,
     required int type,
+    required bool isDefault,
   }) async {
     return await ApiClient.put(
       ApiConstants.updateAddress(id),
@@ -46,6 +47,7 @@ class AddressService {
         "latitude": latitude,
         "longitude": longitude,
         "type": type,
+        "is_default": isDefault,
       },
       authRequired: true, // 🔐 token based
     );
@@ -63,6 +65,7 @@ class AddressService {
     required String latitude,
     required String longitude,
     required int type,
+    required bool isDefault,
   }) async {
     return await ApiClient.post(
       ApiConstants.addAddress,
@@ -77,7 +80,17 @@ class AddressService {
         "latitude": latitude,
         "longitude": longitude,
         "type": type,
+        "is_default": isDefault,
       },
+      authRequired: true, // 🔐 token based
+    );
+  }
+
+  // ================= swich DEFAULT ADDRESS =================
+  static Future<ApiResponse> switchDefaultAddress(int id) async {
+    return await ApiClient.post(
+      ApiConstants.defultAddress,
+      {"address_id": id},
       authRequired: true, // 🔐 token based
     );
   }

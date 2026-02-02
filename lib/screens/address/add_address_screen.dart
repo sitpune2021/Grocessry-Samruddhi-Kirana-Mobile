@@ -24,7 +24,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   /// ================= FORM & STATE =================
   final _formKey = GlobalKey<FormState>();
 
-  bool isDefaultAddress = true;
+  bool isDefaultAddress = false;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -37,6 +37,16 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   void initState() {
     super.initState();
+
+    final addresses = context.read<AddressProvider>().addresses;
+    if (widget.address == null) {
+      // ADD MODE
+      isDefaultAddress = addresses.isEmpty;
+      // true only if first address
+    } else {
+      // EDIT MODE
+      isDefaultAddress = widget.address!.isDefault;
+    }
 
     if (widget.address != null) {
       // ✏️ EDIT ADDRESS
@@ -344,56 +354,76 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
                         /// ================= DEFAULT TOGGLE =================
                         const SizedBox(height: 16),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isDefaultAddress = !isDefaultAddress;
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF6FFF8),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  isDefaultAddress
-                                      ? Icons.check_circle
-                                      : Icons.radio_button_unchecked,
-                                  color: isDefaultAddress
-                                      ? Colors.green
-                                      : Colors.grey,
+                        Builder(
+                          builder: (context) {
+                            final addresses = addressProvider.addresses;
+                            final bool isEditing = widget.address != null;
+
+                            // CASE 1: First address ever
+                            if (addresses.isEmpty && !isEditing) {
+                              isDefaultAddress = true;
+                            }
+
+                            // CASE 2: Only one address & editing
+                            final bool isLocked =
+                                addresses.length == 1 && isEditing;
+
+                            return GestureDetector(
+                              onTap: () {
+                                if (!isLocked) {
+                                  setState(() {
+                                    isDefaultAddress = !isDefaultAddress;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
                                 ),
-                                const SizedBox(width: 12),
-                                const Expanded(
-                                  child: Text(
-                                    'Set as default address',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF6FFF8),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      isDefaultAddress
+                                          ? Icons.check_circle
+                                          : Icons.radio_button_unchecked,
+                                      color: isDefaultAddress
+                                          ? Colors.green
+                                          : Colors.grey,
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Text(
+                                        'Set as default address',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: isDefaultAddress,
+                                      activeThumbColor: Colors.green,
+                                      onChanged: isLocked
+                                          ? null // 🔒 locked
+                                          : (v) {
+                                              setState(() {
+                                                isDefaultAddress = v;
+                                              });
+                                            },
+                                    ),
+                                  ],
                                 ),
-                                Switch(
-                                  value: isDefaultAddress,
-                                  activeThumbColor: Colors.green,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      isDefaultAddress = v;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 14),
                       ],
                     ),
                   ),
@@ -437,6 +467,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   latitude: lp.latitude!.toString(),
                                   longitude: lp.longitude!.toString(),
                                   type: addressProvider.selectedType,
+                                  isDefault: isDefaultAddress,
                                 );
 
                             if (response.success && context.mounted) {
@@ -463,6 +494,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   latitude: lp.latitude!,
                                   longitude: lp.longitude!,
                                   type: addressProvider.selectedType,
+                                  isDefault: isDefaultAddress,
                                 );
 
                             if (response.success && context.mounted) {

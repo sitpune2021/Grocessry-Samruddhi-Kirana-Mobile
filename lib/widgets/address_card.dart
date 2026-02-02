@@ -23,12 +23,6 @@ class AddressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderColor = isSelected ? Colors.green : Colors.grey.shade300;
 
-    /// Title & Icon mapping (NO UI change)
-    // final String title = data.isDefault == true ? 'Default Address' : 'Address';
-    // final IconData icon = data.isDefault == true
-    //     ? Icons.home
-    //     : Icons.location_on;
-
     final String title = getTitle(data.type);
     final IconData icon = getIcon(data.type);
 

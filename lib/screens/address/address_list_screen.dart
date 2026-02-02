@@ -17,8 +17,8 @@ class ManageAddressesScreen extends StatefulWidget {
 }
 
 class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
-  int selectedIndex = 0;
-  bool _isDefaultApplied = false;
+  // int selectedIndex = 0;
+  // bool _isDefaultApplied = false;
 
   @override
   void initState() {
@@ -66,43 +66,24 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
             color: Colors.black,
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              'HELP',
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   TextButton(
+        //     onPressed: () {},
+        //     child: const Text(
+        //       'HELP',
+        //       style: TextStyle(
+        //         color: Colors.green,
+        //         fontWeight: FontWeight.w600,
+        //       ),
+        //     ),
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Consumer<AddressProvider>(
           builder: (context, provider, _) {
-            // if (provider.isLoading) {
-            //   return const Center(child: Loader());
-            // }
-
-            // final List<GetAddress> addresses = provider.addresses;
             final addresses = provider.addresses;
-
-            // 🔥 AUTO SELECT DEFAULT ADDRESS (ONCE)
-            if (addresses.isNotEmpty && !_isDefaultApplied) {
-              final defaultIndex = addresses.indexWhere(
-                (e) => e.isDefault == true,
-              );
-
-              if (defaultIndex != -1) {
-                selectedIndex = defaultIndex;
-              }
-
-              _isDefaultApplied = true;
-            }
-
             return Column(
               children: [
                 const SizedBox(height: 16),
@@ -124,49 +105,60 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final item = addresses[index];
-                            final isSelected = selectedIndex == index;
 
-                            return AddressCard(
-                              data: item,
-                              isSelected: isSelected,
-                              onTap: () {
-                                setState(() {
-                                  selectedIndex = index;
-                                });
-                              },
-
-                              /// ✅ EDIT
-                              onEdit: () async {
-                                final result = await context.push(
-                                  Routes.addAddress,
-                                  extra: item, // ✅ PASS ADDRESS
+                            return AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 400),
+                              transitionBuilder: (child, animation) {
+                                return SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0, 0.2),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: FadeTransition(
+                                    opacity: animation,
+                                    child: child,
+                                  ),
                                 );
+                              },
+                              child: AddressCard(
+                                key: ValueKey(item.id),
+                                data: item,
+                                isSelected: item.isDefault,
 
-                                if (context.mounted && result == true) {
-                                  _isDefaultApplied = false;
-                                  context
+                                onTap: () async {
+                                  await context
                                       .read<AddressProvider>()
-                                      .fetchAllAddresses();
-                                }
-                              },
+                                      .switchDefault(item.id);
+                                },
 
-                              onDelete: () {
-                                _showDeleteBottomSheet(
-                                  context: context,
-                                  address: item,
-                                );
-                              },
+                                /// ✅ EDIT
+                                onEdit: () async {
+                                  final result = await context.push(
+                                    Routes.addAddress,
+                                    extra: item, // ✅ PASS ADDRESS
+                                  );
+
+                                  if (context.mounted && result == true) {
+                                    context
+                                        .read<AddressProvider>()
+                                        .fetchAllAddresses();
+                                  }
+                                },
+
+                                onDelete: () {
+                                  _showDeleteBottomSheet(
+                                    context: context,
+                                    address: item,
+                                  );
+                                },
+                              ),
                             );
                           },
                         ),
                 ),
 
                 /// ================= ADD NEW ADDRESS =================
-                _AddNewAddressButton(
-                  onAdded: () {
-                    _isDefaultApplied = false;
-                  },
-                ),
+                _AddNewAddressButton(onAdded: () {}),
 
                 const SizedBox(height: 16),
 
@@ -178,8 +170,8 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                     onPressed: addresses.isEmpty
                         ? null
                         : () {
-                            final selected = addresses[selectedIndex];
-                            debugPrint('Deliver to: ${selected.addressLine}');
+                            final selected = provider.defaultAddress;
+                            debugPrint('Deliver to: ${selected?.addressLine}');
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

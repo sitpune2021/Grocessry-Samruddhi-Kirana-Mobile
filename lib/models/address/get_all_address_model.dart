@@ -50,8 +50,7 @@ class GetAddress {
   final double latitude;
   final double longitude;
   final int type;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+
   final bool isDefault;
 
   GetAddress({
@@ -66,24 +65,11 @@ class GetAddress {
     required this.latitude,
     required this.longitude,
     required this.type,
-    required this.createdAt,
-    required this.updatedAt,
     required this.isDefault,
   });
 
   /// SAFE JSON PARSER
   factory GetAddress.fromJson(Map<String, dynamic> json) {
-    DateTime parseDate(dynamic value) {
-      if (value == null || value.toString().isEmpty) {
-        return DateTime.now();
-      }
-      try {
-        return DateTime.parse(value.toString());
-      } catch (_) {
-        return DateTime.now();
-      }
-    }
-
     double parseDouble(dynamic value) {
       return double.tryParse(value?.toString() ?? '') ?? 0.0;
     }
@@ -100,8 +86,6 @@ class GetAddress {
       latitude: parseDouble(json['latitude']),
       longitude: parseDouble(json['longitude']),
       type: json["type"],
-      createdAt: parseDate(json['created_at']),
-      updatedAt: parseDate(json['updated_at']),
       isDefault: json['is_default'],
     );
   }
@@ -118,8 +102,6 @@ class GetAddress {
     "latitude": latitude,
     "longitude": longitude,
     "type": type,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
     "is_default": isDefault,
   };
 }

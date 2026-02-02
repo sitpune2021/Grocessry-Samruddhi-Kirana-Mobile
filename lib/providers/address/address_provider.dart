@@ -26,8 +26,6 @@ class AddressProvider extends ChangeNotifier {
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
 
-  
-
   // ================= ADDRESS TYPE (PROVIDER STATE) =================
   AddressType _selectedType = AddressType.home;
   AddressType get selectedType => _selectedType;
@@ -37,6 +35,7 @@ class AddressProvider extends ChangeNotifier {
     fetchAllAddresses();
   }
 
+  // ================= TYPE =================
   void setAddressType(AddressType type) {
     _selectedType = type;
     notifyListeners();
@@ -85,7 +84,7 @@ class AddressProvider extends ChangeNotifier {
 
       if (response.success && response.data != null) {
         final model = AllAddressListModel.fromJson(response.data);
-        _addresses = model.data;
+        _addresses = List<GetAddress>.from(model.data);
       } else {
         _addresses = [];
         _errorMessage = response.message;
@@ -150,6 +149,7 @@ class AddressProvider extends ChangeNotifier {
     required String latitude,
     required String longitude,
     required AddressType type,
+    required bool isDefault,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
@@ -161,6 +161,9 @@ class AddressProvider extends ChangeNotifier {
     ApiResponse response;
 
     try {
+      // defult address handling
+      final bool shouldBeDefault = _addresses.isEmpty ? true : isDefault;
+
       response = await AddressService.addAddress(
         name: name.trim(),
         mobile: mobile.trim(),
@@ -172,6 +175,7 @@ class AddressProvider extends ChangeNotifier {
         latitude: latitude,
         longitude: longitude,
         type: addressTypeToInt(_selectedType),
+        isDefault: shouldBeDefault,
       );
       if (response.success) {
         await fetchAllAddresses();
@@ -200,6 +204,7 @@ class AddressProvider extends ChangeNotifier {
     required double latitude,
     required double longitude,
     required AddressType type,
+    required bool isDefault,
   }) async {
     if (_isLoading) {
       return ApiResponse(success: false, message: 'Please wait');
@@ -211,6 +216,8 @@ class AddressProvider extends ChangeNotifier {
     ApiResponse response;
 
     try {
+      // 🔥 Never allow zero default
+      final bool shouldBeDefault = isDefault ? true : defaultAddress?.id == id;
       response = await AddressService.updateAddress(
         id: id,
         name: name.trim(),
@@ -223,11 +230,31 @@ class AddressProvider extends ChangeNotifier {
         latitude: latitude,
         longitude: longitude,
         type: addressTypeToInt(_selectedType),
+        isDefault: shouldBeDefault,
       );
 
       if (response.success) {
         // 🔁 Refresh list after update
         await fetchAllAddresses();
+      }
+    } catch (e) {
+      response = ApiResponse(success: false, message: e.toString());
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+
+    return response;
+  }
+
+  Future<ApiResponse> switchDefault(int id) async {
+    ApiResponse response;
+
+    try {
+      response = await AddressService.switchDefaultAddress(id);
+
+      if (response.success) {
+        await fetchAllAddresses(); // refresh list
       }
     } catch (e) {
       response = ApiResponse(success: false, message: e.toString());

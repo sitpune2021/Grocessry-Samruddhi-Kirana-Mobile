@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.62:8000/api'; //local url
+  static const baseUrl = 'http://192.168.1.37:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -33,6 +33,7 @@ class ApiConstants {
   static String updateAddress(int id) => '/customer/addresses/$id';
   static String deleteAddress(int id) => '/customer/addresses/$id';
   static const getAllAddress = '/customer/addresses';
+  static const defultAddress = '/user/address/set-default';
 
   static const categories = '/categories';
   static String subCategoriesById(int id) => '/categories/$id/subcategories';
