@@ -89,7 +89,7 @@ class ProductBrandProvider extends ChangeNotifier {
           "data": response.data['data'],
         });
 
-        _selectedBrand = model.brands;
+        _selectedBrand = model.brand;
         _brandProducts = model.data;
       } else {
         _brandProducts = [];

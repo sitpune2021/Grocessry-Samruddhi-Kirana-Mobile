@@ -170,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen>
 
                                 Center(
                                   child: Image.asset(
-                                    "assets/images/app_logi.png",
+                                    "assets/images/logo_app.png",
                                     height: 180,
                                   ),
                                 ),

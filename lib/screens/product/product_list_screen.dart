@@ -308,9 +308,9 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     // final quantity = cartProvider.cartQuantities[productId] ?? 0;
 
     final mrp = double.tryParse(product.mrp) ?? 0;
-    final selling = double.tryParse(product.retailerPrice) ?? 0;
-    final discount = mrp > selling
-        ? (((mrp - selling) / mrp) * 100).round()
+    final finalPrice = double.tryParse(product.finalPrice) ?? 0;
+    final discount = mrp > finalPrice
+        ? (((mrp - finalPrice) / mrp) * 100).round()
         : 0;
 
     return GestureDetector(
@@ -385,7 +385,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   Row(
                     children: [
                       Text(
-                        "₹${mrp.toStringAsFixed(0)}",
+                        "₹${finalPrice.toStringAsFixed(0)}",
                         style: GoogleFonts.poppins(
                           color: Colors.green,
                           fontWeight: FontWeight.w700,
@@ -393,7 +393,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        "₹${selling.toStringAsFixed(0)}",
+                        "₹${mrp.toStringAsFixed(0)}",
                         style: GoogleFonts.poppins(
                           decoration: TextDecoration.lineThrough,
                           color: Colors.grey,

@@ -22,7 +22,10 @@ class ProductModel {
     return ProductModel(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
-      subcategory: Subcategory.fromJson(json['subcategory']),
+      // subcategory: Subcategory.fromJson(json['subcategory']),
+      subcategory: json['subcategory'] != null
+          ? Subcategory.fromJson(json['subcategory'])
+          : const Subcategory(id: 0, name: ''),
       data:
           (json['data'] as List<dynamic>?)
               ?.map((e) => Product.fromJson(e))
@@ -47,7 +50,10 @@ class Product {
   final String basePrice;
   final String retailerPrice;
   final String mrp;
+  final String finalPrice;
   final String gstPercentage;
+  final int discountPercentage;
+  final String discountLabel;
   final int stock;
   final int quantity;
   final int maxQuantity;
@@ -61,7 +67,10 @@ class Product {
     required this.basePrice,
     required this.retailerPrice,
     required this.mrp,
+    required this.finalPrice,
     required this.gstPercentage,
+    required this.discountPercentage,
+    required this.discountLabel,
     required this.stock,
     required this.quantity,
     required this.maxQuantity,
@@ -77,7 +86,10 @@ class Product {
       basePrice: json['base_price']?.toString() ?? '0',
       retailerPrice: json['retailer_price']?.toString() ?? '0',
       mrp: json['mrp']?.toString() ?? '0',
+      finalPrice: json['final_price']?.toString() ?? '0',
       gstPercentage: json['gst_percentage']?.toString() ?? '0',
+      discountPercentage: _toInt(json['discount_percentage']),
+      discountLabel: json['discount_label']?.toString() ?? '',
       stock: _toInt(json['stock']),
       quantity: _toInt(json['quantity']),
       maxQuantity: _toInt(json['max_quantity']),
@@ -97,7 +109,10 @@ class Product {
     'base_price': basePrice,
     'retailer_price': retailerPrice,
     'mrp': mrp,
+    'final_price': finalPrice,
     'gst_percentage': gstPercentage,
+    "discount_percentage": discountPercentage,
+    "discount_label": discountLabel,
     'stock': stock,
     'quantity': quantity,
     'max_quantity': maxQuantity,

@@ -1,23 +1,21 @@
 import 'dart:convert';
 
-/// Decode JSON string to model
 ProductByBrandModel productByBrandModelFromJson(String str) =>
     ProductByBrandModel.fromJson(json.decode(str));
 
-/// Encode model to JSON string
 String productByBrandModelToJson(ProductByBrandModel data) =>
     json.encode(data.toJson());
 
 class ProductByBrandModel {
   final bool status;
   final String message;
-  final Brands brands;
+  final Brands brand;
   final List<Product> data;
 
   const ProductByBrandModel({
     required this.status,
     required this.message,
-    required this.brands,
+    required this.brand,
     required this.data,
   });
 
@@ -25,7 +23,7 @@ class ProductByBrandModel {
     return ProductByBrandModel(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
-      brands: Brands.fromJson(json['brand'] ?? {}),
+      brand: Brands.fromJson(json['brand'] ?? {}),
       data:
           (json['data'] as List<dynamic>?)
               ?.map((e) => Product.fromJson(e))
@@ -37,7 +35,7 @@ class ProductByBrandModel {
   Map<String, dynamic> toJson() => {
     'status': status,
     'message': message,
-    'brand': brands.toJson(),
+    'brand': brand.toJson(),
     'data': data.map((e) => e.toJson()).toList(),
   };
 }
@@ -60,12 +58,15 @@ class Product {
   final int brandId;
   final int categoryId;
   final String name;
-  final String basePrice;
-  final String retailerPrice;
-  final String mrp;
-  final String gstPercentage;
+  final double basePrice;
+  final double retailerPrice;
+  final double mrp;
+  final double gstPercentage;
   final int stock;
+  final int discountPercentage;
+  final String discountLabel;
   final List<String> imageUrls;
+  final List<String> productImageUrls;
 
   const Product({
     required this.id,
@@ -77,7 +78,10 @@ class Product {
     required this.mrp,
     required this.gstPercentage,
     required this.stock,
+    required this.discountPercentage,
+    required this.discountLabel,
     required this.imageUrls,
+    required this.productImageUrls,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -86,13 +90,20 @@ class Product {
       brandId: json['brand_id'] ?? 0,
       categoryId: json['category_id'] ?? 0,
       name: json['name'] ?? '',
-      basePrice: json['base_price'] ?? '',
-      retailerPrice: json['retailer_price'] ?? '',
-      mrp: json['mrp'] ?? '',
-      gstPercentage: json['gst_percentage'] ?? '',
+      basePrice: double.parse(json['base_price'].toString()),
+      retailerPrice: double.parse(json['retailer_price'].toString()),
+      mrp: double.parse(json['mrp'].toString()),
+      gstPercentage: double.parse(json['gst_percentage'].toString()),
       stock: json['stock'] ?? 0,
+      discountPercentage: json['discount_percentage'] ?? 0,
+      discountLabel: json['discount_label'] ?? '',
       imageUrls:
           (json['image_urls'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      productImageUrls:
+          (json['product_image_urls'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -109,6 +120,9 @@ class Product {
     'mrp': mrp,
     'gst_percentage': gstPercentage,
     'stock': stock,
+    'discount_percentage': discountPercentage,
+    'discount_label': discountLabel,
     'image_urls': imageUrls,
+    'product_image_urls': productImageUrls,
   };
 }

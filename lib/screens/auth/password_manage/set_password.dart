@@ -44,7 +44,6 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
     if (res.success) {
       auth.resetForgotPasswordState();
 
-
       context.go(Routes.login);
     } else {
       ScaffoldMessenger.of(
@@ -129,7 +128,7 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
                                   /// LOGO
                                   Center(
                                     child: Image.asset(
-                                      "assets/images/login_screen_logo.png",
+                                      "assets/images/logo_app.png",
                                       height: 150,
                                     ),
                                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 
@@ -13,9 +14,6 @@ class AddressBottomSheet extends StatefulWidget {
 }
 
 class _AddressBottomSheetState extends State<AddressBottomSheet> {
-  int selectedIndex = 0;
-  bool _isDefaultApplied = false;
-
   @override
   void initState() {
     super.initState();
@@ -31,17 +29,6 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
       child: Consumer<AddressProvider>(
         builder: (context, provider, _) {
           final addresses = provider.addresses;
-
-          // Auto select default (same logic as your screen)
-          if (addresses.isNotEmpty && !_isDefaultApplied) {
-            final defaultIndex = addresses.indexWhere(
-              (e) => e.isDefault == true,
-            );
-            if (defaultIndex != -1) {
-              selectedIndex = defaultIndex;
-            }
-            _isDefaultApplied = true;
-          }
 
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -87,14 +74,16 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
               else
                 ...List.generate(addresses.length, (index) {
                   final item = addresses[index];
-                  final isSelected = selectedIndex == index;
+                  final isSelected = item.isDefault;
 
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
+                    onTap: provider.isLoading
+                        ? null
+                        : () async {
+                            await context.read<AddressProvider>().switchDefault(
+                              item.id,
+                            );
+                          },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(14),
@@ -149,13 +138,30 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
                                   item.addressLine,
                                   style: const TextStyle(color: Colors.grey),
                                 ),
+                                if (item.landmark.isNotEmpty)
+                                  Text(
+                                    item.landmark,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
                               ],
                             ),
                           ),
 
-                          const Icon(Icons.edit, size: 20),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.delete_outline, size: 20),
+                          IconButton(
+                            icon: const Icon(Icons.edit, size: 20),
+                            onPressed: () async {
+                              final result = await context.push(
+                                Routes.addAddress,
+                                extra: item,
+                              );
+
+                              if (context.mounted && result == true) {
+                                context
+                                    .read<AddressProvider>()
+                                    .fetchAllAddresses();
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -193,15 +199,15 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
                   onPressed: addresses.isEmpty
                       ? null
                       : () {
-                          final selected = addresses[selectedIndex];
-                          // context
-                          //     .read<AddressProvider>()
-                          // .setDefaultAddress(selected);
                           Navigator.pop(context);
                         },
                   child: const Text(
                     "CONFIRM ADDRESS",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: AppColors.border,
+                    ),
                   ),
                 ),
               ),

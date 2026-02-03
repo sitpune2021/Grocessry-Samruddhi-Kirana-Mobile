@@ -40,7 +40,7 @@ class ApiConstants {
   static String productsBySubCategoryId(int id) =>
       '/subcategories/$id/products';
   static String productDetailsById(int id) => '/products/$id';
-  
+
   static String similarProducts(int id) => '/products/$id/similar';
 
   static const brands = '/brands';

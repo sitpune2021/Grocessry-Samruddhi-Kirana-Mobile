@@ -41,6 +41,10 @@ class AllProductProvider extends ChangeNotifier {
   ProductDetailsModel? _productDetails;
   ProductDetailsModel? get productDetails => _productDetails;
 
+  // ================= NEW: SUB CATEGORY COUNTS =================
+  final Map<int, int> _subCategoryCounts = {};
+  Map<int, int> get subCategoryCounts => _subCategoryCounts;
+
   // ================= STATE MAPS =================
   final Map<int, bool> _favorites = {};
   Map<int, bool> get favorites => _favorites;
@@ -68,6 +72,10 @@ class AllProductProvider extends ChangeNotifier {
         "data": response.data['data'],
       });
       _categories = model.data;
+
+      if (_categories.isNotEmpty) {
+        onCategorySelected(0);
+      }
     } else {
       _categories = [];
     }
@@ -80,16 +88,22 @@ class AllProductProvider extends ChangeNotifier {
   // ================= CATEGORY SELECT =================
   void onCategorySelected(int index) {
     _selectedTab = index;
-
-    if (index == 0) {
-      clearSubCategories();
-      notifyListeners();
-      return;
-    }
-
-    final categoryId = _categories[index - 1].id;
+    final categoryId = _categories[index].id;
     fetchSubCategories(categoryId);
+    notifyListeners();
   }
+  // void onCategorySelected(int index) {
+  //   _selectedTab = index;
+
+  //   if (index == 0) {
+  //     clearSubCategories();
+  //     notifyListeners();
+  //     return;
+  //   }
+
+  //   final categoryId = _categories[index - 1].id;
+  //   fetchSubCategories(categoryId);
+  // }
 
   // ================= FETCH SUB CATEGORIES =================
   Future<ApiResponse> fetchSubCategories(int categoryId) async {
@@ -106,6 +120,10 @@ class AllProductProvider extends ChangeNotifier {
         "data": response.data['data'],
       });
       _subCategories = model.data;
+      // ✅ PREFETCH COUNTS FOR ALL SUBCATEGORIES
+      for (final sub in _subCategories) {
+        fetchProducts(sub.id);
+      }
     } else {
       _subCategories = [];
     }
@@ -129,8 +147,12 @@ class AllProductProvider extends ChangeNotifier {
       _subcategory = model.subcategory;
       _allProducts = model.data;
       _products = List.from(_allProducts);
+
+      // ✅ STORE COUNT (NEW)
+      _subCategoryCounts[subCategoryId] = _allProducts.length;
     } else {
       _products = [];
+      _subCategoryCounts[subCategoryId] = 0;
     }
 
     _isProductLoading = false;
@@ -212,7 +234,7 @@ class AllProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
- // =================REMOVED CART =================
+  // =================REMOVED CART =================
   void removeFromCart(int productId) {
     final currentQty = _quantities[productId] ?? 0;
 
@@ -236,6 +258,7 @@ class AllProductProvider extends ChangeNotifier {
     _subcategory = null;
     _favorites.clear();
     _quantities.clear();
+    _subCategoryCounts.clear();
     notifyListeners();
   }
 }
