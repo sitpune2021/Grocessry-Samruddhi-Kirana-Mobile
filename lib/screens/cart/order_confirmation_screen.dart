@@ -205,8 +205,11 @@ class OrderConfirmationScreen extends StatelessWidget {
                         // TRACK ORDER
                         TextButton(
                           onPressed: () {
-                            context.push(Routes.order);
+                            context.go(Routes.dashboard, extra: 3);
                           },
+                          // onPressed: () {
+                          //   context.push(Routes.activeOrder);
+                          // },
                           child: const Text(
                             "Track Order →",
                             style: TextStyle(

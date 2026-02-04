@@ -15,6 +15,7 @@ import 'package:samruddha_kirana/screens/cart/order_confirmation_screen.dart';
 import 'package:samruddha_kirana/screens/home/dashboard.dart';
 import 'package:samruddha_kirana/screens/auth/sign_in_screen.dart';
 import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
+import 'package:samruddha_kirana/screens/orders/active_order_screen.dart';
 import 'package:samruddha_kirana/screens/orders/order_details_screen.dart';
 import 'package:samruddha_kirana/screens/orders/orders_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_details_screen.dart';
@@ -71,11 +72,19 @@ class AppRouter {
           child: const SetPasswordScreen(),
         ),
       ),
+      // GoRoute(
+      //   path: Routes.dashboard,
+      //   pageBuilder: (context, state) =>
+      //       PageTransitions.slide(state: state, child: const DashboardScreen()),
+      // ),
       GoRoute(
         path: Routes.dashboard,
-        pageBuilder: (context, state) =>
-            PageTransitions.slide(state: state, child: const DashboardScreen()),
+        builder: (context, state) {
+          final index = state.extra as int? ?? 0;
+          return DashboardScreen(initialIndex: index);
+        },
       ),
+
       GoRoute(
         path: Routes.updateProfile,
         pageBuilder: (context, state) => PageTransitions.slide(
@@ -140,6 +149,13 @@ class AppRouter {
         path: Routes.newcart,
         pageBuilder: (context, state) =>
             PageTransitions.slide(state: state, child: const NewCartScreen()),
+      ),
+      GoRoute(
+        path: Routes.activeOrder,
+        pageBuilder: (context, state) => PageTransitions.slide(
+          state: state,
+          child: const ActiveOrdersPage(),
+        ),
       ),
       GoRoute(
         path: Routes.order,

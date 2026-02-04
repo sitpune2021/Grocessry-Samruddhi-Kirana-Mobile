@@ -22,6 +22,7 @@ class Routes {
   static const couponOffer = '/couponOffer';
   static const checkoutOrder = '/checkout-order';
 
+  static const activeOrder = '/active-order';
   static const order = '/order';
   static const orderDetails = '/order-details';
 }

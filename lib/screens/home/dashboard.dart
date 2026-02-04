@@ -14,7 +14,8 @@ import 'package:samruddha_kirana/widgets/address_buttom_sheet.dart';
 import '../category/main_categories_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final int initialIndex;
+  const DashboardScreen({super.key, this.initialIndex = 0});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -30,6 +31,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
+    
     _scrollController.addListener(() {
       if (_currentIndex != 0) return;
 

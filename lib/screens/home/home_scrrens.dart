@@ -26,6 +26,8 @@ class _RealHomeState extends State<RealHome> {
   final ScrollController _brandScrollController = ScrollController();
   int _brandDotIndex = 0;
 
+  final ScrollController _categoryScrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -260,6 +262,7 @@ class _RealHomeState extends State<RealHome> {
                           ).isDesktop;
 
                           return Scrollbar(
+                            controller: _categoryScrollController,
                             thumbVisibility: isDesktop,
                             interactive: true,
                             thickness: isDesktop ? 6 : 3,
@@ -424,96 +427,87 @@ class _RealHomeState extends State<RealHome> {
                             return const Center(child: Text("No Brands Found"));
                           }
 
-                          final isDesktop = ResponsiveBreakpoints.of(
-                            context,
-                          ).isDesktop;
+                          // final isDesktop = ResponsiveBreakpoints.of(
+                          //   context,
+                          // ).isDesktop;
 
-                          return Scrollbar(
-                            thumbVisibility: isDesktop,
-                            interactive: true,
-                            thickness: isDesktop ? 6 : 3,
-                            radius: const Radius.circular(12),
-                            child: ListView.builder(
-                              controller: _brandScrollController,
-                              scrollDirection: Axis.horizontal,
-                              physics: const ClampingScrollPhysics(),
-                              padding: const EdgeInsets.fromLTRB(15, 8, 15, 20),
-                              itemCount: provider.brands.length,
-                              itemBuilder: (context, index) {
-                                final brand = provider.brands[index];
+                          return ListView.builder(
+                            controller: _brandScrollController,
+                            scrollDirection: Axis.horizontal,
+                            physics: const ClampingScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(15, 8, 15, 20),
+                            itemCount: provider.brands.length,
+                            itemBuilder: (context, index) {
+                              final brand = provider.brands[index];
 
-                                return InkWell(
-                                  borderRadius: BorderRadius.circular(14),
-                                  onTap: () {
-                                    debugPrint("🟢 Brand ID: ${brand.id}");
-                                    context.push(
-                                      Routes.brandListDetails,
-                                      extra: brand.id,
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 110,
-                                    margin: const EdgeInsets.only(right: 15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColors.darkGreen.withValues(
-                                            alpha: 0.08,
-                                          ),
-                                          Colors.white,
-                                        ],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () {
+                                  debugPrint("🟢 Brand ID: ${brand.id}");
+                                  context.push(
+                                    Routes.brandListDetails,
+                                    extra: brand.id,
+                                  );
+                                },
+                                child: Container(
+                                  width: 110,
+                                  margin: const EdgeInsets.only(right: 15),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.darkGreen.withValues(
+                                          alpha: 0.08,
+                                        ),
+                                        Colors.white,
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
                                       ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.05,
-                                          ),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          child: Image.asset(
-                                            "assets/fack_img/img_3.png",
-                                            height: 55,
-                                            width: 55,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                          ),
-                                          child: Text(
-                                            brand.name,
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey.shade800,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    ],
                                   ),
-                                );
-                              },
-                            ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          "assets/fack_img/img_3.png",
+                                          height: 55,
+                                          width: 55,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                        ),
+                                        child: Text(
+                                          brand.name,
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.grey.shade800,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
