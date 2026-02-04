@@ -63,16 +63,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               children: [
                 _topImageHeader(context, product),
                 _productInfoCard(provider, product),
-                topIconsRow(),
-                // const HighlightsSection(),
                 InformationSection(product: product),
-                // const InformationSection(),
                 HighlightsSection(product: product),
-
+                
+                //similar products section commented out for now
                 _sectionTitle("Similar Products"),
-                _productsHorizontalList(provider),
-
-                _seeAllButton(),
+                // _productsHorizontalList(provider),
+                // _seeAllButton(),
                 const SizedBox(height: 100),
               ],
             ),

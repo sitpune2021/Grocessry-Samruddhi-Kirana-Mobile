@@ -5,6 +5,7 @@ import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/screens/cart/new_cart_screen.dart';
+import 'package:samruddha_kirana/screens/category/browse_categories_screen.dart';
 import 'package:samruddha_kirana/screens/home/home_scrrens.dart';
 import 'package:samruddha_kirana/screens/orders/active_order_screen.dart';
 import 'package:samruddha_kirana/screens/profile/profile_screen.dart';
@@ -32,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    
+
     _scrollController.addListener(() {
       if (_currentIndex != 0) return;
 
@@ -55,7 +56,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Widget> get _screens => [
     // HomeScreen(scrollController: _scrollController),
     RealHome(scrollController: _scrollController),
-    MainCategoriesScreen(),
+    // MainCategoriesScreen(),
+    BrowseCategoriesPage(),
     NewCartScreen(),
     // OrderAgainScreen(),
     ActiveOrdersPage(),
