@@ -3,10 +3,25 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
+import 'package:samruddha_kirana/providers/app_version/app_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppInfoProvider>().loadAppInfo();
+      context.read<AuthProvider>().getUserProfileData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,18 +67,52 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    "Your Account",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "ID: 7899463980",
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, _) {
+                      final profile = auth.profile;
+
+                      final fullName = profile != null
+                          ? "${profile.data.firstName} ${profile.data.lastName}"
+                          : "User";
+
+                      final mobile = profile?.data.mobile ?? "";
+                      // final email = profile?.data.email ?? "";
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            fullName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // ---------- MOBILE ----------
+                          if (mobile.isNotEmpty)
+                            Text(
+                              "Contact: $mobile",
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+
+                          // ---------- EMAIL ----------
+                          // if (email.isNotEmpty)
+                          //   Text(
+                          //     email,
+                          //     style: const TextStyle(
+                          //       color: Colors.white70,
+                          //       fontSize: 12,
+                          //     ),
+                          //   ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -114,8 +163,11 @@ class ProfileScreen extends StatelessWidget {
 
             // ---------------- SETTINGS ----------------
             _sectionCard("SETTINGS & INFO", [
-              _itemTile(Icons.person_sharp, "Edit Profile",
-                  onTap: () => context.push(Routes.updateProfile),),
+              _itemTile(
+                Icons.person_sharp,
+                "Edit Profile",
+                onTap: () => context.push(Routes.updateProfile),
+              ),
               _itemTile(Icons.share_rounded, "Share App"),
               _itemTile(Icons.info_rounded, "About Us"),
               _itemTiles(
@@ -150,13 +202,21 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ---------------- APP VERSION ----------------
-            const Text(
-              "APP VERSION 2.0.1",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-                letterSpacing: 0.8,
-              ),
+            Consumer<AppInfoProvider>(
+              builder: (context, appInfo, _) {
+                if (appInfo.version.isEmpty) {
+                  return const SizedBox();
+                }
+
+                return Text(
+                  "APP VERSION : ${appInfo.fullVersion}",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                    letterSpacing: 0.8,
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 24),

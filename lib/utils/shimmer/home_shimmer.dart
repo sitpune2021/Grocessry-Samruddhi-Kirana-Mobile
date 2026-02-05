@@ -110,16 +110,17 @@ class HomeShimmerScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // Category chips row
-                      Row(
-                        children: List.generate(
-                          5,
-                          (i) => Padding(
-                            padding: EdgeInsets.only(right: i < 4 ? 14 : 0),
-                            child: shimmerBox(w: 100, h: 84, r: 14),
-                          ),
+                      SizedBox(
+                        height: 100,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 5,
+                          separatorBuilder: (_, _) => const SizedBox(width: 14),
+                          itemBuilder: (_, _) =>
+                              shimmerBox(w: 100, h: 84, r: 14),
                         ),
                       ),
-
                       const SizedBox(height: 30),
 
                       // "Explore Sub-Categories" title
@@ -154,16 +155,18 @@ class HomeShimmerScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       // Brand cards row
-                      Row(
-                        children: List.generate(
-                          4,
-                          (i) => Padding(
-                            padding: EdgeInsets.only(right: i < 3 ? 15 : 0),
-                            child: shimmerBox(w: 110, h: 120, r: 14),
-                          ),
+                      SizedBox(
+                        height: 140,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(15, 8, 15, 20),
+                          itemCount: 4,
+                          separatorBuilder: (_, _) => const SizedBox(width: 15),
+                          itemBuilder: (_, _) =>
+                              shimmerBox(w: 110, h: 120, r: 14),
                         ),
                       ),
-
                       const SizedBox(height: 40),
                     ],
                   ),

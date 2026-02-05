@@ -4,6 +4,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/router.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/address/location_provider.dart';
+import 'package:samruddha_kirana/providers/app_version/app_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/providers/cuppon%20_offer/cuppon_&_offer_provider.dart';
 import 'package:samruddha_kirana/providers/orders/banner_provider.dart';
@@ -17,7 +18,7 @@ import 'package:samruddha_kirana/services/internet_service.dart';
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-void main() {
+void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -29,6 +30,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AppInfoProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => BannerProvider()),
         ChangeNotifierProvider(create: (_) => AllProductProvider()),
