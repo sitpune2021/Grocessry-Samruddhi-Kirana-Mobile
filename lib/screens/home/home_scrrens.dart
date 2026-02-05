@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,11 +7,14 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/providers/orders/banner_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
+import 'package:samruddha_kirana/screens/home/home_banner.dart';
 import 'package:samruddha_kirana/utils/address_type_mapper.dart';
 import 'package:samruddha_kirana/utils/shimmer/home_shimmer.dart';
 import 'package:samruddha_kirana/widgets/address_buttom_sheet.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class RealHome extends StatefulWidget {
   final ScrollController scrollController;
@@ -32,6 +36,7 @@ class _RealHomeState extends State<RealHome> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BannerProvider>().fetchBanners();
       context.read<AllProductProvider>().fetchCategories();
       context.read<ProductBrandProvider>().fetchBrands();
       context.read<AddressProvider>().fetchAllAddresses();
@@ -199,38 +204,8 @@ class _RealHomeState extends State<RealHome> {
                     const SizedBox(height: 10),
 
                     /// banner
-                    Container(
-                      height: 160,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xff00C853), Color(0xff4CAF50)],
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "WEEKLY SPECIAL",
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              "Fresh\nOrganic\nHarvest",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
+                    const HomeBannerSlider(),
+                    
                     const SizedBox(height: 24),
 
                     /// categories
@@ -313,13 +288,28 @@ class _RealHomeState extends State<RealHome> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.category_rounded,
-                                          size: 26,
-                                          color: selected
-                                              ? Colors.black45
-                                              : Colors.grey.shade600,
+                                        CachedNetworkImage(
+                                          imageUrl: item.images.isNotEmpty
+                                              ? item.images.first
+                                              : "",
+                                          height: 32,
+                                          width: 32,
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) =>
+                                              const SizedBox(
+                                                height: 32,
+                                                width: 32,
+                                                child: Loader(strokeWidth: 2),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(
+                                                Icons
+                                                    .image_not_supported_outlined,
+                                                size: 28,
+                                                color: Colors.grey.shade400,
+                                              ),
                                         ),
+
                                         const SizedBox(height: 4),
                                         Text(
                                           item.name,
@@ -479,11 +469,26 @@ class _RealHomeState extends State<RealHome> {
                                     children: [
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          "assets/fack_img/img_3.png",
-                                          height: 55,
-                                          width: 55,
-                                          fit: BoxFit.cover,
+                                        child: CachedNetworkImage(
+                                          imageUrl: brand.images.isNotEmpty
+                                              ? brand.images.first
+                                              : "",
+                                          height: 32,
+                                          width: 32,
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) =>
+                                              const SizedBox(
+                                                height: 32,
+                                                width: 32,
+                                                child: Loader(strokeWidth: 2),
+                                              ),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(
+                                                Icons
+                                                    .image_not_supported_outlined,
+                                                size: 28,
+                                                color: Colors.grey.shade400,
+                                              ),
                                         ),
                                       ),
                                       const SizedBox(height: 8),

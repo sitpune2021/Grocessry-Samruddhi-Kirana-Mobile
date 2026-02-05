@@ -40,12 +40,19 @@ class BrandListModel {
 class Brand {
   final int id;
   final String name;
+  final List<String> images;
 
-  const Brand({required this.id, required this.name});
+  const Brand({required this.id, required this.name, required this.images});
 
   factory Brand.fromJson(Map<String, dynamic> json) {
-    return Brand(id: json['id'] ?? 0, name: json['name'] ?? '');
+    return Brand(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      images: json["images"] == null
+          ? []
+          : List<String>.from(json["images"].map((x) => x)),
+    );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, "images": images};
 }

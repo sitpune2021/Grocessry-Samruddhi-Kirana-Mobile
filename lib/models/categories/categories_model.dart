@@ -41,16 +41,30 @@ class Category {
   final int id;
   final String name;
   final String slug;
+  final List<String> images;
 
-  const Category({required this.id, required this.name, required this.slug});
+  const Category({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.images,
+  });
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
+      images: json["images"] == null
+          ? []
+          : List<String>.from(json["images"].map((x) => x)),
     );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'slug': slug};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'slug': slug,
+    "images": images,
+  };
 }

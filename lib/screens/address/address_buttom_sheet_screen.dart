@@ -29,7 +29,7 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
       child: Consumer<AddressProvider>(
         builder: (context, provider, _) {
           final addresses = provider.addresses;
-
+          final bool isMaxReached = addresses.length >= 5;
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -168,22 +168,42 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
                   );
                 }),
 
-              // Add New Address
-              OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.push(Routes.addAddress);
-                },
-                icon: const Icon(Icons.add, color: Colors.green),
-                label: const Text(
-                  "Add New Address",
-                  style: TextStyle(color: Colors.green),
+              /// ================= ADD NEW ADDRESS (HIDDEN AT 5) =================
+              if (!isMaxReached)
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push(Routes.addAddress);
+                  },
+                  icon: const Icon(Icons.add, color: Colors.green),
+                  label: const Text(
+                    "Add New Address",
+                    style: TextStyle(color: Colors.green),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    shape: const StadiumBorder(),
+                    side: const BorderSide(color: Colors.green),
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.info_outline, color: Colors.grey, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        "Maximum 5 addresses allowed.",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                style: OutlinedButton.styleFrom(
-                  shape: const StadiumBorder(),
-                  side: const BorderSide(color: Colors.green),
-                ),
-              ),
 
               const SizedBox(height: 20),
 

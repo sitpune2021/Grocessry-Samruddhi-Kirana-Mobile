@@ -17,8 +17,6 @@ class ManageAddressesScreen extends StatefulWidget {
 }
 
 class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
-  // int selectedIndex = 0;
-  // bool _isDefaultApplied = false;
 
   @override
   void initState() {
@@ -56,6 +54,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
       backgroundColor: const Color(0xFFF6F7F6),
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: const BackButton(color: Colors.black),
         title: Text(
@@ -66,24 +65,13 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
             color: Colors.black,
           ),
         ),
-        // actions: [
-        //   TextButton(
-        //     onPressed: () {},
-        //     child: const Text(
-        //       'HELP',
-        //       style: TextStyle(
-        //         color: Colors.green,
-        //         fontWeight: FontWeight.w600,
-        //       ),
-        //     ),
-        //   ),
-        // ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Consumer<AddressProvider>(
           builder: (context, provider, _) {
             final addresses = provider.addresses;
+            final isMaxReached = addresses.length >= 5;
             return Column(
               children: [
                 const SizedBox(height: 16),
@@ -158,7 +146,12 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                 ),
 
                 /// ================= ADD NEW ADDRESS =================
-                _AddNewAddressButton(onAdded: () {}),
+                _AddNewAddressButton(
+                  isDisabled: isMaxReached,
+                  onAdded: () {
+                    context.read<AddressProvider>().fetchAllAddresses();
+                  },
+                ),
 
                 const SizedBox(height: 16),
 
@@ -299,28 +292,41 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
 
 class _AddNewAddressButton extends StatelessWidget {
   final VoidCallback onAdded;
-  const _AddNewAddressButton({required this.onAdded});
+  final bool isDisabled;
+  const _AddNewAddressButton({required this.onAdded, required this.isDisabled});
   @override
   Widget build(BuildContext context) {
+    final Color borderColor = isDisabled ? Colors.grey : AppColors.darkGreen;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green, width: 2),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: TextButton.icon(
-        onPressed: () async {
-          final result = await context.push(Routes.addAddress);
+        onPressed: isDisabled
+            ? () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('You can add maximum 5 addresses'),
+                  ),
+                );
+              }
+            : () async {
+                final result = await context.push(Routes.addAddress);
 
-          if (context.mounted && result == true) {
-            context.read<AddressProvider>().fetchAllAddresses();
-          }
-        },
-        icon: const Icon(Icons.add, color: Colors.green),
-        label: const Text(
+                if (context.mounted && result == true) {
+                  onAdded();
+                }
+              },
+        icon: Icon(Icons.add, color: isDisabled ? Colors.grey : Colors.green),
+        label: Text(
           'ADD NEW ADDRESS',
-          style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: isDisabled ? Colors.grey : Colors.green,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

@@ -6,6 +6,7 @@ import 'package:samruddha_kirana/providers/address/address_provider.dart';
 import 'package:samruddha_kirana/providers/address/location_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/providers/cuppon%20_offer/cuppon_&_offer_provider.dart';
+import 'package:samruddha_kirana/providers/orders/banner_provider.dart';
 import 'package:samruddha_kirana/providers/orders/order_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
@@ -29,6 +30,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => BannerProvider()),
         ChangeNotifierProvider(create: (_) => AllProductProvider()),
         ChangeNotifierProvider(create: (_) => ProductBrandProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),

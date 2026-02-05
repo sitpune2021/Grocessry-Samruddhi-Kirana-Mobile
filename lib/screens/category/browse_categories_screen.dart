@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
+import 'package:samruddha_kirana/widgets/loader.dart';
 
 class BrowseCategoriesPage extends StatefulWidget {
   const BrowseCategoriesPage({super.key});
@@ -78,7 +80,7 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
             child: Consumer<AllProductProvider>(
               builder: (context, provider, _) {
                 if (provider.isCategoryLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: Loader());
                 }
 
                 if (provider.categories.isEmpty) {
@@ -91,7 +93,7 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
                     Container(
                       width: ResponsiveValue<double>(
                         context,
-                        defaultValue: 80,
+                        defaultValue: 100,
                         conditionalValues: const [
                           Condition.largerThan(name: TABLET, value: 100),
                         ],
@@ -109,7 +111,9 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
 
                           return _SideCategoryItem(
                             title: category.name,
-                            icon: Icons.category_rounded,
+                            imageUrl: category.images.isNotEmpty
+                                ? category.images.first
+                                : "",
                             isSelected: isSelected,
                             onTap: () {
                               provider.onCategorySelected(index);
@@ -225,13 +229,13 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
 
 class _SideCategoryItem extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final String imageUrl;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _SideCategoryItem({
     required this.title,
-    required this.icon,
+    required this.imageUrl,
     required this.isSelected,
     required this.onTap,
   });
@@ -252,9 +256,17 @@ class _SideCategoryItem extends StatelessWidget {
               backgroundColor: isSelected
                   ? AppColors.darkGreen.withValues(alpha: 0.2)
                   : Colors.grey.shade200,
-              child: Icon(
-                icon,
-                color: isSelected ? AppColors.darkGreen : Colors.black54,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                height: 28,
+                width: 28,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => const Loader(strokeWidth: 2),
+                errorWidget: (context, url, error) => Icon(
+                  Icons.image_not_supported_outlined,
+                  size: 26,
+                  color: Colors.grey.shade400,
+                ),
               ),
             ),
             const SizedBox(height: 6),

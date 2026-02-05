@@ -35,6 +35,8 @@ class ApiConstants {
   static const getAllAddress = '/customer/addresses';
   static const defultAddress = '/user/address/set-default';
 
+  static const banners = '/banners';
+
   static const categories = '/categories';
   static String subCategoriesById(int id) => '/categories/$id/subcategories';
   static String productsBySubCategoryId(int id) =>
