@@ -174,11 +174,6 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
                                       itemBuilder: (context, index) {
                                         final subCategory =
                                             provider.subCategories[index];
-                                        final count =
-                                            provider
-                                                .subCategoryCounts[subCategory
-                                                .id] ??
-                                            0;
 
                                         final isLast =
                                             index ==
@@ -188,7 +183,8 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
                                           children: [
                                             _SubCategoryItem(
                                               title: subCategory.name,
-                                              count: count.toString(),
+                                              count: subCategory.productsCount
+                                                  .toString(),
                                               onTap: () {
                                                 context.push(
                                                   Routes.product,

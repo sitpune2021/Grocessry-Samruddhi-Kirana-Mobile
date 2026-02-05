@@ -205,7 +205,7 @@ class _RealHomeState extends State<RealHome> {
 
                     /// banner
                     const HomeBannerSlider(),
-                    
+
                     const SizedBox(height: 24),
 
                     /// categories
@@ -373,10 +373,8 @@ class _RealHomeState extends State<RealHome> {
                           childAspectRatio: 2.2,
                           physics: const NeverScrollableScrollPhysics(),
                           children: provider.subCategories.map((sub) {
-                            final count =
-                                provider.subCategoryCounts[sub.id] ?? 0;
                             debugPrint(
-                              '🔵 SubCategory ID: ${sub.id} has $count products',
+                              '🔵 SubCategory ID: ${sub.id} has ${sub.productsCount} products',
                             );
                             return GestureDetector(
                               onTap: () {
@@ -388,7 +386,7 @@ class _RealHomeState extends State<RealHome> {
                               },
                               child: SubCategoryCard(
                                 sub.name,
-                                "$count Items",
+                                "${sub.productsCount} Items",
                                 Icons.category,
                               ),
                             );

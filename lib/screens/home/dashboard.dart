@@ -12,7 +12,6 @@ import 'package:samruddha_kirana/screens/profile/profile_screen.dart';
 import 'package:samruddha_kirana/widgets/address_buttom_sheet.dart';
 
 // import 'home_screen.dart';
-import '../category/main_categories_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final int initialIndex;
@@ -56,10 +55,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Widget> get _screens => [
     // HomeScreen(scrollController: _scrollController),
     RealHome(scrollController: _scrollController),
-    // MainCategoriesScreen(),
     BrowseCategoriesPage(),
     NewCartScreen(),
-    // OrderAgainScreen(),
     ActiveOrdersPage(),
     ProfileScreen(),
   ];

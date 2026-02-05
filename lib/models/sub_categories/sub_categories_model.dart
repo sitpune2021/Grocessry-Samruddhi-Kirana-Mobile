@@ -45,12 +45,25 @@ class SubCategorieModel {
 class SubCategories {
   final int id;
   final String name;
+  final int productsCount;
 
-  const SubCategories({required this.id, required this.name});
+  const SubCategories({
+    required this.id,
+    required this.name,
+    required this.productsCount,
+  });
 
   factory SubCategories.fromJson(Map<String, dynamic> json) {
-    return SubCategories(id: json['id'] ?? 0, name: json['name'] ?? '');
+    return SubCategories(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      productsCount: json['products_count'] ?? 0,
+    );
   }
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    "products_count": productsCount,
+  };
 }
