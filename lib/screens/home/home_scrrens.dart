@@ -166,28 +166,48 @@ class _RealHomeState extends State<RealHome> {
 
                   const SizedBox(height: 16),
                   // search bar
-                  GestureDetector(
-                    onTap: () {
-                      // Handle search bar tap
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xffF3F4F6),
+                  TextField(
+                    readOnly: true,
+                    onTap: () => context.push(Routes.search),
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xffF3F4F6),
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: "Search your product by name",
+                      border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
                       ),
-                      child: const TextField(
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 14),
-                          prefixIcon: Icon(Icons.search),
-                          hintText: "Search your product by name",
-                          border: InputBorder.none,
-                        ),
-                      ),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
 
+                  // InkWell(
+                  //   borderRadius: BorderRadius.circular(25),
+                  //   onTap: () => context.push(Routes.search),
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       color: const Color(0xffF3F4F6),
+                  //       borderRadius: BorderRadius.circular(25),
+                  //     ),
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 16,
+                  //       vertical: 14,
+                  //     ),
+                  //     child: Row(
+                  //       children: const [
+                  //         Icon(Icons.search, color: Colors.grey),
+                  //         SizedBox(width: 10),
+                  //         Text(
+                  //           "Search your product by name",
+                  //           style: TextStyle(color: Colors.grey),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 10),
                 ],
               ),

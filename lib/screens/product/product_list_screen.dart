@@ -183,11 +183,6 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                         ),
                     ],
                   ),
-
-                  // IconButton(
-                  //   icon: const Icon(Icons.shopping_cart_outlined),
-                  //   onPressed: () => context.push(Routes.newcart),
-                  // ),
                 ],
               ),
 
@@ -235,10 +230,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                               horizontalPadding,
                               cartProvider.totalItems > 0 ? 100 : 12, // 👈 KEY
                             ),
-                            // padding: EdgeInsets.symmetric(
-                            //   horizontal: horizontalPadding,
-                            //   vertical: 12,
-                            // ),
+
                             itemCount: provider.products.length,
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -405,17 +397,11 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   AddQtyButton(
                     qty: quantity,
                     maxQty: product.maxQuantity,
-                    // onAdd: () => provider.addToCart(productId),
                     onAdd: () async {
                       final result = await cartProvider.addToCart(
                         product: product,
                       );
 
-                      // cartProvider.addToCart(
-                      //   productId: productId,
-                      //   stock: product.stock,
-                      //   maxQuantity: product.maxQuantity,
-                      // );
                       if (!context.mounted) return;
                       _handleCartResult(context, result);
                     },

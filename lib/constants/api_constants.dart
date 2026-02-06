@@ -37,6 +37,9 @@ class ApiConstants {
 
   static const banners = '/banners';
 
+  static String searchProducts(String query) =>
+      '/products/search?search=$query';
+
   static const categories = '/categories';
   static String subCategoriesById(int id) => '/categories/$id/subcategories';
   static String productsBySubCategoryId(int id) =>

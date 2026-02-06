@@ -19,9 +19,9 @@ class SearchProductModel {
 
   factory SearchProductModel.fromJson(Map<String, dynamic> json) {
     return SearchProductModel(
-      status: json['status'],
-      count: json['count'],
-      data: PaginationData.fromJson(json['data']),
+      status: json['status'] ?? false,
+      count: _toInt(json['count']),
+      data: PaginationData.fromJson(json['data'] ?? {}),
     );
   }
 
@@ -34,7 +34,7 @@ class SearchProductModel {
 
 class PaginationData {
   final int currentPage;
-  final List<Product> products;
+  final List<Products> products;
   final String firstPageUrl;
   final int from;
   final int lastPage;
@@ -65,19 +65,23 @@ class PaginationData {
 
   factory PaginationData.fromJson(Map<String, dynamic> json) {
     return PaginationData(
-      currentPage: json['current_page'],
-      products: (json['data'] as List).map((e) => Product.fromJson(e)).toList(),
-      firstPageUrl: json['first_page_url'],
-      from: json['from'],
-      lastPage: json['last_page'],
-      lastPageUrl: json['last_page_url'],
-      links: (json['links'] as List).map((e) => PageLink.fromJson(e)).toList(),
-      nextPageUrl: json['next_page_url'],
-      path: json['path'],
-      perPage: json['per_page'],
-      prevPageUrl: json['prev_page_url'],
-      to: json['to'],
-      total: json['total'],
+      currentPage: _toInt(json['current_page']),
+      products: (json['data'] as List<dynamic>? ?? [])
+          .map((e) => Products.fromJson(e))
+          .toList(),
+      firstPageUrl: json['first_page_url']?.toString() ?? '',
+      from: _toInt(json['from']),
+      lastPage: _toInt(json['last_page']),
+      lastPageUrl: json['last_page_url']?.toString() ?? '',
+      links: (json['links'] as List<dynamic>? ?? [])
+          .map((e) => PageLink.fromJson(e))
+          .toList(),
+      nextPageUrl: json['next_page_url']?.toString(),
+      path: json['path']?.toString() ?? '',
+      perPage: _toInt(json['per_page']),
+      prevPageUrl: json['prev_page_url']?.toString(),
+      to: _toInt(json['to']),
+      total: _toInt(json['total']),
     );
   }
 
@@ -98,7 +102,7 @@ class PaginationData {
   };
 }
 
-class Product {
+class Products {
   final int id;
   final int categoryId;
   final int subCategoryId;
@@ -118,12 +122,12 @@ class Product {
   final String finalPrice;
   final int stock;
   final List<String> productImages;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final dynamic deletedAt;
   final List<String> productImageUrls;
 
-  Product({
+  Products({
     required this.id,
     required this.categoryId,
     required this.subCategoryId,
@@ -149,35 +153,35 @@ class Product {
     required this.productImageUrls,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'],
-      categoryId: json['category_id'],
-      subCategoryId: json['sub_category_id'],
-      brandId: json['brand_id'],
-      name: json['name'],
-      unitId: json['unit_id'],
-      unitValue: json['unit_value'],
-      sku: json['sku'],
+  factory Products.fromJson(Map<String, dynamic> json) {
+    return Products(
+      id: _toInt(json['id']),
+      categoryId: _toInt(json['category_id']),
+      subCategoryId: _toInt(json['sub_category_id']),
+      brandId: _toInt(json['brand_id']),
+      name: json['name']?.toString() ?? '',
+      unitId: _toInt(json['unit_id']),
+      unitValue: json['unit_value']?.toString() ?? '',
+      sku: json['sku']?.toString() ?? '',
       barcode: json['barcode'],
-      description: json['description'],
-      basePrice: json['base_price'],
-      retailerPrice: json['retailer_price'],
-      mrp: json['mrp'],
-      taxId: json['tax_id'],
-      gstPercentage: json['gst_percentage'],
-      gstAmount: json['gst_amount'],
-      finalPrice: json['final_price'],
-      stock: json['stock'],
-      productImages: json['product_images'] == null
-          ? []
-          : List<String>.from(json['product_images']),
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      description: json['description']?.toString() ?? '',
+      basePrice: json['base_price']?.toString() ?? '0',
+      retailerPrice: json['retailer_price']?.toString() ?? '0',
+      mrp: json['mrp']?.toString() ?? '0',
+      taxId: _toInt(json['tax_id']),
+      gstPercentage: json['gst_percentage']?.toString() ?? '0',
+      gstAmount: json['gst_amount']?.toString() ?? '0',
+      finalPrice: json['final_price']?.toString() ?? '0',
+      stock: _toInt(json['stock']),
+      productImages: (json['product_images'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      createdAt: _parseDate(json['created_at']),
+      updatedAt: _parseDate(json['updated_at']),
       deletedAt: json['deleted_at'],
-      productImageUrls: json['product_image_urls'] == null
-          ? []
-          : List<String>.from(json['product_image_urls']),
+      productImageUrls: (json['product_image_urls'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toList(),
     );
   }
 
@@ -201,8 +205,8 @@ class Product {
     'final_price': finalPrice,
     'stock': stock,
     'product_images': productImages,
-    'created_at': createdAt.toIso8601String(),
-    'updated_at': updatedAt.toIso8601String(),
+    'created_at': createdAt?.toIso8601String(),
+    'updated_at': updatedAt?.toIso8601String(),
     'deleted_at': deletedAt,
     'product_image_urls': productImageUrls,
   };
@@ -223,10 +227,10 @@ class PageLink {
 
   factory PageLink.fromJson(Map<String, dynamic> json) {
     return PageLink(
-      url: json['url'],
-      label: json['label'],
-      page: json['page'],
-      active: json['active'],
+      url: json['url']?.toString(),
+      label: json['label']?.toString() ?? '',
+      page: json['page'] != null ? _toInt(json['page']) : null,
+      active: json['active'] ?? false,
     );
   }
 
@@ -236,4 +240,22 @@ class PageLink {
     'page': page,
     'active': active,
   };
+}
+
+/// 🔐 SAFE HELPERS
+int _toInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value) ?? 0;
+  if (value is double) return value.toInt();
+  return 0;
+}
+
+DateTime? _parseDate(dynamic value) {
+  if (value == null) return null;
+  try {
+    return DateTime.parse(value.toString());
+  } catch (_) {
+    return null;
+  }
 }

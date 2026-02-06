@@ -3,6 +3,7 @@ import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/categories/categories_model.dart';
 import 'package:samruddha_kirana/models/products/product_details_model.dart';
 import 'package:samruddha_kirana/models/products/product_model.dart';
+import 'package:samruddha_kirana/models/search_product/search_product_model.dart';
 import 'package:samruddha_kirana/models/sub_categories/sub_categories_model.dart';
 import 'package:samruddha_kirana/services/product_services/all_product_services.dart';
 
@@ -19,6 +20,9 @@ class AllProductProvider extends ChangeNotifier {
 
   bool _isProductDetailsLoading = false;
   bool get isProductDetailsLoading => _isProductDetailsLoading;
+
+  bool _isSearchLoading = false;
+  bool get isSearchLoading => _isSearchLoading;
 
   // ================= SELECTED TAB =================
   int _selectedTab = 0;
@@ -40,6 +44,14 @@ class AllProductProvider extends ChangeNotifier {
 
   ProductDetailsModel? _productDetails;
   ProductDetailsModel? get productDetails => _productDetails;
+
+  // ================= SEARCH (API) =================
+  final List<Products> _searchResults = [];
+  int _searchPage = 1;
+  bool _hasMoreSearch = true;
+
+  List<Products> get searchResults => _searchResults;
+  bool get hasMoreSearch => _hasMoreSearch;
 
   // ================= NEW: SUB CATEGORY COUNTS =================
   final Map<int, int> _subCategoryCounts = {};
@@ -92,18 +104,6 @@ class AllProductProvider extends ChangeNotifier {
     fetchSubCategories(categoryId);
     notifyListeners();
   }
-  // void onCategorySelected(int index) {
-  //   _selectedTab = index;
-
-  //   if (index == 0) {
-  //     clearSubCategories();
-  //     notifyListeners();
-  //     return;
-  //   }
-
-  //   final categoryId = _categories[index - 1].id;
-  //   fetchSubCategories(categoryId);
-  // }
 
   // ================= FETCH SUB CATEGORIES =================
   Future<ApiResponse> fetchSubCategories(int categoryId) async {
@@ -209,6 +209,43 @@ class AllProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ================= API SEARCH =================
+  Future<void> searchProductsApi({
+    required String query,
+    bool loadMore = false,
+  }) async {
+    if (_isSearchLoading) return;
+
+    if (!loadMore) {
+      _searchPage = 1;
+      _searchResults.clear();
+      _hasMoreSearch = true;
+    }
+
+    if (!_hasMoreSearch) return;
+
+    _isSearchLoading = true;
+    notifyListeners();
+
+    final response = await AllProductServices.searchProducts(
+      query: query,
+      page: _searchPage,
+    );
+
+    if (response.success && response.data != null) {
+      final model = SearchProductModel.fromJson(response.data);
+
+      _searchResults.addAll(model.data.products);
+
+      _hasMoreSearch = model.data.currentPage < model.data.lastPage;
+
+      _searchPage++;
+    }
+
+    _isSearchLoading = false;
+    notifyListeners();
+  }
+
   // ================= FAVORITE =================
   void toggleFavorite(int productId) {
     _favorites[productId] = !(_favorites[productId] ?? false);
@@ -259,6 +296,14 @@ class AllProductProvider extends ChangeNotifier {
     _favorites.clear();
     _quantities.clear();
     _subCategoryCounts.clear();
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    _searchResults.clear();
+    _searchPage = 1;
+    _hasMoreSearch = true;
+    _isSearchLoading = false;
     notifyListeners();
   }
 }

@@ -264,11 +264,18 @@ class DeliveryAddress {
   final int userId;
   final String firstName;
   final String? lastName;
+
+  final String flatHouse;
+  final String? floor;
+  final String area;
+  final String landmark;
   final String address;
   final String city;
   final String country;
+
   final String postcode;
   final String phone;
+
   final String latitude;
   final String longitude;
 
@@ -277,6 +284,10 @@ class DeliveryAddress {
     required this.userId,
     required this.firstName,
     required this.lastName,
+    required this.flatHouse,
+    required this.floor,
+    required this.area,
+    required this.landmark,
     required this.address,
     required this.city,
     required this.country,
@@ -290,15 +301,19 @@ class DeliveryAddress {
     return DeliveryAddress(
       id: json["id"],
       userId: json["user_id"],
-      firstName: json["first_name"],
+      firstName: json["first_name"] ?? "",
       lastName: json["last_name"],
+      flatHouse: json["flat_house"] ?? "",
+      floor: json["floor"],
+      area: json["area"] ?? "",
+      landmark: json["landmark"] ?? "",
       address: json["address"],
-      city: json["city"],
+      city: json["city"] ?? "",
       country: json["country"],
-      postcode: json["postcode"],
-      phone: json["phone"],
-      latitude: json["latitude"],
-      longitude: json["longitude"],
+      postcode: json["postcode"] ?? "",
+      phone: json["phone"] ?? "",
+      latitude: json["latitude"] ?? "",
+      longitude: json["longitude"] ?? "",
     );
   }
 
@@ -308,6 +323,10 @@ class DeliveryAddress {
     "first_name": firstName,
     "last_name": lastName,
     "address": address,
+    "flat_house": flatHouse,
+    "floor": floor,
+    "area": area,
+    "landmark": landmark,
     "city": city,
     "country": country,
     "postcode": postcode,

@@ -14,6 +14,8 @@ class Routes {
   static const getAddress = '/get-address';
   static const addAddress = '/add-Address';
 
+  static const search = '/search';
+
   static const product = '/products';
   static const productDetails = '/product-details';
   static const brandListDetails = '/brand-list-details';
