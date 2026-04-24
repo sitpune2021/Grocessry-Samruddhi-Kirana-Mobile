@@ -42,17 +42,23 @@ class _RealHomeState extends State<RealHome> {
       context.read<AddressProvider>().fetchAllAddresses();
     });
 
+    // ✅ NEW - proportional, works for any number of brands
     _brandScrollController.addListener(() {
-      final offset = _brandScrollController.offset;
-      setState(() {
-        if (offset < 100) {
-          _brandDotIndex = 0;
-        } else if (offset < 220) {
-          _brandDotIndex = 1;
-        } else {
-          _brandDotIndex = 2;
-        }
-      });
+      if (!_brandScrollController.hasClients) return;
+      final maxScroll = _brandScrollController.position.maxScrollExtent;
+      if (maxScroll == 0) return;
+
+      final progress = _brandScrollController.offset / maxScroll;
+
+      final newIndex = progress < 0.33
+          ? 0
+          : progress < 0.66
+          ? 1
+          : 2;
+
+      if (newIndex != _brandDotIndex) {
+        setState(() => _brandDotIndex = newIndex);
+      }
     });
   }
 
@@ -126,7 +132,7 @@ class _RealHomeState extends State<RealHome> {
                                 Text(
                                   defaultAddress == null
                                       ? "Select Address"
-                                      : "${intToAddressType(defaultAddress.type).name.toUpperCase()} • ${defaultAddress.name}-${defaultAddress.addressLine}",
+                                      : "${intToAddressType(defaultAddress.type).name.toUpperCase()} • ${defaultAddress.name}-${defaultAddress.buildingArea}",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -143,6 +149,24 @@ class _RealHomeState extends State<RealHome> {
                               ],
                             ),
                           ),
+
+                          /// 🔥 ADD THIS BELOW TEXT
+                          if (addressProvider.pincodeData != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                addressProvider.pincodeData!.message ?? "",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color:
+                                      addressProvider.pincodeData!.status ==
+                                          true
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
 
@@ -164,7 +188,7 @@ class _RealHomeState extends State<RealHome> {
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   // search bar
                   TextField(
                     readOnly: true,
@@ -184,31 +208,7 @@ class _RealHomeState extends State<RealHome> {
                     ),
                   ),
 
-                  // InkWell(
-                  //   borderRadius: BorderRadius.circular(25),
-                  //   onTap: () => context.push(Routes.search),
-                  //   child: Container(
-                  //     decoration: BoxDecoration(
-                  //       color: const Color(0xffF3F4F6),
-                  //       borderRadius: BorderRadius.circular(25),
-                  //     ),
-                  //     padding: const EdgeInsets.symmetric(
-                  //       horizontal: 16,
-                  //       vertical: 14,
-                  //     ),
-                  //     child: Row(
-                  //       children: const [
-                  //         Icon(Icons.search, color: Colors.grey),
-                  //         SizedBox(width: 10),
-                  //         Text(
-                  //           "Search your product by name",
-                  //           style: TextStyle(color: Colors.grey),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  const SizedBox(height: 10),
+                  // const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -425,7 +425,27 @@ class _RealHomeState extends State<RealHome> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
+
+                    /// Dot Indicator
+                    // const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        3,
+                        (index) => Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: index == _brandDotIndex
+                                ? AppColors.darkGreen
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                      ),
+                    ),
 
                     SizedBox(
                       height: 140,
@@ -488,11 +508,11 @@ class _RealHomeState extends State<RealHome> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(12),
                                         child: CachedNetworkImage(
-                                          imageUrl: brand.images.isNotEmpty
-                                              ? brand.images.first
+                                          imageUrl: brand.image.isNotEmpty
+                                              ? brand.image
                                               : "",
-                                          height: 32,
-                                          width: 32,
+                                          height: 82,
+                                          width: 99,
                                           fit: BoxFit.contain,
                                           placeholder: (context, url) =>
                                               const SizedBox(
@@ -536,26 +556,7 @@ class _RealHomeState extends State<RealHome> {
                       ),
                     ),
 
-                    /// Dot Indicator
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        3,
-                        (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: index == _brandDotIndex
-                                ? AppColors.darkGreen
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 60),
                   ],
                 ),
               ),

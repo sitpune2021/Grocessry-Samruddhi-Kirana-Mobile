@@ -24,10 +24,11 @@ class AddressService {
     required int id,
     required String name,
     required String mobile,
-    required String addressLine,
+    required String flatNo,
+    required String floor,
+    required String buildingArea,
     required String landmark,
     required String city,
-    required String state,
     required String pincode,
     required double latitude,
     required double longitude,
@@ -39,10 +40,11 @@ class AddressService {
       {
         "name": name,
         "mobile": mobile,
-        "address_line": addressLine,
+        "flat_no": flatNo,
+        "floor": floor,
+        "building_area": buildingArea,
         "landmark": landmark,
         "city": city,
-        "state": state,
         "pincode": pincode,
         "latitude": latitude,
         "longitude": longitude,
@@ -57,10 +59,11 @@ class AddressService {
   static Future<ApiResponse> addAddress({
     required String name,
     required String mobile,
-    required String addressLine,
+    required String flatNo,
+    required String floor,
+    required String buildingArea,
     required String landmark,
     required String city,
-    required String state,
     required String pincode,
     required String latitude,
     required String longitude,
@@ -72,10 +75,11 @@ class AddressService {
       {
         "name": name,
         "mobile": mobile,
-        "address_line": addressLine,
+        "flat_no": flatNo,
+        "floor": floor,
+        "building_area": buildingArea,
         "landmark": landmark,
         "city": city,
-        "state": state,
         "pincode": pincode,
         "latitude": latitude,
         "longitude": longitude,
@@ -91,6 +95,15 @@ class AddressService {
     return await ApiClient.post(
       ApiConstants.defultAddress,
       {"address_id": id},
+      authRequired: true, // 🔐 token based
+    );
+  }
+
+  // ================= PINCODE CHECK =================
+  static Future<ApiResponse> checkPincode(String pincode) async {
+    return await ApiClient.post(
+      ApiConstants.pincodeCheck,
+      {"pincode": pincode},
       authRequired: true, // 🔐 token based
     );
   }

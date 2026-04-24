@@ -17,7 +17,6 @@ class ManageAddressesScreen extends StatefulWidget {
 }
 
 class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -94,52 +93,90 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                           itemBuilder: (context, index) {
                             final item = addresses[index];
 
-                            return AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              transitionBuilder: (child, animation) {
-                                return SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0, 0.2),
-                                    end: Offset.zero,
-                                  ).animate(animation),
-                                  child: FadeTransition(
-                                    opacity: animation,
-                                    child: child,
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 400),
+                                  transitionBuilder: (child, animation) {
+                                    return SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(0, 0.2),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: AddressCard(
+                                    key: ValueKey(item.id),
+                                    data: item,
+                                    isSelected: item.isDefault,
+
+                                    onTap: () async {
+                                      await context
+                                          .read<AddressProvider>()
+                                          .switchDefault(item.id);
+                                    },
+
+                                    /// ✅ EDIT
+                                    onEdit: () async {
+                                      final result = await context.push(
+                                        Routes.addAddress,
+                                        extra: item, // ✅ PASS ADDRESS
+                                      );
+
+                                      if (context.mounted && result == true) {
+                                        context
+                                            .read<AddressProvider>()
+                                            .fetchAllAddresses();
+                                      }
+                                    },
+
+                                    onDelete: () {
+                                      _showDeleteBottomSheet(
+                                        context: context,
+                                        address: item,
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                              child: AddressCard(
-                                key: ValueKey(item.id),
-                                data: item,
-                                isSelected: item.isDefault,
+                                ),
 
-                                onTap: () async {
-                                  await context
-                                      .read<AddressProvider>()
-                                      .switchDefault(item.id);
-                                },
-
-                                /// ✅ EDIT
-                                onEdit: () async {
-                                  final result = await context.push(
-                                    Routes.addAddress,
-                                    extra: item, // ✅ PASS ADDRESS
-                                  );
-
-                                  if (context.mounted && result == true) {
-                                    context
-                                        .read<AddressProvider>()
-                                        .fetchAllAddresses();
-                                  }
-                                },
-
-                                onDelete: () {
-                                  _showDeleteBottomSheet(
-                                    context: context,
-                                    address: item,
-                                  );
-                                },
-                              ),
+                                // ✅ SERVICE NOT AVAILABLE MESSAGE
+                                if (item.isDefault &&
+                                    provider.pincodeData != null &&
+                                    provider.pincodeData!.status == false)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                      top: 4,
+                                      bottom: 12,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.info_outline,
+                                          color: Colors.red,
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          provider.pincodeData!.message ??
+                                              'Service not available in this area',
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                else
+                                  const SizedBox(height: 12),
+                              ],
                             );
                           },
                         ),
@@ -164,7 +201,7 @@ class _ManageAddressesScreenState extends State<ManageAddressesScreen> {
                         ? null
                         : () {
                             final selected = provider.defaultAddress;
-                            debugPrint('Deliver to: ${selected?.addressLine}');
+                            debugPrint('Deliver to: ${selected?.buildingArea}');
                           },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

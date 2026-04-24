@@ -85,6 +85,8 @@ class _SearchProductsScreenState extends State<SearchProductsScreen> {
 
           body: provider.isSearchLoading && products.isEmpty
               ? const _SearchShimmer()
+              : _searchController.text.isEmpty
+              ? _emptyState() // initial screen — no query yet
               : products.isEmpty
               ? _noResults()
               : GridView.builder(
@@ -260,7 +262,52 @@ class _SearchProductsScreenState extends State<SearchProductsScreen> {
     ),
   );
 
-  Widget _noResults() => const Center(child: Text("No products found"));
+  Widget _emptyState() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.search, size: 64, color: Colors.grey.shade300),
+        const SizedBox(height: 16),
+        Text(
+          "Search for a product",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey.shade500,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          "Type a product name to get started",
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+        ),
+      ],
+    ),
+  );
+
+  // Widget _noResults() => const Center(child: Text("No products found"));
+  Widget _noResults() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
+        const SizedBox(height: 16),
+        Text(
+          "No products found",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey.shade500,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          "Try a different search term",
+          style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+        ),
+      ],
+    ),
+  );
 }
 
 class _SearchShimmer extends StatelessWidget {

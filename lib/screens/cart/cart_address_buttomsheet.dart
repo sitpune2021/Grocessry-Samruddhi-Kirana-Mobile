@@ -189,10 +189,10 @@ class _SavedAddressSheetState extends State<SavedAddressSheet> {
 
     final subtitle =
         [
-          data.addressLine,
+          data.buildingArea,
           data.landmark,
           data.city,
-          data.state,
+          // data.state,
         ].where((e) => e.trim().isNotEmpty).join(", ") +
         (data.pincode.isNotEmpty ? " - ${data.pincode}" : "");
 

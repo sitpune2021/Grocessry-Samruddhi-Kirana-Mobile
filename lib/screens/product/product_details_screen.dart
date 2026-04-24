@@ -54,29 +54,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       bottomNavigationBar: _bottomCartBar(provider, product.id),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            controller: _scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _topImageHeader(context, product),
-                _productInfoCard(provider, product),
-                InformationSection(product: product),
-                HighlightsSection(product: product),
-                
-                //similar products section commented out for now
-                _sectionTitle("Similar Products"),
-                // _productsHorizontalList(provider),
-                // _seeAllButton(),
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
+      body: SafeArea(
+        top: true,
+        bottom: true,
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _topImageHeader(context, product),
+                  _productInfoCard(provider, product),
+                  InformationSection(product: product),
+                  HighlightsSection(product: product),
 
-          if (_showStickyAddButton) _stickyAddButton(provider, product),
-        ],
+                  //similar products section commented out for now
+                  _sectionTitle("Similar Products"),
+                  // _productsHorizontalList(provider),
+                  // _seeAllButton(),
+                  const SizedBox(height: 100),
+                ],
+              ),
+            ),
+
+            if (_showStickyAddButton) _stickyAddButton(provider, product),
+          ],
+        ),
       ),
     );
   }
@@ -85,6 +89,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   // TOP IMAGE
   // ───────────────────────────────────────────
   Widget _topImageHeader(BuildContext context, product) {
+    // final topPadding = MediaQuery.of(context).padding.top;
     return Stack(
       children: [
         ClipRRect(
@@ -92,25 +97,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             bottomLeft: Radius.circular(20),
             bottomRight: Radius.circular(20),
           ),
-          child: CachedImageView(
-            imageUrl: product.images.isNotEmpty ? product.images.first : null,
-            height: 260,
-            width: double.infinity,
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
+          child: AspectRatio(
+            aspectRatio: 1 / 1,
+            child: CachedImageView(
+              imageUrl: product.images.isNotEmpty ? product.images.first : null,
+              // height: 260,
+              // height:
+              //     20 + topPadding, // ← add extra height so image fills properly
+              width: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
             ),
           ),
         ),
         Positioned(
-          top: 40,
+          top: 12,
           left: 16,
           child: _roundButton(Icons.arrow_back, () {
             Navigator.pop(context);
           }),
         ),
         Positioned(
-          top: 40,
+          top: 12,
           right: 16,
           child: _roundButton(Icons.favorite_border, () {}),
         ),
@@ -136,7 +147,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final _ = provider.quantities[product.id] ?? 0;
 
     return Transform.translate(
-      offset: const Offset(0, -40),
+      offset: const Offset(0, 10),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(18),
@@ -150,14 +161,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
-              children: [
-                Icon(Icons.timer, size: 18, color: Colors.green),
-                SizedBox(width: 4),
-                Text("10 Mins", style: TextStyle(color: Colors.green)),
-              ],
-            ),
-            const SizedBox(height: 6),
             Text(
               product.name,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),

@@ -123,12 +123,73 @@ class OrderReceiptAlert extends StatelessWidget {
   // ================= ADDRESS =================
   // (API not available → UI kept same)
 
+  // Widget _addressText() {
+  //   return const Padding(
+  //     padding: EdgeInsets.only(left: 28),
+  //     child: Text(
+  //       'Address not available',
+  //       style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.5),
+  //     ),
+  //   );
+  // }
   Widget _addressText() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 28),
-      child: Text(
-        'Address not available',
-        style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.5),
+    final address = order.deliveryAddress;
+
+    if (address == null) {
+      return const Padding(
+        padding: EdgeInsets.only(left: 28),
+        child: Text(
+          'Address not available',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Name + Phone
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  address.firstName ?? '',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              if ((address.phone ?? '').isNotEmpty)
+                Text(
+                  'No. ${address.phone}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(height: 4),
+
+          /// Address line 1
+          Text(
+            '${address.flatHouse ?? ''}, ${address.floor ?? ''}, ${address.area ?? ''}.',
+            style: const TextStyle(color: Colors.grey),
+          ),
+
+          const SizedBox(height: 2),
+
+          /// Address line 2
+          Text(
+            '${address.city ?? ''}, ${address.postcode ?? ''}.',
+            style: const TextStyle(color: Colors.grey),
+          ),
+        ],
       ),
     );
   }
@@ -237,9 +298,50 @@ class OrderReceiptAlert extends StatelessWidget {
           _summaryRow('Coupon Discount', order.couponDiscount),
           const Divider(height: 26),
           _summaryRow('Total Amount', order.totalAmount, isBold: true),
+          const Divider(height: 26),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Payment Method',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _paymentColor(order.paymentMethod),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  order.paymentMethod.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  Color _paymentColor(String method) {
+    switch (method.toLowerCase()) {
+      case "cash":
+        return Colors.green;
+      case "online":
+        return Colors.blue;
+      case "card":
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
   }
 
   Widget _summaryRow(

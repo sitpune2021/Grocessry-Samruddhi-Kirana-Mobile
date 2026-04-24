@@ -110,6 +110,7 @@ class OrderData {
   final double totalAmount;
 
   final String orderStatus;
+  final String paymentMethod;
 
   final int? customerRating;
   final List<String>? customerRatingTags;
@@ -125,6 +126,7 @@ class OrderData {
   final DateTime? deliveredAt;
 
   final List<OrderItem> orderItems;
+  final DeliveryAddress? deliveryAddress;
 
   OrderData({
     required this.id,
@@ -139,6 +141,7 @@ class OrderData {
     required this.couponDiscount,
     required this.totalAmount,
     required this.orderStatus,
+    required this.paymentMethod,
     required this.customerRating,
     required this.customerRatingTags,
     required this.cancelReason,
@@ -149,6 +152,7 @@ class OrderData {
     required this.updatedAt,
     required this.deliveredAt,
     required this.orderItems,
+    required this.deliveryAddress,
   });
 
   factory OrderData.fromJson(Map<String, dynamic> json) {
@@ -167,6 +171,7 @@ class OrderData {
       totalAmount: _toDouble(json["total_amount"]),
 
       orderStatus: json["status"],
+      paymentMethod: json["payment_method"] ?? "",
 
       customerRating: json["customer_rating"],
       customerRatingTags: json["customer_rating_tags"] == null
@@ -192,6 +197,9 @@ class OrderData {
           : List<OrderItem>.from(
               json["order_items"].map((x) => OrderItem.fromJson(x)),
             ),
+      deliveryAddress: json["delivery_address"] == null
+          ? null
+          : DeliveryAddress.fromJson(json["delivery_address"]),
     );
   }
 
@@ -208,6 +216,7 @@ class OrderData {
     "coupon_discount": couponDiscount,
     "total_amount": totalAmount,
     "status": orderStatus,
+    "payment_method": paymentMethod,
     "customer_rating": customerRating,
     "customer_rating_tags": customerRatingTags,
     "cancel_reason": cancelReason,
@@ -218,6 +227,104 @@ class OrderData {
     "updated_at": updatedAt.toIso8601String(),
     "delivered_at": deliveredAt?.toIso8601String(),
     "order_items": orderItems.map((x) => x.toJson()).toList(),
+    "delivery_address": deliveryAddress?.toJson(),
+  };
+}
+
+class DeliveryAddress {
+  final int id;
+  final int userId;
+  final String? firstName;
+  final String? lastName;
+  final String? flatHouse;
+  final String? floor;
+  final String? area;
+  final String? address;
+  final int? type;
+  final String? landmark;
+  final String? city;
+  final String? country;
+  final String? postcode;
+  final String? phone;
+  final String? email;
+  final String? latitude;
+  final String? longitude;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final int? isDefault;
+
+  DeliveryAddress({
+    required this.id,
+    required this.userId,
+    required this.firstName,
+    required this.lastName,
+    required this.flatHouse,
+    required this.floor,
+    required this.area,
+    required this.address,
+    required this.type,
+    required this.landmark,
+    required this.city,
+    required this.country,
+    required this.postcode,
+    required this.phone,
+    required this.email,
+    required this.latitude,
+    required this.longitude,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.isDefault,
+  });
+
+  factory DeliveryAddress.fromJson(Map<String, dynamic> json) =>
+      DeliveryAddress(
+        id: json["id"] ?? 0,
+        userId: json["user_id"] ?? 0,
+        firstName: json["first_name"],
+        lastName: json["last_name"],
+        flatHouse: json["flat_house"],
+        floor: json["floor"],
+        area: json["area"],
+        address: json["address"],
+        type: json["type"],
+        landmark: json["landmark"],
+        city: json["city"],
+        country: json["country"],
+        postcode: json["postcode"],
+        phone: json["phone"],
+        email: json["email"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.tryParse(json["created_at"]),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.tryParse(json["updated_at"]),
+        isDefault: json["is_default"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "user_id": userId,
+    "first_name": firstName,
+    "last_name": lastName,
+    "flat_house": flatHouse,
+    "floor": floor,
+    "area": area,
+    "address": address,
+    "type": type,
+    "landmark": landmark,
+    "city": city,
+    "country": country,
+    "postcode": postcode,
+    "phone": phone,
+    "email": email,
+    "latitude": latitude,
+    "longitude": longitude,
+    "created_at": createdAt?.toIso8601String(),
+    "updated_at": updatedAt?.toIso8601String(),
+    "is_default": isDefault,
   };
 }
 

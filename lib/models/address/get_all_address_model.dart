@@ -41,10 +41,8 @@ class AllAddressListModel {
 class GetAddress {
   final int id;
   final String name;
-  final String addressLine;
   final String landmark;
   final String city;
-  final String state;
   final String pincode;
   final String mobile;
   final double latitude;
@@ -52,20 +50,24 @@ class GetAddress {
   final int type;
 
   final bool isDefault;
+  final String flatNo;
+  final String floor;
+  final String buildingArea;
 
   GetAddress({
     required this.id,
     required this.name,
-    required this.addressLine,
     required this.landmark,
     required this.city,
-    required this.state,
     required this.pincode,
     required this.mobile,
     required this.latitude,
     required this.longitude,
     required this.type,
     required this.isDefault,
+    required this.flatNo,
+    required this.floor,
+    required this.buildingArea,
   });
 
   /// SAFE JSON PARSER
@@ -74,34 +76,67 @@ class GetAddress {
       return double.tryParse(value?.toString() ?? '') ?? 0.0;
     }
 
+    bool parseBool(dynamic value) {
+      if (value is bool) return value;
+      if (value is int) return value == 1;
+      if (value is String) {
+        return value == "1" || value.toLowerCase() == "true";
+      }
+      return false;
+    }
+
+    String parseString(dynamic value) {
+      return value?.toString() ?? '';
+    }
+
+    // return GetAddress(
+    //   id: json['id'] ?? 0,
+    //   name: json['name'] ?? '',
+    //   landmark: json['landmark'] ?? '',
+    //   city: json['city'] ?? '',
+    //   pincode: json['pincode'] ?? '',
+    //   mobile: json['mobile'] ?? '',
+    //   latitude: parseDouble(json['latitude']),
+    //   longitude: parseDouble(json['longitude']),
+    //   type: json["type"],
+    //   isDefault: json['is_default'],
+
+    //   flatNo: json['flat_no'],
+    //   floor: json['floor'],
+    //   buildingArea: json['building_area'],
+    // );
     return GetAddress(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      addressLine: json['address_line'] ?? '',
-      landmark: json['landmark'] ?? '',
-      city: json['city'] ?? '',
-      state: json['state'] ?? '',
-      pincode: json['pincode'] ?? '',
-      mobile: json['mobile'] ?? '',
+      name: parseString(json['name']),
+      landmark: parseString(json['landmark']),
+      city: parseString(json['city']),
+      pincode: parseString(json['pincode']),
+      mobile: parseString(json['mobile']),
       latitude: parseDouble(json['latitude']),
       longitude: parseDouble(json['longitude']),
-      type: json["type"],
-      isDefault: json['is_default'],
+      type: json['type'] ?? 0,
+      isDefault: parseBool(json['is_default']),
+
+      flatNo: parseString(json['flat_no']),
+      floor: parseString(json['floor']),
+      buildingArea: parseString(json['building_area']),
     );
   }
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
-    "address_line": addressLine,
     "landmark": landmark,
     "city": city,
-    "state": state,
     "pincode": pincode,
     "mobile": mobile,
     "latitude": latitude,
     "longitude": longitude,
     "type": type,
     "is_default": isDefault,
+
+    "flat_no": flatNo,
+    "floor": floor,
+    "building_area": buildingArea,
   };
 }

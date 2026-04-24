@@ -21,6 +21,9 @@ class ViewCartModel {
 class Data {
   final int id;
   final int userId;
+  final int? couponId;
+  final String? couponCode;
+  final String? sessionId;
   final int? productId;
   final int quantity;
   final String? price;
@@ -31,10 +34,14 @@ class Data {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<Item> items;
+  final List<Coupon> availableCoupons;
 
   Data({
     required this.id,
     required this.userId,
+    required this.couponId,
+    required this.couponCode,
+    required this.sessionId,
     required this.productId,
     required this.quantity,
     required this.price,
@@ -45,24 +52,57 @@ class Data {
     required this.createdAt,
     required this.updatedAt,
     required this.items,
+    required this.availableCoupons,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) {
+    final cart = json["cart"] ?? {};
     return Data(
-      id: json["id"] ?? 0,
-      userId: json["user_id"] ?? 0,
-      productId: json["product_id"],
-      quantity: json["quantity"] ?? 0,
-      price: json["price"]?.toString(),
-      subtotal: json["subtotal"]?.toString() ?? "0",
-      taxTotal: json["tax_total"]?.toString() ?? "0",
-      discount: json["discount"]?.toString() ?? "0",
-      total: json["total"]?.toString() ?? "0",
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
-      items: json["items"] == null
-          ? []
-          : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
+      id: cart["id"] ?? 0,
+      userId: cart["user_id"] ?? 0,
+
+      couponId: cart["coupon_id"],
+      couponCode: cart["coupon_code"],
+      sessionId: cart["session_id"],
+
+      productId: cart["product_id"],
+      quantity: cart["quantity"] ?? 0,
+      price: cart["price"]?.toString(),
+
+      subtotal: cart["subtotal"]?.toString() ?? "0",
+      taxTotal: cart["tax_total"]?.toString() ?? "0",
+      discount: cart["discount"]?.toString() ?? "0",
+      total: cart["total"]?.toString() ?? "0",
+      // createdAt: DateTime.parse(json["created_at"]),
+      // updatedAt: DateTime.parse(json["updated_at"]),
+      createdAt: cart["created_at"] != null
+          ? DateTime.parse(cart["created_at"])
+          : DateTime.now(),
+      updatedAt: cart["updated_at"] != null
+          ? DateTime.parse(cart["updated_at"])
+          : DateTime.now(),
+      items: (cart["items"] is List)
+          ? List<Item>.from(
+              (cart["items"] as List).map((x) => Item.fromJson(x)),
+            )
+          : [],
+      // items: cart["items"] == null
+      //     ? []
+      //     : List<Item>.from(json["items"].map((x) => Item.fromJson(x))),
+      // // ✅ Coupons
+      // availableCoupons: json["available_coupons"] == null
+      //     ? []
+      //     : List<Coupon>.from(
+      //         json["available_coupons"].map((x) => Coupon.fromJson(x)),
+      //       ),
+      // ✅ SAFE COUPONS
+      availableCoupons: (json["available_coupons"] is List)
+          ? List<Coupon>.from(
+              (json["available_coupons"] as List).map(
+                (x) => Coupon.fromJson(x),
+              ),
+            )
+          : [],
     );
   }
 }
@@ -114,9 +154,18 @@ class Item {
       taxTotal: json["tax_total"]?.toString() ?? "0",
       itemTotal: json["item_total"]?.toString() ?? "0",
       lineTotal: json["line_total"]?.toString(),
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
-      product: CartProduct.fromJson(json["product"]),
+      // createdAt: DateTime.parse(json["created_at"]),
+      // updatedAt: DateTime.parse(json["updated_at"]),
+      // product: CartProduct.fromJson(json["product"]),
+      createdAt: json["created_at"] != null
+          ? DateTime.parse(json["created_at"])
+          : DateTime.now(),
+      updatedAt: json["updated_at"] != null
+          ? DateTime.parse(json["updated_at"])
+          : DateTime.now(),
+      product: json["product"] == null
+          ? CartProduct.empty()
+          : CartProduct.fromJson(json["product"]),
     );
   }
 }
@@ -195,10 +244,44 @@ class CartProduct {
       productImageUrls: json["product_image_urls"] == null
           ? []
           : List<String>.from(json["product_image_urls"]),
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
+      // createdAt: DateTime.parse(json["created_at"]),
+      // updatedAt: DateTime.parse(json["updated_at"]),
+      createdAt: json["created_at"] != null
+          ? DateTime.parse(json["created_at"])
+          : DateTime.now(),
+      updatedAt: json["updated_at"] != null
+          ? DateTime.parse(json["updated_at"])
+          : DateTime.now(),
       deletedAt: json["deleted_at"],
-      tax: Tax.fromJson(json["tax"]),
+      // tax: Tax.fromJson(json["tax"]),
+      tax: json["tax"] == null ? Tax.empty() : Tax.fromJson(json["tax"]),
+    );
+  }
+
+  factory CartProduct.empty() {
+    return CartProduct(
+      id: 0,
+      categoryId: 0,
+      subCategoryId: 0,
+      brandId: 0,
+      unitId: 0,
+      unitValue: "",
+      name: "",
+      sku: "",
+      description: "",
+      basePrice: "0",
+      retailerPrice: "0",
+      mrp: "0",
+      gstPercentage: "0",
+      gstAmount: "0",
+      finalPrice: "0",
+      stock: 0,
+      productImages: [],
+      productImageUrls: [],
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      deletedAt: null,
+      tax: Tax.empty(),
     );
   }
 }
@@ -236,8 +319,51 @@ class Tax {
       igst: (json["igst"] ?? 0).toDouble(),
       gst: (json["gst"] ?? 0).toDouble(),
       isActive: json["is_active"] ?? false,
-      createdAt: DateTime.parse(json["created_at"]),
-      updatedAt: DateTime.parse(json["updated_at"]),
+      // createdAt: DateTime.parse(json["created_at"]),
+      // updatedAt: DateTime.parse(json["updated_at"]),
+      createdAt: json["created_at"] != null
+          ? DateTime.parse(json["created_at"])
+          : DateTime.now(),
+      updatedAt: json["updated_at"] != null
+          ? DateTime.parse(json["updated_at"])
+          : DateTime.now(),
+    );
+  }
+  factory Tax.empty() {
+    return Tax(
+      id: 0,
+      name: "",
+      cgst: 0,
+      sgst: 0,
+      igst: 0,
+      gst: 0,
+      isActive: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+  }
+}
+
+// ================= COUPON =================
+class Coupon {
+  final int id;
+  final String title;
+  final String code;
+  final bool isApplicable;
+
+  Coupon({
+    required this.id,
+    required this.title,
+    required this.code,
+    required this.isApplicable,
+  });
+
+  factory Coupon.fromJson(Map<String, dynamic> json) {
+    return Coupon(
+      id: json["id"] ?? 0,
+      title: json["title"] ?? "",
+      code: json["code"] ?? "",
+      isApplicable: json["is_applicable"] ?? false,
     );
   }
 }

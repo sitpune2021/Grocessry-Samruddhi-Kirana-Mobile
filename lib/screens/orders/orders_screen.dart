@@ -18,12 +18,12 @@ class OrdersScreen extends StatelessWidget {
             'Orders',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           ),
-          actions: const [
-            Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: Icon(Icons.search, color: Colors.black),
-            ),
-          ],
+          // actions: const [
+          //   Padding(
+          //     padding: EdgeInsets.only(right: 16),
+          //     child: Icon(Icons.search, color: Colors.black),
+          //   ),
+          // ],
           bottom: const TabBar(
             labelColor: Colors.black,
             unselectedLabelColor: Colors.grey,

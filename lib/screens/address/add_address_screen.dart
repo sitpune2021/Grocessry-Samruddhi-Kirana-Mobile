@@ -26,13 +26,23 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   bool isDefaultAddress = false;
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController pincodeController = TextEditingController();
-  final TextEditingController houseController = TextEditingController();
-  final TextEditingController areaController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController stateController = TextEditingController();
+  // final TextEditingController nameController = TextEditingController();
+  // final TextEditingController phoneController = TextEditingController();
+  // final TextEditingController pincodeController = TextEditingController();
+  // final TextEditingController houseController = TextEditingController();
+  // final TextEditingController areaController = TextEditingController();
+  // final TextEditingController cityController = TextEditingController();
+
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final pincodeController = TextEditingController();
+
+  final flatController = TextEditingController();
+  final floorController = TextEditingController();
+  final buildingController = TextEditingController();
+
+  final landmarkController = TextEditingController();
+  final cityController = TextEditingController();
 
   @override
   void initState() {
@@ -53,10 +63,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       nameController.text = widget.address!.name;
       phoneController.text = widget.address!.mobile;
       pincodeController.text = widget.address!.pincode;
+
+      flatController.text = widget.address!.flatNo;
+      floorController.text = widget.address!.floor;
+      buildingController.text = widget.address!.buildingArea;
+
+      landmarkController.text = widget.address!.landmark;
       cityController.text = widget.address!.city;
-      areaController.text = widget.address!.landmark;
-      stateController.text = widget.address!.state;
-      houseController.text = widget.address!.addressLine;
 
       // ✅ EDIT FALLBACK FOR LOCATION
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -82,10 +95,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     nameController.dispose();
     phoneController.dispose();
     pincodeController.dispose();
-    houseController.dispose();
-    areaController.dispose();
+
+    flatController.dispose();
+    floorController.dispose();
+    buildingController.dispose();
+
+    landmarkController.dispose();
     cityController.dispose();
-    stateController.dispose();
     super.dispose();
   }
 
@@ -177,15 +193,27 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                           // onChanged: _sanitizePincode,
                         ),
                         _inputField(
-                          controller: houseController,
-                          hint: 'Flat / House No. / Floor',
+                          controller: flatController,
+                          hint: 'Flat / House No',
                           icon: Icons.tag,
                           validator: _requiredValidator,
                         ),
                         _inputField(
-                          controller: areaController,
-                          hint: 'Building Name / Area / Street',
+                          controller: floorController,
+                          hint: 'Floor',
                           icon: Icons.apartment_outlined,
+                          validator: _requiredValidator,
+                        ),
+                        _inputField(
+                          controller: buildingController,
+                          hint: 'Building / Area',
+                          icon: Icons.apartment,
+                          validator: _requiredValidator,
+                        ),
+                        _inputField(
+                          controller: landmarkController,
+                          hint: 'Landmark',
+                          icon: Icons.location_on_outlined,
                           validator: _requiredValidator,
                         ),
 
@@ -205,20 +233,20 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                 validator: _alphaValidator,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _inputField(
-                                controller: stateController,
-                                hint: 'State',
-                                icon: Icons.map_outlined,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                    RegExp(r'[a-zA-Z ]'),
-                                  ),
-                                ],
-                                validator: _alphaValidator,
-                              ),
-                            ),
+                            // const SizedBox(width: 12),
+                            // Expanded(
+                            //   child: _inputField(
+                            //     controller: stateController,
+                            //     hint: 'State',
+                            //     icon: Icons.map_outlined,
+                            //     inputFormatters: [
+                            //       FilteringTextInputFormatter.allow(
+                            //         RegExp(r'[a-zA-Z ]'),
+                            //       ),
+                            //     ],
+                            //     validator: _alphaValidator,
+                            //   ),
+                            // ),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -237,9 +265,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
                                   setState(() {
                                     cityController.text = lp.city;
-                                    stateController.text = lp.state;
                                     pincodeController.text = lp.pincode;
-                                    areaController.text = lp.area;
+                                    landmarkController.text = lp.area;
                                   });
                                 },
                           child: Column(
@@ -459,10 +486,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                 .addAddress(
                                   name: nameController.text,
                                   mobile: phoneController.text,
-                                  addressLine: houseController.text,
-                                  landmark: areaController.text,
+                                  flatNo: flatController.text,
+                                  floor: floorController.text,
+                                  buildingArea: buildingController.text,
+                                  landmark: landmarkController.text,
                                   city: cityController.text,
-                                  state: stateController.text,
                                   pincode: pincodeController.text,
                                   latitude: lp.latitude!.toString(),
                                   longitude: lp.longitude!.toString(),
@@ -486,10 +514,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                   id: widget.address!.id,
                                   name: nameController.text,
                                   mobile: phoneController.text,
-                                  addressLine: houseController.text,
-                                  landmark: areaController.text,
+                                  flatNo: flatController.text,
+                                  floor: floorController.text,
+                                  buildingArea: buildingController.text,
+                                  landmark: landmarkController.text,
                                   city: cityController.text,
-                                  state: stateController.text,
                                   pincode: pincodeController.text,
                                   latitude: lp.latitude!,
                                   longitude: lp.longitude!,

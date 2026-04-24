@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/constants/api_constants.dart';
 import 'package:samruddha_kirana/api/api_client.dart';
+import 'package:samruddha_kirana/storage/storage_helper.dart';
 
 class CartService {
   // ================= ADD Cart =================
@@ -8,6 +10,23 @@ class CartService {
     required String productid,
     required String stock,
   }) async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Debug prints
+    debugPrint("Warehouse ID: $warehouseId");
+    debugPrint("Pincode: $pincode");
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
+
+    // ✅ Print full headers also
+    debugPrint("Extra Headers: $extraHeaders");
+
     return await ApiClient.post(
       ApiConstants.productAddCart,
       {
@@ -15,6 +34,7 @@ class CartService {
         "quantity": stock, // always "1",
       },
       authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
     );
   }
 
@@ -22,10 +42,27 @@ class CartService {
   static Future<ApiResponse> cartProductIncrment({
     required String productid,
   }) async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Debug prints
+    debugPrint("Warehouse ID: $warehouseId");
+    debugPrint("Pincode: $pincode");
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
+
+    // ✅ Print full headers also
+    debugPrint("Extra Headers: $extraHeaders");
     return await ApiClient.post(
       ApiConstants.productAddincrement,
       {"product_id": productid},
       authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
     );
   }
 
@@ -33,10 +70,27 @@ class CartService {
   static Future<ApiResponse> cartProductDecrement({
     required String productid,
   }) async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Debug prints
+    debugPrint("Warehouse ID: $warehouseId");
+    debugPrint("Pincode: $pincode");
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
+
+    // ✅ Print full headers also
+    debugPrint("Extra Headers: $extraHeaders");
     return await ApiClient.post(
       ApiConstants.productAddDecrement,
       {"product_id": productid},
       authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
     );
   }
 
@@ -61,19 +115,73 @@ class CartService {
 
   // ================= Clear Cart All Product =================
   static Future<ApiResponse> clearAllProductInCart() async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Debug prints
+    debugPrint("Warehouse ID: $warehouseId");
+    debugPrint("Pincode: $pincode");
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
+
+    // ✅ Print full headers also
+    debugPrint("Extra Headers: $extraHeaders");
     return await ApiClient.delete(
       ApiConstants.clearCart,
       authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
     );
   }
 
   // =================== Checkout Cart ========================checkOut
-  static Future<ApiResponse> cartCheckOut({required String addressid}) async {
+  static Future<ApiResponse> cartCheckOut({
+    required String addressid,
+    required String paymentOptionCode,
+  }) async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
     return await ApiClient.post(
       ApiConstants.checkOut,
-      {"address_id": addressid},
+      {"address_id": addressid, "payment_method": paymentOptionCode},
       authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
     );
+  }
+
+  // ================= Confirm Order =================
+  static Future<ApiResponse> confirmOrder({required String orderId}) async {
+    // ✅ Fetch pincode & warehouseId from local storage
+    final warehouseId = await StorageHelper.getWarehouseId();
+    final pincode = await StorageHelper.getPincode();
+
+    // ✅ Build extra headers only if values exist
+    final extraHeaders = <String, String>{
+      if (warehouseId != null) 'warehouse-id': warehouseId.toString(),
+      if (pincode != null) 'pincode': pincode,
+    };
+    return await ApiClient.post(
+      ApiConstants.confirmOrder,
+      {"order_id": orderId},
+      authRequired: true, // 🔐 token based
+      extraHeaders: extraHeaders.isNotEmpty ? extraHeaders : null,
+    );
+  }
+
+  // ================= Payment Options =================
+  static Future<ApiResponse> getPaymentOptions() async {
+    return await ApiClient.get(ApiConstants.paymentOption, authRequired: true);
   }
 
   // =================== Checkout Timer ========================

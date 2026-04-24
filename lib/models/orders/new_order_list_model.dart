@@ -47,6 +47,7 @@ class OrdersData {
   final double totalAmount;
 
   final String orderStatus;
+  final String paymentMethod;
 
   final int? customerRating;
   final List<String>? customerRatingTags;
@@ -77,6 +78,7 @@ class OrdersData {
     required this.couponDiscount,
     required this.totalAmount,
     required this.orderStatus,
+    required this.paymentMethod,
     required this.customerRating,
     required this.customerRatingTags,
     required this.cancelReason,
@@ -105,7 +107,13 @@ class OrdersData {
       couponDiscount: _toDouble(json["coupon_discount"]),
       totalAmount: _toDouble(json["total_amount"]),
 
-      orderStatus: json["status"],
+      // orderStatus: json["status"],
+      // ✅ handle BOTH old enum + new string
+      orderStatus: json["status"] is String
+          ? json["status"]
+          : json["status"].toString().split('.').last,
+
+      paymentMethod: json["payment_method"] ?? "",
 
       customerRating: json["customer_rating"],
       customerRatingTags: json["customer_rating_tags"] == null
@@ -151,6 +159,7 @@ class OrdersData {
     "coupon_discount": couponDiscount,
     "total_amount": totalAmount,
     "status": orderStatus,
+    "payment_method": paymentMethod,
     "customer_rating": customerRating,
     "customer_rating_tags": customerRatingTags,
     "cancel_reason": cancelReason,
@@ -263,11 +272,11 @@ class DeliveryAddress {
   final int id;
   final int userId;
   final String firstName;
-  final String? lastName;
 
   final String flatHouse;
   final String? floor;
   final String area;
+
   final String landmark;
   final String address;
   final String city;
@@ -283,7 +292,6 @@ class DeliveryAddress {
     required this.id,
     required this.userId,
     required this.firstName,
-    required this.lastName,
     required this.flatHouse,
     required this.floor,
     required this.area,
@@ -302,14 +310,13 @@ class DeliveryAddress {
       id: json["id"],
       userId: json["user_id"],
       firstName: json["first_name"] ?? "",
-      lastName: json["last_name"],
       flatHouse: json["flat_house"] ?? "",
       floor: json["floor"],
       area: json["area"] ?? "",
       landmark: json["landmark"] ?? "",
-      address: json["address"],
+      address: json["address"] ?? "",
       city: json["city"] ?? "",
-      country: json["country"],
+      country: json["country"] ?? "",
       postcode: json["postcode"] ?? "",
       phone: json["phone"] ?? "",
       latitude: json["latitude"] ?? "",
@@ -321,7 +328,6 @@ class DeliveryAddress {
     "id": id,
     "user_id": userId,
     "first_name": firstName,
-    "last_name": lastName,
     "address": address,
     "flat_house": flatHouse,
     "floor": floor,

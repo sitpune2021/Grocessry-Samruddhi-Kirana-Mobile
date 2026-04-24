@@ -157,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
                     position: _titleSlide,
                     child: ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+                        colors: [Color(0xFF00C853), Color(0xFF00C853)],
                       ).createShader(bounds),
                       child: const Text(
                         'Samruddha Kirana',
@@ -234,14 +234,14 @@ class _FeatureItem extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: Colors.blue, size: 22),
+          child: Icon(icon, color: Color(0xFF00C853), size: 22),
         ),
         const SizedBox(height: 8),
         Text(
           text,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: Colors.blue,
+            color: Color(0xFF00C853),
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),

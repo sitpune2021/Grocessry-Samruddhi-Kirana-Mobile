@@ -7,13 +7,19 @@ import 'package:samruddha_kirana/providers/app_version/app_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final ScrollController? scrollController;
+
+  const ProfileScreen({super.key, this.scrollController});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  ScrollController? _internalController;
+
+  ScrollController get _effectiveController =>
+      widget.scrollController ?? (_internalController ??= ScrollController());
   @override
   void initState() {
     super.initState();
@@ -21,6 +27,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context.read<AppInfoProvider>().loadAppInfo();
       context.read<AuthProvider>().getUserProfileData();
     });
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,16 +112,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 fontSize: 13,
                               ),
                             ),
-
-                          // ---------- EMAIL ----------
-                          // if (email.isNotEmpty)
-                          //   Text(
-                          //     email,
-                          //     style: const TextStyle(
-                          //       color: Colors.white70,
-                          //       fontSize: 12,
-                          //     ),
-                          //   ),
                         ],
                       );
                     },
@@ -154,6 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _itemTile(
                 Icons.location_on_rounded,
                 "Address Book",
+                onTap: () => context.push(Routes.getAddress),
+              ),
+              _itemTile(
+                Icons.location_on_rounded,
+                "Order Returns",
                 onTap: () => context.push(Routes.getAddress),
               ),
               _itemTile(Icons.favorite_rounded, "Wishlist"),
@@ -219,8 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
 
-            const SizedBox(height: 24),
-
+            // const SizedBox(height: 64),
             // const SizedBox(height: 30),
           ],
         ),

@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/models/orders/past_order_list_model.dart';
 import 'package:samruddha_kirana/screens/orders/order_recept_screen.dart';
 
 class PastOrderTile extends StatefulWidget {
+  final int id;
   final String orderId;
   final String date;
   final String price;
   final String status;
-
+  final String paymentMethod;
   final OrderData orderData;
 
   const PastOrderTile({
     super.key,
+    required this.id,
     required this.orderId,
     required this.date,
     required this.price,
     required this.status,
-
+    required this.paymentMethod,
     required this.orderData,
   });
 
@@ -122,6 +127,27 @@ class _PastOrderTileState extends State<PastOrderTile>
                   widget.status.toUpperCase(),
                   style: const TextStyle(color: Colors.grey, fontSize: 13),
                 ),
+                const SizedBox(height: 4),
+
+                /// 💳 PAYMENT METHOD CHIP
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _paymentColor(widget.paymentMethod),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    widget.paymentMethod.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -188,10 +214,46 @@ class _PastOrderTileState extends State<PastOrderTile>
                   ),
                 ),
               ),
+              SizedBox(height: screenWidth * 0.02),
+              if (widget.status == 'delivered') ...[
+                GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    context.push(
+                      Routes.refundOrder,
+                      extra: {
+                        'orderId': int.parse(widget.id.toString()),
+                        'orderData': widget.orderData,
+                      },
+                    );
+                  },
+                  child: const Text(
+                    'Request Refund',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
       ),
     );
+  }
+}
+
+Color _paymentColor(String method) {
+  switch (method.toLowerCase()) {
+    case "cash":
+      return Colors.green;
+    case "online":
+      return Colors.blue;
+    case "card":
+      return Colors.purple;
+    default:
+      return Colors.grey;
   }
 }

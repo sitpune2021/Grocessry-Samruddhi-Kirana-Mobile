@@ -9,6 +9,7 @@ import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
 import 'package:samruddha_kirana/providers/cuppon%20_offer/cuppon_&_offer_provider.dart';
 import 'package:samruddha_kirana/providers/orders/banner_provider.dart';
 import 'package:samruddha_kirana/providers/orders/order_provider.dart';
+import 'package:samruddha_kirana/providers/payment/payment_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 import 'package:samruddha_kirana/providers/product_brand_provider/product_brand_provider.dart';
@@ -40,6 +41,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()..viewCart()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ],
 
       child: const MyApp(),

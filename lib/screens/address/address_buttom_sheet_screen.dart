@@ -76,95 +76,138 @@ class _AddressBottomSheetState extends State<AddressBottomSheet> {
                   final item = addresses[index];
                   final isSelected = item.isDefault;
 
-                  return GestureDetector(
-                    onTap: provider.isLoading
-                        ? null
-                        : () async {
-                            await context.read<AddressProvider>().switchDefault(
-                              item.id,
-                            );
-                          },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.green
-                              : Colors.grey.shade300,
-                          width: 2,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Radio
-                          Container(
-                            width: 22,
-                            height: 22,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.green, width: 2),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: provider.isLoading
+                            ? null
+                            : () async {
+                                await context
+                                    .read<AddressProvider>()
+                                    .switchDefault(item.id);
+                              },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.green
+                                  : Colors.grey.shade300,
+                              width: 2,
                             ),
-                            child: isSelected
-                                ? Center(
-                                    child: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.green,
+                          ),
+                          child: Row(
+                            children: [
+                              // Radio
+                              Container(
+                                width: 22,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.green,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: isSelected
+                                    ? Center(
+                                        child: Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              const SizedBox(width: 12),
+
+                              // Address Text
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: 12),
-
-                          // Address Text
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item.buildingArea.isNotEmpty
+                                          ? "${item.flatNo}, ${item.floor}, ${item.buildingArea}, ${item.landmark}, ${item.city} - ${item.pincode}"
+                                          : "${item.flatNo}, ${item.floor}, ${item.landmark}, ${item.city} - ${item.pincode}",
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    if (item.landmark.isNotEmpty)
+                                      Text(
+                                        item.landmark,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  item.addressLine,
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                                if (item.landmark.isNotEmpty)
-                                  Text(
-                                    item.landmark,
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                              ],
-                            ),
-                          ),
+                              ),
 
-                          IconButton(
-                            icon: const Icon(Icons.edit, size: 20),
-                            onPressed: () async {
-                              final result = await context.push(
-                                Routes.addAddress,
-                                extra: item,
-                              );
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 20),
+                                onPressed: () async {
+                                  final result = await context.push(
+                                    Routes.addAddress,
+                                    extra: item,
+                                  );
 
-                              if (context.mounted && result == true) {
-                                context
-                                    .read<AddressProvider>()
-                                    .fetchAllAddresses();
-                              }
-                            },
+                                  if (context.mounted && result == true) {
+                                    context
+                                        .read<AddressProvider>()
+                                        .fetchAllAddresses();
+                                  }
+                                },
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+
+                      // ✅ SERVICE NOT AVAILABLE MESSAGE
+                      if (isSelected &&
+                          provider.pincodeData != null &&
+                          provider.pincodeData!.status == false)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4, bottom: 12),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                color: Colors.red,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                provider.pincodeData!.message ??
+                                    'Service not available in this area',
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        const SizedBox(height: 4),
+                    ],
                   );
                 }),
 

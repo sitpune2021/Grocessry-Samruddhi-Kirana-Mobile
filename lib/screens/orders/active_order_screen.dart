@@ -10,19 +10,32 @@ import 'package:samruddha_kirana/providers/orders/order_provider.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 
 class ActiveOrdersPage extends StatefulWidget {
-  const ActiveOrdersPage({super.key});
+  final ScrollController? scrollController;
+
+  const ActiveOrdersPage({super.key, this.scrollController});
 
   @override
   State<ActiveOrdersPage> createState() => _ActiveOrdersPageState();
 }
 
 class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
+  ScrollController? _internalController;
+
+  ScrollController get _effectiveController =>
+      widget.scrollController ?? (_internalController ??= ScrollController());
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<OrderProvider>().getNewOrders();
     });
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -87,6 +100,7 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
             child: ListView.builder(
               padding: EdgeInsets.all(horizontalPadding),
               itemCount: provider.newOrders.length,
+              controller: _effectiveController,
               itemBuilder: (context, index) {
                 final OrdersData order = provider.newOrders[index];
 
@@ -128,14 +142,22 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
+          // 🔹 FIRST ROW → Order + Status (same line)
           Row(
             children: [
-              const Text(
-                "CONFIRMED",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                "Order #${order.orderNumber}",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+
               const Spacer(),
+
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -157,18 +179,11 @@ class _ActiveOrdersPageState extends State<ActiveOrdersPage> {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
+          // 🔹 SECOND ROW → Date (right aligned)
           Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Order #${order.orderNumber}",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-
-          Align(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.centerRight,
             child: Text(
               _formatDate(order.createdAt),
               style: const TextStyle(fontSize: 12, color: Colors.grey),

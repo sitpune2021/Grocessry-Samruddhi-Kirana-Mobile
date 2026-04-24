@@ -7,6 +7,7 @@ class NewOrderCard extends StatelessWidget {
   final String rightText;
   final double totalAmount;
   final List orderItems;
+  final String paymentMethod;
   final VoidCallback onViewDetails;
 
   const NewOrderCard({
@@ -16,6 +17,7 @@ class NewOrderCard extends StatelessWidget {
     required this.rightText,
     required this.totalAmount,
     required this.orderItems,
+    required this.paymentMethod,
     required this.onViewDetails,
   });
 
@@ -74,6 +76,7 @@ class NewOrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
+
           /// -------- ORDER ID (LEFT) + TOTAL AMOUNT (RIGHT) --------
           Row(
             children: [
@@ -136,6 +139,26 @@ class NewOrderCard extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      /// 🔥 PAYMENT METHOD (RIGHT SIDE)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _paymentColor(paymentMethod),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          paymentMethod.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -184,5 +207,18 @@ class NewOrderCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+Color _paymentColor(String method) {
+  switch (method.toLowerCase()) {
+    case "cash":
+      return Colors.green;
+    case "online":
+      return Colors.blue;
+    case "card":
+      return Colors.purple;
+    default:
+      return Colors.grey;
   }
 }

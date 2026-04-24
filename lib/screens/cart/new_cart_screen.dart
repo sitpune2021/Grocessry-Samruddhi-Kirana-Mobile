@@ -4,7 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
+import 'package:samruddha_kirana/models/cart/checkout_order_model.dart';
+// import 'package:samruddha_kirana/models/cart/cart_view_model.dart';
+import 'package:samruddha_kirana/models/payment/payment_option_model.dart';
 import 'package:samruddha_kirana/providers/address/address_provider.dart';
+import 'package:samruddha_kirana/providers/cuppon%20_offer/cuppon_&_offer_provider.dart';
+import 'package:samruddha_kirana/providers/payment/payment_provider.dart';
 import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 import 'package:samruddha_kirana/screens/cart/cart_address_buttomsheet.dart';
 import 'package:samruddha_kirana/widgets/address_card.dart';
@@ -12,7 +17,9 @@ import 'package:samruddha_kirana/widgets/animation_cart_item.dart';
 import 'package:samruddha_kirana/widgets/loader.dart';
 
 class NewCartScreen extends StatefulWidget {
-  const NewCartScreen({super.key});
+  final ScrollController? scrollController;
+
+  const NewCartScreen({super.key, this.scrollController});
 
   @override
   State<NewCartScreen> createState() => _NewCartScreenState();
@@ -22,13 +29,83 @@ class _NewCartScreenState extends State<NewCartScreen> {
   // Track which product is being removed
   int? _removingProductId;
 
+  // CheckoutOrderModel? _pendingOrder;
+
+  ScrollController? _internalController;
+
+  ScrollController get _effectiveController =>
+      widget.scrollController ?? (_internalController ??= ScrollController());
+
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cart = context.read<CartProvider>();
       cart.viewCart();
       cart.checkCheckoutTimer();
+
+      final payment = context.read<PaymentProvider>();
+
+      // ✅ Inject confirmOrder function into PaymentProvider
+      // This is called INTERNALLY by the provider after verify succeeds —
+      // never called on any failure path.
+      payment.confirmOrderFn = (String orderId) async {
+        return await context.read<CartProvider>().confirmOrder(orderId);
+      };
+
+      // ✅ onPaymentSuccess — only fires after verify 200 success
+      //    AND confirmOrder success. Just navigate here.
+      payment.onPaymentSuccess = (CheckoutOrderModel order) {
+        if (!mounted) return;
+
+        debugPrint('🔥 onPaymentSuccess fired — order: ${order.data.orderId}');
+
+        context.read<PaymentProvider>().resetPayment();
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          context.go(
+            Routes.checkoutOrder,
+            extra: {'order': order, 'needsConfirm': false},
+          );
+        });
+      };
+
+      // ✅ onPaymentFailed — fires on any failure (razorpay error,
+      //    verify fail, or confirmOrder fail). confirmOrder was NOT called.
+      payment.onPaymentFailed = (String errMsg) {
+        if (!mounted) return;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                errMsg.isNotEmpty
+                    ? errMsg
+                    : 'Payment failed. Please try again.',
+              ),
+              backgroundColor: Colors.black87,
+              duration: const Duration(seconds: 10),
+            ),
+          );
+        });
+      };
+
+      // ✅ Resume after Android activity recreation
+      if (payment.status == PaymentStatus.success &&
+          payment.pendingOrder != null) {
+        debugPrint(
+          '🔄 Resuming after Android recreation — order found in provider',
+        );
+        final order = payment.pendingOrder!;
+        payment.resetPayment();
+        context.go(
+          Routes.checkoutOrder,
+          extra: {'order': order, 'needsConfirm': false},
+        );
+      }
     });
   }
 
@@ -145,6 +222,12 @@ class _NewCartScreenState extends State<NewCartScreen> {
   }
 
   @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     /// ================= RESPONSIVE VALUES =================
     final horizontalPadding = ResponsiveValue<double>(
@@ -205,18 +288,44 @@ class _NewCartScreenState extends State<NewCartScreen> {
                       final title = getTitle(address.type);
                       final subtitle = [
                         address.landmark,
-                        address.addressLine,
+                        address.buildingArea,
                       ].where((e) => e.trim().isNotEmpty).join(", ");
 
-                      return Text(
-                        "$title, $subtitle",
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "$title, $subtitle",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          /// 🔥 PINCODE MESSAGE
+                          if (provider.isPincodeChecking)
+                            const Text(
+                              "Checking delivery...",
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
+                            )
+                          else if (provider.pincodeData != null)
+                            Text(
+                              provider.pincodeData!.message ?? "",
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: provider.pincodeData!.status == true
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                        ],
                       );
                     },
                   ),
@@ -233,10 +342,7 @@ class _NewCartScreenState extends State<NewCartScreen> {
         ),
 
         centerTitle: true,
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-        //   onPressed: () => Navigator.pop(context),
-        // ),
+
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 12),
@@ -307,15 +413,15 @@ class _NewCartScreenState extends State<NewCartScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 6),
                   _timerSection(),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 4),
                   _couponCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 6),
                   _summarySection(cart),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 6),
                   _placeOrderButton(buttonHeight),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 55),
                 ],
               );
             },
@@ -527,13 +633,6 @@ class _NewCartScreenState extends State<NewCartScreen> {
             children: [
               _qtySelector(qty, productId),
               const SizedBox(height: 20),
-
-              // GestureDetector(
-              //   onTap: () {
-              //     context.read<CartProvider>().removeSingleProduct(productId);
-              //   },
-              //   child: const Icon(Icons.delete, color: Colors.red, size: 22),
-              // ),
               GestureDetector(
                 onTap: () => _handleRemoveProduct(productId),
                 child: const Icon(Icons.delete, color: Colors.red, size: 22),
@@ -589,36 +688,78 @@ class _NewCartScreenState extends State<NewCartScreen> {
 
   // ================= COUPON =================
   Widget _couponCard() {
-    final cart = context.read<CartProvider>();
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      // onTap: () => context.push(Routes.couponOffer),
-      onTap: () {
-        context.push(
-          Routes.couponOffer,
-          extra: double.tryParse(cart.subtotal) ?? 0.0,
+    return Consumer<CartProvider>(
+      builder: (context, cartProvider, _) {
+        final appliedCouponCode = cartProvider.couponCode;
+
+        final bool isCouponApplied =
+            appliedCouponCode != null && appliedCouponCode.isNotEmpty;
+
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isCouponApplied ? Colors.green : Colors.grey,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.local_offer,
+                color: isCouponApplied ? Colors.green : Colors.grey,
+              ),
+              const SizedBox(width: 10),
+
+              /// TEXT
+              Expanded(
+                child: Text(
+                  isCouponApplied
+                      ? "$appliedCouponCode applied ✅"
+                      : "Apply Coupon Code",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isCouponApplied ? Colors.green : Colors.black,
+                  ),
+                ),
+              ),
+
+              /// ACTION
+              if (isCouponApplied)
+                GestureDetector(
+                  onTap: () async {
+                    await context.read<CouponProvider>().removeCoupon();
+
+                    // 🔥 instant UI update
+                    if (!context.mounted) return;
+                    context.read<CartProvider>().viewCart();
+                  },
+                  child: const Text(
+                    "REMOVE",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              else
+                GestureDetector(
+                  onTap: () {
+                    context.push(
+                      Routes.couponOffer,
+                      extra: double.tryParse(cartProvider.subtotal) ?? 0.0,
+                    );
+                  },
+                  child: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.green,
+                  ),
+                ),
+            ],
+          ),
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.green),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: const [
-            Icon(Icons.local_offer, color: Colors.green),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                "Apply Coupon Code",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.green),
-          ],
-        ),
-      ),
     );
   }
 
@@ -713,138 +854,385 @@ class _NewCartScreenState extends State<NewCartScreen> {
     );
   }
 
-  // ================= CTA =================
   Widget _placeOrderButton(double height) {
-    return Consumer<CartProvider>(
-      builder: (context, cart, _) {
+    return Consumer2<CartProvider, PaymentProvider>(
+      builder: (context, cart, payment, _) {
         return SizedBox(
           height: height,
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: cart.orderAllowed ? Colors.green : Colors.grey,
+              backgroundColor: Colors.green, // always enabled color
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            onPressed: cart.orderAllowed
-                ? () async {
+            onPressed: payment.isLoading
+                ? null
+                : () async {
                     final addressProvider = context.read<AddressProvider>();
                     final cartProvider = context.read<CartProvider>();
 
                     final address = addressProvider.defaultAddress;
 
-                    // 1. No address selected
+                    // ✅ Check address only
                     if (address == null) {
                       _openDeliveryAddressSheet(context);
                       return;
                     }
 
-                    // 2. Address exists → checkout
-                    final orderModel = await cartProvider.checkout(
-                      addressId: address.id.toString(),
-                    );
-
-                    // 🔑 guard after async
+                    // ✅ Fetch payment options
+                    await cartProvider.fetchPaymentOptions();
                     if (!context.mounted) return;
 
-                    if (orderModel != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Order placed successfully"),
+                    // ✅ Show bottom sheet
+                    _showPaymentBottomSheet(context, address.id.toString());
+                  },
+            child: payment.isLoading
+                ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        "Place Order",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
-                      );
-
-                      context.go(Routes.checkoutOrder, extra: orderModel);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Failed to place order")),
-                      );
-                    }
-                  }
-                : null, // 🔒 disabled if backend says no
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  "Place Order",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.lock, size: 18, color: Colors.white),
+                    ],
                   ),
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.lock, size: 18, color: Colors.white),
-              ],
-            ),
           ),
         );
       },
     );
   }
 
-  // // ================= CTA =================
-  // Widget _placeOrderButton(double height) {
-  //   return SizedBox(
-  //     height: height,
-  //     width: double.infinity,
-  //     child: ElevatedButton(
-  //       style: ElevatedButton.styleFrom(
-  //         backgroundColor: Colors.green,
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(16),
-  //         ),
-  //       ),
-  //       onPressed: () async {
-  //         final addressProvider = context.read<AddressProvider>();
-  //         final cartProvider = context.read<CartProvider>();
+  // ================= CTA =================
+  void _showPaymentBottomSheet(BuildContext context, String addressId) {
+    final screenContext = context;
+    int? selectedPaymentId;
 
-  //         final address = addressProvider.defaultAddress;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (sheetContext, setSheetState) {
+            return Consumer<CartProvider>(
+              builder: (_, cart, _) {
+                if (cart.isPaymentLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
 
-  //         // 1. No address selected
-  //         if (address == null) {
-  //           _openDeliveryAddressSheet(context);
-  //           return;
-  //         }
+                if (cart.paymentOptions.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Center(child: Text("No payment options available")),
+                  );
+                }
 
-  //         // 2. Address exists → checkout
-  //         final orderModel = await cartProvider.checkout(
-  //           addressId: address.id.toString(),
-  //         );
+                /// ✅ DEFAULT SELECT FIRST OPTION
+                selectedPaymentId ??= cart.paymentOptions.first.id;
 
-  //         // 🔑 guard after async
-  //         if (!mounted) return;
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// 🔥 HEADER
+                        const Text(
+                          "Select Payment Method",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          "Choose your preferred way to pay securely",
+                          style: TextStyle(color: Colors.grey),
+                        ),
 
-  //         if (orderModel != null) {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(content: Text("Order placed successfully")),
-  //           );
+                        const SizedBox(height: 20),
 
-  //           context.go(Routes.checkoutOrder, extra: orderModel);
-  //         } else {
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(content: Text("Failed to place order")),
-  //           );
-  //         }
-  //       },
+                        /// 🔽 PAYMENT OPTIONS
+                        ...cart.paymentOptions.map((option) {
+                          final isSelected = selectedPaymentId == option.id;
 
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: const [
-  //           Text(
-  //             "Place Order",
-  //             style: TextStyle(
-  //               fontSize: 18,
-  //               fontWeight: FontWeight.w600,
-  //               color: Colors.white,
-  //             ),
-  //           ),
-  //           SizedBox(width: 8),
-  //           Icon(Icons.lock, size: 18, color: Colors.white),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+                          return GestureDetector(
+                            onTap: () {
+                              setSheetState(() {
+                                selectedPaymentId = option.id;
+                              });
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFFE8F5E9)
+                                    : const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? Colors.green
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  /// LEFT ICON BOX
+                                  Container(
+                                    height: 42,
+                                    width: 42,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      option.code.toLowerCase() == "cash"
+                                          ? Icons
+                                                .local_shipping // 🚚 COD icon
+                                          : Icons
+                                                .account_balance_wallet, // 💳 Online
+                                      color: Colors.green,
+                                      size: 22,
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 12),
+
+                                  /// TEXT
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              option.name,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+
+                                            /// ✅ RECOMMENDED TAG
+                                            if (option.code.toLowerCase() ==
+                                                "online")
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                  left: 8,
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                ),
+                                                child: const Text(
+                                                  "RECOMMENDED",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 4),
+
+                                        /// SUBTITLE
+                                        Text(
+                                          option.code.toLowerCase() == "cash"
+                                              ? "Pay when your order arrives"
+                                              : "Credit, Debit or Wallet",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  /// RADIO ICON
+                                  Icon(
+                                    isSelected
+                                        ? Icons.radio_button_checked
+                                        : Icons.radio_button_off,
+                                    color: isSelected
+                                        ? Colors.green
+                                        : Colors.grey,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+
+                        const SizedBox(height: 10),
+
+                        /// 🔒 SECURITY TEXT
+                        Row(
+                          children: const [
+                            Icon(Icons.security, size: 16, color: Colors.grey),
+                            SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                "All transactions are SSL encrypted. Your payment data is never stored on our servers.",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        /// 🔥 CONFIRM BUTTON
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final selectedOption = cart.paymentOptions
+                                  .firstWhere((e) => e.id == selectedPaymentId);
+
+                              Navigator.pop(sheetContext);
+
+                              await _handleCheckout(
+                                screenContext,
+                                addressId,
+                                selectedOption,
+                              );
+                            },
+                            child: const Text(
+                              "Confirm Payment →",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 26),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _handleCheckout(
+    BuildContext context,
+    String addressId,
+    PaymentOption option,
+  ) async {
+    final cartProvider = context.read<CartProvider>();
+    final paymentProvider = context.read<PaymentProvider>();
+
+    // ✅ Call checkout API with payment_option_id
+    final order = await cartProvider.checkout(
+      addressId: addressId,
+      paymentOptionCode: option.code,
+    );
+
+    // 🔐 Safety check after async
+    if (!context.mounted) return;
+
+    if (order == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to place order. Please try again."),
+        ),
+      );
+      return;
+    }
+
+    // ✅ HANDLE PAYMENT TYPE
+    // ✅ CASH FLOW
+    if (option.code.toLowerCase() == "cash") {
+      final confirmed = await cartProvider.confirmOrder(
+        order.data.orderId.toString(),
+      );
+
+      if (!context.mounted) return;
+
+      if (confirmed) {
+        context.go(
+          Routes.checkoutOrder,
+          //  extra: order
+          extra: {
+            'order': order,
+            'needsConfirm':
+                false, // ✅ already confirmed above — screen skips API
+          },
+        );
+      } else {
+        final errMsg = cartProvider.confirmOrderMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              errMsg.isNotEmpty ? errMsg : "Order confirmation failed.",
+            ),
+            backgroundColor: Colors.black87,
+            duration: const Duration(seconds: 20),
+          ),
+        );
+      }
+      return;
+    }
+
+    // ✅ ONLINE FLOW
+    // 👉 ONLINE PAYMENT (Razorpay .)
+    if (option.code.toLowerCase() == "online") {
+      paymentProvider.resetPayment();
+
+      paymentProvider.startPayment(order);
+      // onPaymentSuccess → _pendingOrder != null → navigate to confirm screen
+      // onPaymentFailed  → _pendingOrder = null  → show error snackbar only
+    }
+  }
 }

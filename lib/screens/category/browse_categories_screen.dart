@@ -9,19 +9,32 @@ import 'package:samruddha_kirana/providers/product_all/all_product_provider.dart
 import 'package:samruddha_kirana/widgets/loader.dart';
 
 class BrowseCategoriesPage extends StatefulWidget {
-  const BrowseCategoriesPage({super.key});
+  final ScrollController? scrollController;
+
+  const BrowseCategoriesPage({super.key, this.scrollController});
 
   @override
   State<BrowseCategoriesPage> createState() => _BrowseCategoriesPageState();
 }
 
 class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
+  ScrollController? _internalController;
+
+  ScrollController get _effectiveController =>
+      widget.scrollController ?? (_internalController ??= ScrollController());
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AllProductProvider>().fetchCategories();
     });
+  }
+
+  @override
+  void dispose() {
+    _internalController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -62,14 +75,22 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
                 color: const Color(0xffF3F4F6),
                 borderRadius: BorderRadius.circular(25),
               ),
-              child: const TextField(
+              child: // search bar
+              TextField(
+                readOnly: true,
+                onTap: () => context.push(Routes.search),
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xffF3F4F6),
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: "Search your product by name",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide.none,
+                  ),
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
-                  prefixIcon: Icon(Icons.search),
-                  hintText: "Search categories",
-                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ),
@@ -105,6 +126,8 @@ class _BrowseCategoriesPageState extends State<BrowseCategoriesPage> {
                       ),
                       child: ListView.builder(
                         itemCount: provider.categories.length,
+                        controller: _effectiveController,
+
                         itemBuilder: (context, index) {
                           final category = provider.categories[index];
                           final isSelected = provider.selectedTab == index;

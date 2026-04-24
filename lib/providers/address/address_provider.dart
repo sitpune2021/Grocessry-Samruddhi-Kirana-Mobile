@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:samruddha_kirana/api/api_response.dart';
 import 'package:samruddha_kirana/models/address/get_all_address_model.dart';
+import 'package:samruddha_kirana/models/pincode_check/pincode_check_model.dart';
 import 'package:samruddha_kirana/screens/address/add_address_screen.dart';
 import 'package:samruddha_kirana/services/address/address_service.dart';
+import 'package:samruddha_kirana/storage/storage_helper.dart';
 import 'package:samruddha_kirana/utils/address_type_mapper.dart';
 
 class AddressProvider extends ChangeNotifier {
@@ -29,6 +31,13 @@ class AddressProvider extends ChangeNotifier {
   // ================= ADDRESS TYPE (PROVIDER STATE) =================
   AddressType _selectedType = AddressType.home;
   AddressType get selectedType => _selectedType;
+
+  // ================= PINCODE CHECK =================
+  bool _isPincodeChecking = false;
+  bool get isPincodeChecking => _isPincodeChecking;
+
+  CheckPincodeModel? _pincodeData;
+  CheckPincodeModel? get pincodeData => _pincodeData;
 
   // 🔥 AUTO LOAD ON PROVIDER INIT
   AddressProvider() {
@@ -67,6 +76,50 @@ class AddressProvider extends ChangeNotifier {
 
   bool get hasSelectedAddress => _addresses.isNotEmpty;
 
+  // ================= PINCODE CHECK (INTERNAL) =================
+  Future<ApiResponse> checkPincode(String pincode) async {
+    if (_isPincodeChecking) {
+      return ApiResponse(success: false, message: 'Already checking');
+    }
+
+    _isPincodeChecking = true;
+    notifyListeners();
+
+    ApiResponse response;
+
+    try {
+      response = await AddressService.checkPincode(pincode);
+
+      if (
+      // response.success &&
+      response.data != null) {
+        _pincodeData = CheckPincodeModel.fromJson(response.data);
+        debugPrint('📦 Pincode status: ${_pincodeData?.status}');
+        debugPrint('📦 Pincode message: ${_pincodeData?.message}');
+        debugPrint('📦 Pincode check: ${_pincodeData?.data?.warehouseId}');
+        debugPrint('📦 Pincode check: ${_pincodeData?.data?.pincode}');
+
+        // ✅ SAVE TO SHARED PREFERENCES
+        await StorageHelper.savePincodeData(
+          warehouseId: _pincodeData?.data?.warehouseId ?? 0,
+          pincode: _pincodeData?.data?.pincode ?? '',
+        );
+      } else {
+        _pincodeData = null;
+        // _errorMessage = response.message;
+      }
+    } catch (e) {
+      _pincodeData = null;
+      _errorMessage = e.toString();
+      response = ApiResponse(success: false, message: _errorMessage);
+    } finally {
+      _isPincodeChecking = false;
+      notifyListeners();
+    }
+
+    return response;
+  }
+
   // ================= FETCH ADDRESSES =================
   Future<ApiResponse> fetchAllAddresses() async {
     if (_isLoading) {
@@ -85,6 +138,12 @@ class AddressProvider extends ChangeNotifier {
       if (response.success && response.data != null) {
         final model = AllAddressListModel.fromJson(response.data);
         _addresses = List<GetAddress>.from(model.data);
+
+        // ✅ Check pincode for the default address after load
+        final def = defaultAddress;
+        if (def != null) {
+          await checkPincode(def.pincode);
+        }
       } else {
         _addresses = [];
         _errorMessage = response.message;
@@ -141,10 +200,11 @@ class AddressProvider extends ChangeNotifier {
   Future<ApiResponse> addAddress({
     required String name,
     required String mobile,
-    required String addressLine,
+    required String flatNo,
+    required String floor,
+    required String buildingArea,
     required String landmark,
     required String city,
-    required String state,
     required String pincode,
     required String latitude,
     required String longitude,
@@ -167,10 +227,11 @@ class AddressProvider extends ChangeNotifier {
       response = await AddressService.addAddress(
         name: name.trim(),
         mobile: mobile.trim(),
-        addressLine: addressLine.trim(),
+        flatNo: flatNo.trim(),
+        floor: floor.trim(),
+        buildingArea: buildingArea.trim(),
         landmark: landmark.trim(),
         city: city.trim(),
-        state: state.trim(),
         pincode: pincode.trim(),
         latitude: latitude,
         longitude: longitude,
@@ -180,6 +241,9 @@ class AddressProvider extends ChangeNotifier {
       if (response.success) {
         await fetchAllAddresses();
         resetType(); // reset after add
+
+        // ✅ Check pincode of the newly added address
+        await checkPincode(pincode.trim());
       }
     } catch (e) {
       response = ApiResponse(success: false, message: e.toString());
@@ -196,10 +260,11 @@ class AddressProvider extends ChangeNotifier {
     required int id,
     required String name,
     required String mobile,
-    required String addressLine,
+    required String flatNo,
+    required String floor,
+    required String buildingArea,
     required String landmark,
     required String city,
-    required String state,
     required String pincode,
     required double latitude,
     required double longitude,
@@ -222,10 +287,11 @@ class AddressProvider extends ChangeNotifier {
         id: id,
         name: name.trim(),
         mobile: mobile.trim(),
-        addressLine: addressLine.trim(),
+        flatNo: flatNo.trim(),
+        floor: floor.trim(),
+        buildingArea: buildingArea.trim(),
         landmark: landmark.trim(),
         city: city.trim(),
-        state: state.trim(),
         pincode: pincode.trim(),
         latitude: latitude,
         longitude: longitude,
@@ -255,6 +321,13 @@ class AddressProvider extends ChangeNotifier {
 
       if (response.success) {
         await fetchAllAddresses(); // refresh list
+
+        // ✅ Check pincode of the newly selected default address
+        final newDefault = _addresses.firstWhere(
+          (e) => e.id == id,
+          orElse: () => _addresses.first,
+        );
+        await checkPincode(newDefault.pincode);
       }
     } catch (e) {
       response = ApiResponse(success: false, message: e.toString());
@@ -271,6 +344,7 @@ class AddressProvider extends ChangeNotifier {
     _addresses = [];
     _errorMessage = '';
     _hasLoadedOnce = false;
+    _pincodeData = null;
     resetType();
     notifyListeners();
   }

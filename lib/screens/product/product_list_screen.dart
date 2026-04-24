@@ -202,21 +202,21 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               _productCount(provider.products.length),
-                              Row(
-                                children: [
-                                  _actionChip(
-                                    icon: Icons.filter_list,
-                                    label: "Filter",
-                                    onTap: () {},
-                                  ),
-                                  const SizedBox(width: 8),
-                                  _actionChip(
-                                    icon: Icons.sort,
-                                    label: "Sort",
-                                    onTap: () {},
-                                  ),
-                                ],
-                              ),
+                              // Row(
+                              //   children: [
+                              //     _actionChip(
+                              //       icon: Icons.filter_list,
+                              //       label: "Filter",
+                              //       onTap: () {},
+                              //     ),
+                              //     const SizedBox(width: 8),
+                              //     _actionChip(
+                              //       icon: Icons.sort,
+                              //       label: "Sort",
+                              //       onTap: () {},
+                              //     ),
+                              //   ],
+                              // ),
                             ],
                           ),
                         ),
@@ -289,6 +289,12 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
   ) {
     final int productId = product.id;
 
+    // ✅ ADD THIS
+    final int stock = (product.maxQuantity ?? 0) is int
+        ? (product.maxQuantity ?? 0)
+        : int.tryParse(product.maxQuantity.toString()) ?? 0;
+    final bool isOutOfStock = stock <= 0;
+
     final isFavorite = provider.favorites[productId] ?? false;
     // final quantity = provider.quantities[productId] ?? 0;
     final cartProvider = context.watch<CartProvider>();
@@ -306,112 +312,168 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
         : 0;
 
     return GestureDetector(
-      onTap: () => context.push(Routes.productDetails, extra: productId),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: product.imageUrls.isNotEmpty
-                        ? product.imageUrls.first
-                        : '',
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (_, _) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(color: Colors.white),
-                    ),
-                    errorWidget: (_, _, _) => Image.asset(
-                      'assets/images/no_image.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+      onTap: isOutOfStock
+          ? null // disable tap when out of stock
+          : () => context.push(Routes.productDetails, extra: productId),
+      child: Stack(
+        children: [
+          // child:
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 8,
                 ),
-                if (discount > 0)
-                  Positioned(top: 8, left: 8, child: _discountBadge(discount)),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () => provider.toggleFavorite(productId),
-                    child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.grey,
-                      size: 18,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: product.imageUrls.isNotEmpty
+                            ? product.imageUrls.first
+                            : '',
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (_, _) => Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: Container(color: Colors.white),
+                        ),
+                        errorWidget: (_, _, _) => Image.asset(
+                          'assets/images/no_image.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
+                    if (discount > 0)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: _discountBadge(discount),
+                      ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: () => provider.toggleFavorite(productId),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.grey,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Text(
+                            "₹${finalPrice.toStringAsFixed(0)}",
+                            style: GoogleFonts.poppins(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "₹${mrp.toStringAsFixed(0)}",
+                            style: GoogleFonts.poppins(
+                              decoration: TextDecoration.lineThrough,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      AddQtyButton(
+                        qty: quantity,
+                        maxQty: product.maxQuantity,
+                        onAdd:
+                            isOutOfStock // ✅ disable add when out of stock
+                            ? () {}
+                            : () async {
+                                final result = await cartProvider.addToCart(
+                                  product: product,
+                                );
+
+                                if (!context.mounted) return;
+                                _handleCartResult(context, result);
+                              },
+                        onRemove:
+                            isOutOfStock // ✅ disable remove too
+                            ? () {}
+                            : () => cartProvider.removeFromCart(productId),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
+          ),
 
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Text(
-                        "₹${finalPrice.toStringAsFixed(0)}",
-                        style: GoogleFonts.poppins(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "₹${mrp.toStringAsFixed(0)}",
-                        style: GoogleFonts.poppins(
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  AddQtyButton(
-                    qty: quantity,
-                    maxQty: product.maxQuantity,
-                    onAdd: () async {
-                      final result = await cartProvider.addToCart(
-                        product: product,
-                      );
-
-                      if (!context.mounted) return;
-                      _handleCartResult(context, result);
-                    },
-                    onRemove: () => cartProvider.removeFromCart(productId),
-                  ),
-                ],
+          // ── grey overlay when out of stock ──
+          if (isOutOfStock)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.65),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
-          ],
-        ),
+
+          // ── "Out of Stock" label ──
+          if (isOutOfStock)
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade600,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "Out of Stock",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

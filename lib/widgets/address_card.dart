@@ -96,9 +96,15 @@ class AddressCard extends StatelessWidget {
                   ],
 
                   /// Address (Street)
-                  if (hasText(data.addressLine)) ...[
+                  if ((data.flatNo.isNotEmpty) ||
+                      (data.floor.isNotEmpty) ||
+                      (data.buildingArea.isNotEmpty)) ...[
                     Text(
-                      data.addressLine,
+                      [
+                        data.flatNo,
+                        data.floor,
+                        data.buildingArea,
+                      ].where((e) => e.isNotEmpty).join(', '),
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 2),
@@ -115,12 +121,12 @@ class AddressCard extends StatelessWidget {
 
                   /// Address (City, Country, Postcode)
                   if (hasText(data.city) ||
-                      hasText(data.state) ||
+                      // hasText(data.state) ||
                       hasText(data.pincode)) ...[
                     Text(
                       [
                             data.city,
-                            data.state,
+                            // data.state,
                           ].where((e) => hasText(e)).join(', ') +
                           (hasText(data.pincode) ? ' - ${data.pincode}' : ''),
                       style: const TextStyle(fontSize: 14, color: Colors.grey),

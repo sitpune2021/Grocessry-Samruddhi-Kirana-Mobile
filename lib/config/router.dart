@@ -18,6 +18,7 @@ import 'package:samruddha_kirana/screens/onboarding/onboarding_screen.dart';
 import 'package:samruddha_kirana/screens/orders/active_order_screen.dart';
 import 'package:samruddha_kirana/screens/orders/order_details_screen.dart';
 import 'package:samruddha_kirana/screens/orders/orders_screen.dart';
+import 'package:samruddha_kirana/screens/orders/refund/order_product_return_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_details_screen.dart';
 import 'package:samruddha_kirana/screens/product/product_list_screen.dart';
 import 'package:samruddha_kirana/screens/profile/update_profile/update_profile_screen.dart';
@@ -182,6 +183,19 @@ class AppRouter {
           );
         },
       ),
+      GoRoute(
+        path: Routes.refundOrder,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+
+          final int orderId = int.parse(extra['orderId'].toString());
+
+          return PageTransitions.slide(
+            state: state,
+            child: RefundRequestScreen(orderId: orderId),
+          );
+        },
+      ),
 
       GoRoute(
         path: Routes.couponOffer,
@@ -198,14 +212,24 @@ class AppRouter {
       // OrderConfirmationScreen
       GoRoute(
         path: Routes.checkoutOrder,
-        pageBuilder: (context, state) {
-          final order = state.extra as CheckoutOrderModel;
-          return PageTransitions.slide(
-            state: state,
-            child: OrderConfirmationScreen(order: order),
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return OrderConfirmationScreen(
+            order: args['order'] as CheckoutOrderModel,
+            needsConfirm: args['needsConfirm'] as bool,
           );
         },
       ),
+      // GoRoute(
+      //   path: Routes.checkoutOrder,
+      //   pageBuilder: (context, state) {
+      //     final order = state.extra as CheckoutOrderModel;
+      //     return PageTransitions.slide(
+      //       state: state,
+      //       child: OrderConfirmationScreen(order: order),
+      //     );
+      //   },
+      // ),
     ],
   );
 }

@@ -259,43 +259,119 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
             const SizedBox(height: 24),
 
             /// ================= ORDER INFO =================
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'ORDER ID\n${data?.orderNumber ?? '--'}',
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                const Text(
-                  'PAYMENT MODE\nONLINE',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                children: [
+                  /// 🔹 ORDER ID
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "ORDER ID",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          data?.orderNumber ?? "--",
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
+                  /// 🔹 DIVIDER
+                  Container(height: 35, width: 1, color: Colors.grey.shade300),
+
+                  const SizedBox(width: 12),
+
+                  /// 🔹 PAYMENT MODE
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "PAYMENT MODE",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+
+                        /// 🔥 CHIP STYLE
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _paymentColor(data?.paymentMethod),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            (data?.paymentMethod ?? "--").toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
 
             /// ================= HELP =================
-            SizedBox(
-              height: buttonHeight,
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                ),
-                child: const Text("NEED HELP?"),
-              ),
-            ),
-
+            // SizedBox(
+            //   height: buttonHeight,
+            //   width: double.infinity,
+            //   child: OutlinedButton(
+            //     onPressed: () {},
+            //     style: OutlinedButton.styleFrom(
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(28),
+            //       ),
+            //     ),
+            //     child: const Text("NEED HELP?"),
+            //   ),
+            // ),
             const SizedBox(height: 32),
           ],
         ),
       ),
     );
+  }
+}
+
+Color _paymentColor(String? method) {
+  switch (method?.toLowerCase()) {
+    case "cash":
+      return Colors.green;
+    case "online":
+      return Colors.blue;
+    case "card":
+      return Colors.purple;
+    default:
+      return Colors.grey;
   }
 }
 
@@ -364,12 +440,12 @@ Widget _deliveryAddressWidget(OrdersData? data) {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${address.address}.',
+                  '${address.flatHouse}, ${address.floor}, ${address.area}.',
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${address.city}, ${address.country} -${address.postcode}',
+                  '${address.city}, ${address.postcode}.',
                   style: const TextStyle(color: Colors.grey),
                 ),
               ],

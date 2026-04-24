@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -123,7 +125,7 @@ class HomeSelectLocationScreen extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.black.withOpacity(0.6)),
+          borderSide: BorderSide(color: Colors.black.withValues(alpha: 0.6)),
         ),
         hintStyle: GoogleFonts.poppins(
           fontSize: 14,

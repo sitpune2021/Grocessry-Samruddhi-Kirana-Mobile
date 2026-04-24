@@ -34,39 +34,23 @@ class CheckoutOrderModel {
 class Data {
   final int orderId;
   final String orderNumber;
-  final double subtotal;
-  final double deliveryCharge;
-  final double couponDiscount;
-  final double totalAmount;
-  final int addressType;
+  final double amount; // ✅ NEW (replace all old fields)
 
   Data({
     required this.orderId,
     required this.orderNumber,
-    required this.subtotal,
-    required this.deliveryCharge,
-    required this.couponDiscount,
-    required this.totalAmount,
-    required this.addressType,
+    required this.amount,
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     orderId: json["order_id"] ?? 0,
     orderNumber: json["order_number"] ?? "",
-    subtotal: (json["subtotal"] ?? 0).toDouble(),
-    deliveryCharge: (json["delivery_charge"] ?? 0).toDouble(),
-    couponDiscount: (json["coupon_discount"] ?? 0).toDouble(),
-    totalAmount: (json["total_amount"] ?? 0).toDouble(),
-    addressType: json["address_type"] ?? 0,
+    amount: (json["amount"] ?? 0).toDouble(),
   );
 
   Map<String, dynamic> toJson() => {
     "order_id": orderId,
     "order_number": orderNumber,
-    "subtotal": subtotal,
-    "delivery_charge": deliveryCharge,
-    "coupon_discount": couponDiscount,
-    "total_amount": totalAmount,
-    "address_type": addressType,
+    "amount": amount,
   };
 }

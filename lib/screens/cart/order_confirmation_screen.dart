@@ -1,17 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:samruddha_kirana/models/cart/checkout_order_model.dart';
 import 'package:samruddha_kirana/config/routes.dart';
+import 'package:samruddha_kirana/providers/product_all/cart_provider.dart';
 
-class OrderConfirmationScreen extends StatelessWidget {
+class OrderConfirmationScreen extends StatefulWidget {
   final CheckoutOrderModel order;
+  final bool needsConfirm; // ✅ NEW
 
-  const OrderConfirmationScreen({super.key, required this.order});
+  const OrderConfirmationScreen({
+    super.key,
+    required this.order,
+    this.needsConfirm = false, // ✅ default false — safe for online
+  });
+
+  @override
+  State<OrderConfirmationScreen> createState() =>
+      _OrderConfirmationScreenState();
+}
+
+class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
+  bool _isConfirming = true;
+  bool _confirmSuccess = false;
+  String _errorMessage = "";
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // _confirmOrder();
+      if (widget.needsConfirm) {
+        _confirmOrder(); // CASH only
+      } else {
+        // ONLINE: already confirmed by /payment/verify — skip API call
+        setState(() {
+          _isConfirming = false;
+          _confirmSuccess = true;
+        });
+      }
+    });
+  }
+
+  Future<void> _confirmOrder() async {
+    final cartProvider = context.read<CartProvider>();
+
+    // ✅ Call confirmOrder API using orderId from checkout response
+    final confirmed = await cartProvider.confirmOrder(
+      widget.order.data.orderId.toString(), // adjust field name if needed
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isConfirming = false;
+      _confirmSuccess = confirmed;
+      _errorMessage = confirmed ? "" : cartProvider.confirmOrderMessage;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final data = order.data;
+    // final data = order.data;
 
     // ================= RESPONSIVE VALUES =================
     final horizontalPadding = ResponsiveValue<double>(
@@ -35,11 +86,98 @@ class OrderConfirmationScreen extends StatelessWidget {
       conditionalValues: const [Condition.largerThan(name: TABLET, value: 64)],
     ).value;
 
+    // ── LOADING — while confirmOrder API is in progress ──────────────────
+    if (_isConfirming) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF4F6F5),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: Color(0xFF00C853)),
+              SizedBox(height: 20),
+              Text(
+                "Confirming your order...",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // ── ERROR — confirmOrder API failed ──────────────────────────────────
+    if (!_confirmSuccess) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF4F6F5),
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 72),
+                const SizedBox(height: 16),
+                const Text(
+                  "Order Confirmation Failed",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _errorMessage.isNotEmpty
+                      ? _errorMessage
+                      : "Something went wrong. Please contact support.",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 28),
+
+                // Retry button
+                SizedBox(
+                  width: double.infinity,
+                  height: buttonHeight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00C853),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isConfirming = true;
+                        _confirmSuccess = false;
+                        _errorMessage = "";
+                      });
+                      _confirmOrder();
+                    },
+                    child: const Text(
+                      "Retry",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => context.go(Routes.dashboard),
+                  child: const Text(
+                    "Go to Home",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ── SUCCESS ──────────────────────────────────────────────────────────
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F5),
       body: Column(
         children: [
-          // ============ GREEN HEADER ============
+          // ── GREEN HEADER ──
           Container(
             height: 260,
             width: double.infinity,
@@ -75,7 +213,7 @@ class OrderConfirmationScreen extends StatelessWidget {
             ),
           ),
 
-          // ============ WHITE CARD ============
+          // ── WHITE CARD ──
           Expanded(
             child: Transform.translate(
               offset: const Offset(0, -40),
@@ -104,77 +242,25 @@ class OrderConfirmationScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.grey),
                         ),
 
-                        const SizedBox(height: 20),
+                        // const SizedBox(height: 20),
 
-                        // ORDER NUMBER
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEFF7F2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              const Text(
-                                "ORDER NUMBER",
-                                style: TextStyle(
-                                  letterSpacing: 1.5,
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                data.orderNumber,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // BILL BREAKDOWN
-                        Row(
-                          children: const [
-                            Icon(Icons.receipt_long, color: Color(0xFF00C853)),
-                            SizedBox(width: 8),
-                            Text(
-                              "Bill Breakdown",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-
-                        _billRow("Subtotal", data.subtotal.toStringAsFixed(2)),
-                        _billRow(
-                          "Delivery Charge",
-                          data.deliveryCharge.toStringAsFixed(2),
-                        ),
-                        _billRow(
-                          "Coupon Discount",
-                          "-${data.couponDiscount.toStringAsFixed(2)}",
-                          valueColor: Colors.green,
-                        ),
-
+                        // // BILL BREAKDOWN
+                        // Row(
+                        //   children: const [
+                        //     Icon(Icons.receipt_long, color: Color(0xFF00C853)),
+                        //     SizedBox(width: 8),
+                        //     Text(
+                        //       "Bill Breakdown",
+                        //       style: TextStyle(
+                        //         fontSize: 16,
+                        //         fontWeight: FontWeight.w600,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // const SizedBox(height: 16),
                         const Divider(height: 32),
-
-                        _billRow(
-                          "Total Amount",
-                          data.totalAmount.toStringAsFixed(2),
-                          isBold: true,
-                          valueColor: const Color(0xFF00C853),
-                        ),
-
-                        const Spacer(),
+                        // const Spacer(),
 
                         // CONTINUE SHOPPING
                         SizedBox(
@@ -187,9 +273,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            onPressed: () {
-                              context.go(Routes.dashboard);
-                            },
+                            onPressed: () => context.go(Routes.dashboard),
                             child: const Text(
                               "Continue Shopping",
                               style: TextStyle(
@@ -202,14 +286,10 @@ class OrderConfirmationScreen extends StatelessWidget {
 
                         const SizedBox(height: 16),
 
-                        // TRACK ORDER
                         TextButton(
                           onPressed: () {
                             context.go(Routes.dashboard, extra: 3);
                           },
-                          // onPressed: () {
-                          //   context.push(Routes.activeOrder);
-                          // },
                           child: const Text(
                             "Track Order →",
                             style: TextStyle(
@@ -229,38 +309,6 @@ class OrderConfirmationScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ================= BILL ROW =================
-  Widget _billRow(
-    String title,
-    String value, {
-    bool isBold = false,
-    Color valueColor = Colors.black,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-          Text(
-            "₹$value",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: valueColor,
             ),
           ),
         ],

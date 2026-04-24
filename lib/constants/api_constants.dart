@@ -1,6 +1,6 @@
 class ApiConstants {
   //----------------------------------------------------------------------------
-  static const baseUrl = 'http://192.168.1.66:8000/api'; //local url
+  // static const baseUrl = 'http://192.168.1.36:8000/api'; //local url
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -8,7 +8,8 @@ class ApiConstants {
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
-  // static const baseUrl = 'https://api.yourapp.com'; //  production url
+  static const baseUrl =
+      'https://samrudhkirana.thecanatech.com/api'; //  production url
   //----------------------------------------------------------------------------
 
   static const signup = '/register';
@@ -34,6 +35,7 @@ class ApiConstants {
   static String deleteAddress(int id) => '/customer/addresses/$id';
   static const getAllAddress = '/customer/addresses';
   static const defultAddress = '/user/address/set-default';
+  static const pincodeCheck = '/check-pincode';
 
   static const banners = '/banners';
 
@@ -61,10 +63,25 @@ class ApiConstants {
   static const checkOut = '/cart/checkout';
   static const checkOutTimer = '/customer/order-time-check';
 
-  static const allAvailableCoupons = '/offers';
-  static const applyCoupon = '/apply-offer';
-  static const removeAppliedCoupon = '/remove-offer';
+  static const allAvailableCoupons = '/coupons';
+  static const applyCoupon = '/cart/apply-coupon';
+  static const removeAppliedCoupon = '/cart/remove-coupon';
+
+  // ================= Checkout time payment option =================
+  static const paymentOption = '/payment-options';
+
+  // ================= Order confirm =================
+  static const confirmOrder = '/confirm-order';
+
+  // ================= Razorpay Payment =================
+  static const createRazorpayPaymenr = '/payment/create';
+  static const verifyRazorpayPayment = '/payment/verify';
+  static const failureRazorpayPayment = '/payment/failure';
 
   static const newOrderList = '/orders/new-order';
   static const pastOrderList = '/orders/history';
+
+  static const refundReasons = '/return/reasons';
+  static String orderProductListById(int id) => '/orders/$id/return-products';
+  static const submitRefundRequest = '/order/return';
 }

@@ -27,4 +27,5 @@ class Routes {
   static const activeOrder = '/active-order';
   static const order = '/order';
   static const orderDetails = '/order-details';
+  static const refundOrder = '/refund-order';
 }

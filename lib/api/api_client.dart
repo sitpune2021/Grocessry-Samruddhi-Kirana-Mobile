@@ -37,23 +37,22 @@ class ApiClient {
   static Future<ApiResponse<dynamic>> get(
     String endpoint, {
     bool authRequired = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    // ✅ INTERNET CHECK FIRST
-
     final internetCheck = await _checkInternet();
     if (!internetCheck.success) return internetCheck;
 
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
-      ApiLogger.request(
-        method: 'GET',
-        url: url,
-        headers: _headers(authRequired: authRequired),
-      );
+      final headers = {
+        ..._headers(authRequired: authRequired),
+        if (extraHeaders != null) ...extraHeaders,
+      };
+      ApiLogger.request(method: 'GET', url: url, headers: headers);
 
       final response = await http
-          .get(Uri.parse(url), headers: _headers(authRequired: authRequired))
+          .get(Uri.parse(url), headers: headers)
           .timeout(timeout);
 
       ApiLogger.response(
@@ -74,27 +73,23 @@ class ApiClient {
     String endpoint,
     Map<String, dynamic> body, {
     bool authRequired = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    // ✅ INTERNET CHECK FIRST
     final internetCheck = await _checkInternet();
     if (!internetCheck.success) return internetCheck;
 
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
-      ApiLogger.request(
-        method: 'POST',
-        url: url,
-        headers: _headers(authRequired: authRequired),
-        body: body,
-      );
+      final headers = {
+        ..._headers(authRequired: authRequired),
+        if (extraHeaders != null) ...extraHeaders,
+      };
+
+      ApiLogger.request(method: 'POST', url: url, headers: headers, body: body);
 
       final response = await http
-          .post(
-            Uri.parse(url),
-            headers: _headers(authRequired: authRequired),
-            body: jsonEncode(body),
-          )
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(body))
           .timeout(timeout);
 
       ApiLogger.response(
@@ -115,27 +110,27 @@ class ApiClient {
     String endpoint, {
     Map<String, dynamic>? body,
     bool authRequired = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    // ✅ INTERNET CHECK FIRST
     final internetCheck = await _checkInternet();
     if (!internetCheck.success) return internetCheck;
 
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
+      final headers = {
+        ..._headers(authRequired: authRequired),
+        if (extraHeaders != null) ...extraHeaders,
+      };
       ApiLogger.request(
         method: 'DELETE',
         url: url,
-        headers: _headers(authRequired: authRequired),
+        headers: headers,
         body: body,
       );
 
-      // final response = await http
-      //     .delete(Uri.parse(url), headers: _headers(authRequired: authRequired))
-      //     .timeout(timeout);
-
       final request = http.Request('DELETE', Uri.parse(url));
-      request.headers.addAll(_headers(authRequired: authRequired));
+      request.headers.addAll(headers);
 
       if (body != null) {
         request.body = jsonEncode(body);
@@ -162,27 +157,23 @@ class ApiClient {
     String endpoint,
     Map<String, dynamic> body, {
     bool authRequired = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    // ✅ INTERNET CHECK FIRST
     final internetCheck = await _checkInternet();
     if (!internetCheck.success) return internetCheck;
 
     final url = ApiConstants.baseUrl + endpoint;
 
     try {
-      ApiLogger.request(
-        method: 'PUT',
-        url: url,
-        headers: _headers(authRequired: authRequired),
-        body: body,
-      );
+      final headers = {
+        ..._headers(authRequired: authRequired),
+        if (extraHeaders != null) ...extraHeaders,
+      };
+
+      ApiLogger.request(method: 'PUT', url: url, headers: headers, body: body);
 
       final response = await http
-          .put(
-            Uri.parse(url),
-            headers: _headers(authRequired: authRequired),
-            body: jsonEncode(body),
-          )
+          .put(Uri.parse(url), headers: headers, body: jsonEncode(body))
           .timeout(timeout);
 
       ApiLogger.response(
