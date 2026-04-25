@@ -235,7 +235,7 @@ class AllProductProvider extends ChangeNotifier {
     if (response.success && response.data != null) {
       final model = SearchProductModel.fromJson(response.data);
 
-      _searchResults.addAll(model.data.products);
+      _searchResults.addAll(model.data.data);
 
       _hasMoreSearch = model.data.currentPage < model.data.lastPage;
 

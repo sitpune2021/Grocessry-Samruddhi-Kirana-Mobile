@@ -124,127 +124,333 @@ class _SearchProductsScreenState extends State<SearchProductsScreen> {
 
     final qty = item.isEmpty ? 0 : item.first.qty;
 
-    final mrp = double.tryParse(product.mrp) ?? 0;
-    final price = double.tryParse(product.finalPrice) ?? 0;
-    final discount = mrp > price ? (((mrp - price) / mrp) * 100).round() : 0;
+    final double mrp = product.mrp.toDouble();
+    final double price = product.finalPrice;
+
+    final int discount = mrp > price
+        ? (((mrp - price) / mrp) * 100).round()
+        : 0;
 
     return GestureDetector(
-      onTap: () => context.push(Routes.productDetails, extra: product.id),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(2),
-                  ),
-                  child: CachedNetworkImage(
-                    imageUrl: product.productImageUrls.isNotEmpty
-                        ? product.productImageUrls.first
-                        : '',
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (_, _) => Shimmer.fromColors(
-                      baseColor: Colors.grey.shade300,
-                      highlightColor: Colors.grey.shade100,
-                      child: Container(color: Colors.white),
-                    ),
-                    errorWidget: (_, _, _) =>
-                        Image.asset('assets/images/no_image.png'),
-                  ),
-                ),
-                if (discount > 0)
-                  Positioned(top: 8, left: 8, child: _discount(discount)),
-
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () {
-                      context.read<AllProductProvider>().toggleFavorite(
-                        product.id,
-                      );
-                    },
-                    child: Icon(
-                      context
-                                  .watch<AllProductProvider>()
-                                  .favorites[product.id] ==
-                              true
-                          ? Icons.favorite
-                          : Icons.favorite_border,
-                      color:
-                          context
-                                  .watch<AllProductProvider>()
-                                  .favorites[product.id] ==
-                              true
-                          ? Colors.red
-                          : Colors.grey,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      onTap: product.inStock
+          ? () => context.push(Routes.productDetails, extra: product.id)
+          : null,
+      child: Opacity(
+        opacity: product.inStock ? 1 : 0.5,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 8,
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ================= IMAGE =================
+              Stack(
                 children: [
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Text(
-                        "₹${price.toStringAsFixed(0)}",
-                        style: GoogleFonts.poppins(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w700,
-                        ),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(2),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: product.imageUrls.isNotEmpty
+                          ? product.imageUrls.first
+                          : '',
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(color: Colors.white),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        "₹${mrp.toStringAsFixed(0)}",
-                        style: GoogleFonts.poppins(
-                          decoration: TextDecoration.lineThrough,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
+                      errorWidget: (_, _, _) =>
+                          Image.asset('assets/images/no_image.png'),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  AddQtyButton(
-                    qty: qty,
-                    maxQty: product.stock,
-                    onAdd: () => cartProvider.addToCart(product: product),
-                    onRemove: () => cartProvider.removeFromCart(product.id),
+
+                  // 🔥 DISCOUNT
+                  if (discount > 0)
+                    Positioned(top: 8, left: 8, child: _discount(discount)),
+
+                  // 🔥 FAVORITE
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        context.read<AllProductProvider>().toggleFavorite(
+                          product.id,
+                        );
+                      },
+                      child: Icon(
+                        context
+                                    .watch<AllProductProvider>()
+                                    .favorites[product.id] ==
+                                true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color:
+                            context
+                                    .watch<AllProductProvider>()
+                                    .favorites[product.id] ==
+                                true
+                            ? Colors.red
+                            : Colors.grey,
+                        size: 18,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+
+              // ================= DETAILS =================
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+
+                    Row(
+                      children: [
+                        Text(
+                          "₹${price.toStringAsFixed(0)}",
+                          style: GoogleFonts.poppins(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "₹${mrp.toStringAsFixed(0)}",
+                          style: GoogleFonts.poppins(
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // 🔥 ADD BUTTON / SOLD OUT
+                    product.inStock
+                        ? AddQtyButton(
+                            qty: qty,
+                            maxQty: product.stock,
+                            onAdd: () =>
+                                cartProvider.addToCart(product: product),
+                            onRemove: () =>
+                                cartProvider.removeFromCart(product.id),
+                          )
+                        : Container(
+                            height: 32,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Text(
+                              "SOLD OUT",
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+  // Widget _productCard(BuildContext context, product) {
+  //   final cartProvider = context.watch<CartProvider>();
+
+  //   final item = cartProvider.items
+  //       .where((i) => i.product.id == product.id)
+  //       .toList();
+
+  //   final qty = item.isEmpty ? 0 : item.first.qty;
+
+  //   final double mrp = product.mrp.toDouble();
+  //   final double price = product.finalPrice;
+
+  //   final int discount = mrp > price
+  //       ? (((mrp - price) / mrp) * 100).round()
+  //       : 0;
+
+  //   return GestureDetector(
+  //     onTap: () => context.push(Routes.productDetails, extra: product.id),
+  //     child: Opacity(
+  //       opacity: product.inStock ? 1 : 0.5, // 🔥 fade effect
+
+  //       child: Container(
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(12),
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Colors.black.withValues(alpha: 0.05),
+  //               blurRadius: 8,
+  //             ),
+  //           ],
+  //         ),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Stack(
+  //               children: [
+  //                 ClipRRect(
+  //                   borderRadius: const BorderRadius.vertical(
+  //                     top: Radius.circular(2),
+  //                   ),
+  //                   child: CachedNetworkImage(
+  //                     imageUrl: product.imageUrls.isNotEmpty
+  //                         ? product.imageUrls.first
+  //                         : '',
+  //                     height: 120,
+  //                     width: double.infinity,
+  //                     fit: BoxFit.cover,
+  //                     placeholder: (_, _) => Shimmer.fromColors(
+  //                       baseColor: Colors.grey.shade300,
+  //                       highlightColor: Colors.grey.shade100,
+  //                       child: Container(color: Colors.white),
+  //                     ),
+  //                     errorWidget: (_, _, _) =>
+  //                         Image.asset('assets/images/no_image.png'),
+  //                   ),
+  //                 ),
+
+  //                 // 🔥 SOLD OUT BADGE
+  //                 if (!product.inStock)
+  //                   Positioned(
+  //                     top: 8,
+  //                     left: 8,
+  //                     child: Container(
+  //                       padding: const EdgeInsets.symmetric(
+  //                         horizontal: 6,
+  //                         vertical: 3,
+  //                       ),
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.black,
+  //                         borderRadius: BorderRadius.circular(4),
+  //                       ),
+  //                       child: const Text(
+  //                         "SOLD OUT",
+  //                         style: TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: 10,
+  //                           fontWeight: FontWeight.bold,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+
+  //                 if (discount > 0)
+  //                   Positioned(top: 8, left: 8, child: _discount(discount)),
+
+  //                 Positioned(
+  //                   top: 8,
+  //                   right: 8,
+  //                   child: GestureDetector(
+  //                     onTap: () {
+  //                       context.read<AllProductProvider>().toggleFavorite(
+  //                         product.id,
+  //                       );
+  //                     },
+  //                     child: Icon(
+  //                       context
+  //                                   .watch<AllProductProvider>()
+  //                                   .favorites[product.id] ==
+  //                               true
+  //                           ? Icons.favorite
+  //                           : Icons.favorite_border,
+  //                       color:
+  //                           context
+  //                                   .watch<AllProductProvider>()
+  //                                   .favorites[product.id] ==
+  //                               true
+  //                           ? Colors.red
+  //                           : Colors.grey,
+  //                       size: 18,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+
+  //             Padding(
+  //               padding: const EdgeInsets.all(10),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     product.name,
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+  //                   ),
+  //                   const SizedBox(height: 6),
+  //                   Row(
+  //                     children: [
+  //                       Text(
+  //                         "₹${price.toStringAsFixed(0)}",
+  //                         style: GoogleFonts.poppins(
+  //                           color: Colors.green,
+  //                           fontWeight: FontWeight.w700,
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 6),
+  //                       Text(
+  //                         "₹${mrp.toStringAsFixed(0)}",
+  //                         style: GoogleFonts.poppins(
+  //                           decoration: TextDecoration.lineThrough,
+  //                           color: Colors.grey,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const SizedBox(height: 8),
+
+  //                   // 🔥 ADD BUTTON (HIDE IF OUT OF STOCK)
+  //                   product.inStock
+  //                       ? AddQtyButton(
+  //                           qty: qty,
+  //                           maxQty: product.stock,
+  //                           onAdd: () =>
+  //                               cartProvider.addToCart(product: product),
+  //                           onRemove: () =>
+  //                               cartProvider.removeFromCart(product.id),
+  //                         )
+  //                       : const SizedBox(height: 32), // keep layout same
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _discount(int d) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
