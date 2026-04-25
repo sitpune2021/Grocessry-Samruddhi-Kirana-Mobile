@@ -5,6 +5,7 @@ import 'package:samruddha_kirana/config/routes.dart';
 import 'package:samruddha_kirana/constants/app_colors.dart';
 import 'package:samruddha_kirana/providers/app_version/app_provider.dart';
 import 'package:samruddha_kirana/providers/auth/auth_provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ScrollController? scrollController;
@@ -84,15 +85,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (context, auth, _) {
                       final profile = auth.profile;
 
-                      final fullName = profile != null
-                          ? "${profile.data.firstName} ${profile.data.lastName}"
-                          : "User";
+                      if (profile == null) {
+                        return _buildProfileShimmer(); // 👈 NEW
+                      }
 
-                      final mobile = profile?.data.mobile ?? "";
-                      // final email = profile?.data.email ?? "";
+                      final fullName =
+                          "${profile.data.firstName} ${profile.data.lastName}";
+                      final mobile = profile.data.mobile;
 
                       return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             fullName,
@@ -102,8 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          // ---------- MOBILE ----------
                           if (mobile.isNotEmpty)
                             Text(
                               "Contact: $mobile",
@@ -231,6 +230,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileShimmer() {
+    return Column(
+      children: [
+        Shimmer.fromColors(
+          baseColor: Colors.white24,
+          highlightColor: Colors.white54,
+          child: Container(
+            width: 120,
+            height: 18,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Shimmer.fromColors(
+          baseColor: Colors.white24,
+          highlightColor: Colors.white54,
+          child: Container(
+            width: 80,
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
