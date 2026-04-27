@@ -109,6 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Curved Bottom Bar
           ClipPath(
             clipper: BottomNavCurveClipper(),
+            clipBehavior: Clip.antiAlias,
             child: Container(
               height: 72,
               decoration: BoxDecoration(
@@ -138,6 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Positioned(
             top: 0,
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
                 setState(() {
                   _currentIndex = 2;
@@ -180,6 +182,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final bool isActive = _currentIndex == index;
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         setState(() {
           _currentIndex = index;
